@@ -1,0 +1,140 @@
+\documentclass[english,a4paper,12pt,twoside,openright,x11names]{book}
+% x11names = xcolor option (used for gantt planning)
+
+% compiler avec : pdflatex, bibtex, pdflatex, pdflatex
+
+
+% +---------------------------------------------------------------+
+% | Language
+% +---------------------------------------------------------------+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage{lmodern} % font to compile on windows
+
+% \usepackage[showframe]{geometry} % Show margin
+
+
+\newif\ifisconfidential	\isconfidentialfalse
+
+\newif\ifisdraft\isdraftfalse
+
+
+
+% +---------------------------------------------------------------+
+% | Paramètres
+% +---------------------------------------------------------------+
+
+\newcommand{\TBtitle}{Password Authenticated Key Exchange (PAKE)}
+\newcommand{\TBsubtitle}{}%laisser vide si pas de sous-titre
+\newcommand{\TByear}{2021}
+\newcommand{\TBacademicYears}{2021-2022}
+
+\newcommand{\TBdpt}{Département des Technologie de l'information et de la communication (TIC)}
+\newcommand{\TBfiliere}{Filière Télécommunications}
+\newcommand{\TBorient}{Orientation Sécurité de l'information}
+
+\newcommand{\TBauthor}{Julien Béguin}
+\newcommand{\TBsupervisor}{Prof. Alexandre Duc}
+\newcommand{\TBindustryContact}{}
+\newcommand{\TBindustryName}{}
+\newcommand{\TBindustryAddress}{}
+
+% Confidentiel?
+% uncomment if confidential / comment if not confiential
+% \isconfidentialtrue
+
+\newcommand{\TBresumePubliable}{
+Dans ce travail... Ceci est le résumé publiable...
+} % TODO résumé publiable
+
+% +---------------------------------------------------------------+
+
+
+
+% +-[set path]-------------------------------------+
+\usepackage{template/TB-style}
+% \usepackage{template/TB-macros} % TODO uncomment macros
+\usepackage{template/TB-template}
+%\graphicspath{images/}
+
+
+
+
+% Structure
+% +---------------------------------------------------------------+
+
+% Specification
+% 1. Introduction
+%    1. Summary of the Problem
+%    2. Generalities
+% 2. Analyses (Environment)
+%    1. State of the art
+%    2. Concepts
+% 3. Proof of concept
+% 4. Generic process
+% 5. Conclusion
+% A. Planning
+% B. Logbook
+
+
+
+\begin{document}
+
+\frontmatter
+\pagestyle{empty}
+
+% TITLE and template
+% +---------------------------------------------------------------+
+
+\TBmaketitle
+
+\pagestyle{frontmatter}
+
+
+
+% \TBsecondTitle % TODO uncomment 
+
+% \TBpreambule % TODO uncomment 
+
+% \TBauthentification % TODO uncomment 
+
+
+% Cahier des charges
+% +---------------------------------------------------------------+
+\subfile{00-cahier-des-charges/cahier-des-charges.tex}
+
+
+% TOC
+% +---------------------------------------------------------------+
+\tableofcontents
+\clearpage
+
+
+% Content
+% +---------------------------------------------------------------+
+
+\mainmatter
+\pagestyle{plain}
+
+\subfile{01-introduction/introduction.tex}
+\subfile{02-state-of-the-art/state-of-the-art.tex}
+\subfile{09-conclusion/conclusion.tex}
+
+% +---------------------------------------------------------------+
+\cleardoublepage
+\addcontentsline{toc}{chapter}{Bibliography}
+\bibliographystyle{plain}
+\bibliography{chapters/biblio}
+\nocite{*} %ajoute tout ce qu'il y a dans le bibtex
+
+\listoffigures
+\listoftables
+
+% Annexes
+% +---------------------------------------------------------------+
+\appendix
+
+\subfile{A-annexe/annexe.tex}
+
+\end{document}
