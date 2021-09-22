@@ -5,9 +5,50 @@
 \chapter{Specification}
 \section*{Context}
 
+% - very powerful cryptographic primitive
+% - allow a server to auth a client without having to know or to store the client's password.
+% - allow to share key ?
+% - better than classical auth method
+
+% - not used enough now a day in the industry
+% - many old PAKE were patented or got broken. Which might have hurt the adoption of this primitive in the industry.
+
+
+
+
+Password authenticated key exchange (PAKE) are very powerful cryptographic primitive. They allow a server to share a key with a client or to authenticate a client without having to know or to store the client's password.
+
+For this reason, they provide better security guaranties for initializing a secure connection using password than usual mechanism where the password is transmitted to the server and then compared to an hash.
+
+Despite its *superiority*, PAKEs are not implemented enough in the industry. Many old PAKE were patented or got broken which might have hurt the adoption of this primitive.
+
+% In the recents years, modern PAKE have been proposed
+
 \section*{Goal and objectives}
 
+The goal of this project is to study the main existing PAKE and to understand their differences.
+
+The goal of this project is to study the existing PAKE, including the old one
+
+% - study existing PAKE
+% - old one and moderne one: SRP, OPAQUE, KHAPE, EKE, OKE (cassé), variantes d'EKE (PAK, PPK, PAK-X,), SNAPI, PEKEP. (pas besoin d'aller trop dans les détails pour les ancêtres)
+% - look if more PAKE exist
+
+% - Study in details the main PAKE (EKE, SRP, OPAQUE, KHAPE)
+% - understand their differences
+
+
+% - Then choose a modern PAKE (OPAQUE or KHAPE)
+% - and design a interesting use case were using a KAPE make more sense than using a classical auth method
+% - Explain the advantages that the PAKE has over using a classical auth method
+
+% - Then implement the choosen PAKE and the use case using the desired programing language
+
+
 \section*{Deliverables}
+
+% - implementation of a PAKE with the use case
+% - report containing the state of the art of PAKE, use case explaination and implementation details
 
 \end{document}
 
