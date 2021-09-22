@@ -1,4 +1,3 @@
-!report.pdf
 *.aux
 *.log
 *.out
@@ -9,3 +8,4 @@
 *.lof
 *.lot
 *.synctex.gz
+!report.pdf
