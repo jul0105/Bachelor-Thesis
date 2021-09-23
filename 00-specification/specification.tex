@@ -17,18 +17,40 @@
 
 
 Password authenticated key exchange (PAKE) are very powerful cryptographic primitive. They allow a server to share a key with a client or to authenticate a client without having to know or to store the client's password.
-
 For this reason, they provide better security guaranties for initializing a secure connection using password than usual mechanism where the password is transmitted to the server and then compared to an hash.
+Despite its theoretical superiority, PAKEs are not implemented enough in the industry. Many old PAKE were patented or got broken which might have hurt the adoption of this primitive.
 
-Despite its *superiority*, PAKEs are not implemented enough in the industry. Many old PAKE were patented or got broken which might have hurt the adoption of this primitive.
+% PAKEs stuggle de s'imposer dans l'industie. 
 
-% In the recents years, modern PAKE have been proposed
+% In the recents years, modern PAKE have been proposed and effort are made to make PAKE an industry standard (?)
 
-\section*{Goal and objectives}
+\section*{Goals}
 
-The goal of this project is to study the main existing PAKE and to understand their differences.
 
-The goal of this project is to study the existing PAKE, including the old one
+% The goal of this project is to *have* an *overview* of the existing PAKE, including the old one (SRP, OPAQUE, KHAPE, EKE, OKE, EKE varient (PAK, PPK, PAK-X,), SNAPI, PEKEP and to look for less known PAKE)
+% 
+% Then study in details the *main* PAKE (EKE, SRP, OPAQUE, KHAPE) and understand their differences.
+% 
+% Once the analysis phase is done, one of the modern PAKE is chosen to be implemented. The choice is based on *qualities* of the PAKE and the existing implementation and/or the existence of standards or literature for the PAKE.
+% 
+% Then a interesting use case is designed were using a KAPE make more sense than using a classical auth method. The advantage of the PAKE over the classical auth method is detailed.
+% 
+% Then implement the choosen PAKE and the use case using the desired programing language
+
+
+\begin{enumerate}
+ \item Outline existing PAKE, including the old one. This include SRP, OPAQUE, KHAPE, EKE, OKE, EKE varient (PAK, PPK, PAK-X,), SNAPI and PEKEP. Also look for other less known PAKE.
+
+ \item Study in details the main PAKE --- EKE, SRP, OPAQUE, KHAPE --- and understand their differences.
+
+ \item Choose one of the modern PAKE to implement. The choice is based on the properties of the PAKE, the existence of implementations for this PAKE and/or the existence of standards for this PAKE.
+
+ \item Design an interesting use case were using a KAPE is more appropriate than using a classical authentication method. The advantages of the PAKE are detailed in the report.
+
+ \item Implement the chosen PAKE and the use case using the desired programming language
+\end{enumerate}
+
+
 
 % - study existing PAKE
 % - old one and moderne one: SRP, OPAQUE, KHAPE, EKE, OKE (cassé), variantes d'EKE (PAK, PPK, PAK-X,), SNAPI, PEKEP. (pas besoin d'aller trop dans les détails pour les ancêtres)
@@ -50,5 +72,15 @@ The goal of this project is to study the existing PAKE, including the old one
 % - implementation of a PAKE with the use case
 % - report containing the state of the art of PAKE, use case explaination and implementation details
 
+\begin{itemize}
+ \item Implementation of the chosen PAKE with the use case
+ \item Report containing :
+ \begin{itemize}
+    \item State of the art of PAKEs,
+    \item Description of the use case,
+    \item Advantages of using a PAKE over a classical authentication method for this use case,
+    \item Implementation details
+ \end{itemize}
+\end{itemize}
 \end{document}
 
