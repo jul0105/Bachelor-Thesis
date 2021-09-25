@@ -14,10 +14,14 @@
 
 \section{Problematic}
 
+
+% ------ 06 A Few Thoughts on Cryptographic Engineering -------------
 % Classical auth methods :
 
 % traditional way to auth
 % hash user's password and store them in a database
+% connection between client and server should be secured (HTTPS, TLS)
+% precomputed hash attack (raimbow tables)
 % many way to do it and lot's of improvment 
     % using memory-hard password hashing function (scrypt, Argon2, etc..) (KDF ?)
     % using salt
@@ -59,9 +63,100 @@
 % - "SRP isn't the best PAKE we can deploy"
 
 % SRP TLDR:
-% -
+% - .........
 
 % The new generation: OPAQUE
+
+
+
+% ----- 02 Cloudflare blog post --------
+% Why passwords sucks :
+
+% - "Passwords are a problem"
+% - "hard to remember and manage"
+% - solved with password manager, but the "greater underlying problem" is not here
+% - The problem is: "A password that leaves your possession is guaranteed to sacriface security, no matter its complexity or how hard it may be to guess."
+% - "any direct use of a password, today, means that the password must be handled in the clear"
+
+% - "but my password is transmitted securely over HTTPS"
+% - "but I know the server stores my password in hashed form" (lot of faith in the server
+% - Anyway, the password is processed in cleartext
+% - accidental logging or caching !!!
+% - Hardware vulnerability. "password reside in memory". "Transmitted over a shared bus to the CPU". "Attack vectors far less likely but no less severe" (Spectre, Meltdown).
+% - "Ideally, servers should never see a plaintext password at all"
+
+
+
+% Remove password :
+% - "get rid of passwords altogether"
+% - "Password-based authen is annoying"
+% - "passwords are hard to remember, tedious to type, and notoriously insecure"
+
+% - "New stadards are emerging and growing mature"
+% - "Initiatives to reduce password are promising"
+% - "For example, WebAuthn: web auth based on public key cryptography using hardware (or SW) tokens."
+
+% - "But passwords are so ubiquitous that it will take a long time to agree on a supplant passwords with new standards and technology"
+% - "whether their persistence is due to ease of implementation, familiarity to users, or simple ubiquity on the web and elsewhere."
+
+% - "We'd like to make password-based auth as secure as possible while they persist."
+% - For the moment, "enable a password to be useful without it ever leaving your possession"
+
+
+
+
+% symmetric PAKE :
+
+% proposed by Bellovin and Merrit in 1992: Bellovin, S. M., and Merritt, M. “Encrypted key exchange: Password-based protocols secure against dictionary attacks.” In Proc. IEEE Computer Society Symposium on Research in Security and Privacy (Oakland, May 1992), pp. 72–84.
+
+% - " initial motivation of allowing password-authentication without the possibility of dictionary attacks based on data transmitted over an insecure channel"
+% - "symmetric PAKE is a cryptographic protocol that allows two parties who share only a password to establish a strong shared secret key"
+% "goals of PAKE are :"
+%   1. "The secret keys will match if the passwords match, and appear random otherwise."
+%   2. "Participants do not need to trust third parties (in particular, no Public Key Infrastructure),"
+%   3. "The resulting secret key is not learned by anyone not participating in the protocol - including those who know the password."
+%   4. "The protocol does not reveal either parties’ password to each other (unless the passwords match), or to eavesdroppers."
+
+% - "In sum, the only way to successfully attack the protocol is to guess the password correctly while participating in the protocol"
+
+% - In this setup, PAKE is even worse than using a classical auth method because the user's password must be stored as cleartext in the server
+
+
+
+% asymmetric PAKE (aPAKE) :
+
+% "only the client knows the password, and the server knows a hashed password"
+% "has the 4 properties of PAKE plus one more:"
+%   5. " An attacker who steals password data stored on the server must perform a dictionary attack to retrieve the password."
+% - "The issue with most existing aPAKE protocols, however, is that they do not allow for a salted hash (or if they do, they require that salt to be transmitted to the user, which means the attacker has access to the salt beforehand and can begin computing a rainbow table for the user before stealing any data (SRP))."
+
+
+% OPAQUE :
+% - "OPAQUE is the first aPAKE protocol with a formal security proof that has this property: it allows for a completely secret salt."
+
+
+
+
+
+
+
+% Order:
+
+% Authentication
+% 1. how to authenticate a user
+% 2. attack and improvment (salt, KDF, pepper)
+% 3. why password sucks (HW attack, logging, caching)
+% 4. remove password (long term solution but need an alternative to secure password now)
+
+% PAKE
+% 5. PAKE at the rescue
+% 6. Why PAKE have almost no adoption
+
+% History of PAKE
+% 7. Symmetric PAKE
+% 8. Asymmetric PAKE and SRP
+% 9. OPAQUE
+% 10. KHAPE ?
 
 
 
