@@ -10,7 +10,7 @@
 % - many old PAKE were patented or got broken. Which might have hurt the adoption of this primitive in the industry.
 
 
-Password-authenticated key exchange (PAKE) are very powerful cryptographic primitive. They allow a server to share a key with a client or to authenticate a client without having to know or to store the client's password.
+Password-authenticated key exchange (PAKE) are very powerful cryptographic primitive. They allow a server to share a key with a client or to authenticate a client without having to know or to store his password.
 For this reason, they provide better security guarantees for initializing a secure connection using password than usual mechanism where the password is transmitted to the server and then compared to a hash.
 Despite its theoretical superiority, PAKEs are not implemented enough in the industry. Many old PAKEs were patented or got broken which might have hurt the adoption of this primitive.
 % PAKEs stuggle de s'imposer dans l'industie. 
@@ -28,7 +28,7 @@ Despite its theoretical superiority, PAKEs are not implemented enough in the ind
 % Then implement the choosen PAKE and the use case using the desired programing language
 
 \begin{enumerate}
- \item Outline existing PAKE, including the old one. This includes SRP, OPAQUE, KHAPE, EKE, OKE, EKE variants (PAK, PPK, PAK-X,), SNAPI and PEKEP. Also look for other less known PAKEs.
+ \item Outline existing PAKE. This includes SRP, OPAQUE, KHAPE, EKE, OKE, EKE variants (PAK, PPK, PAK-X,), SNAPI and PEKEP. Also look for other less known PAKEs.
  \item Study in detail the main PAKE --- EKE, SRP, OPAQUE, KHAPE --- and understand their differences.
  \item Choose one of the modern PAKEs to implement. The choice is based on the properties of the PAKE, the existence of implementations for this PAKE and the existence of standards for this PAKE.
  \item Design an interesting use case where using a PAKE is more appropriate than using a classical authentication method. The advantages of the PAKE are detailed in the report.
@@ -53,7 +53,7 @@ Despite its theoretical superiority, PAKEs are not implemented enough in the ind
  \item Implementation of the chosen PAKE with the use case
  \item Report containing :
  \begin{itemize}
-    \item State of the art of PAKEs,
+    \item PAKEs' state of the art,
     \item Description of the use case,
     \item Advantages of using a PAKE over a classical authentication method for this use case,
     \item Implementation details
