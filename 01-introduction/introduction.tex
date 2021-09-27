@@ -12,11 +12,8 @@
 \chapter{Introduction}
 
 
-\section{Problematic}
-
-
 % ------ 06 A Few Thoughts on Cryptographic Engineering -------------
-% Classical auth methods :
+% Classical auth methods : OK
 
 % traditional way to auth
 % hash user's password and store them in a database
@@ -54,7 +51,8 @@
 
 % patents ("though most of these are expired now")
 % "Lack of good PAKE implementations in useful languages". "Make them a hassle to use"
-
+% few exceptions (SRP)
+% new generation, getting better, standards
 
 % One of the exception: SRP
 % - "most wiidely-deployed PAKE protocol in the world"
@@ -158,11 +156,64 @@
 % 9. OPAQUE
 % 10. KHAPE ?
 
+\section{Problematic}
+\subsection{Authentication}
+
+\paragraph{How to authenticate a user ?}
+
+When a user want to connect itself to a online service, he send its username (or email) for identification. Then, he need a way to prove to the server that he is indeed the person he pretend to be. This is what we call authentication. Without it, anybody can impersonate the account of someone else.
+
+Authentication can be based on multiple factors. Something that the user knows (e.g. password, PIN, ...), something that the user has (e.g. digital certificate, OTP token device, smartphone, ...) or something that the user is (e.g. fingerprint, iris, ...). Multiple factors can be combined to obtain a strong authentication.
+
+Traditionally, the user send the authentication value to the server through a secure channel to avoid eavesdropping and then the server compare the value that he received to the value that he store for the specific user.
+
+This means that the server has to knows and store this sensible value before authentication (generally during register).
+
+Traditionally on websites and softwares, passwords are used as authentication value. They are the easier to implement and the most familiar to the users.
 
 
-\section{Generalities}
+
+\paragraph{Attacks and mitigations}
+This setup is not ideal and can lead to multiple attacks.
+
+In case where the server get compromised, since the server store the passwords, the attacker immediately obtain access to all passwords. This means that he can impersonate every user.
+
+To avoid this scenario, numerous technique has been developed.
+- memory-hard password hashing function (scrypt, Argon2, etc...)
+- salt
+- pepper
+
+These techniques improve the security of storing password but they doesn't address a deeper problem;
+When the user wants to login, he has to send its cleartext password to the server in order for the server to authenticate the user. This necessity void any password storing improvement if the server is ever persistently compromised or if password are accidentally logged or cached.
 
 
+\paragraph{Why passwords are bad ?}
+Passwords are a problem. They are hard to remember and to manage for the user. A password manager can help to manages password but the greater underlying problem is not here.
+The problem is that ``a password that leaves your possession is guaranteed to sacrifice security, no matter its complexity or how hard it may be to guess. Passwords are insecure by their very existence`` \cite{PAKE_Cloudflare_blog}. % cite
+
+
+
+% Why passwords sucks :
+
+% - "Passwords are a problem"
+% - "hard to remember and manage"
+% - solved with password manager, but the "greater underlying problem" is not here
+% - The problem is: "A password that leaves your possession is guaranteed to sacriface security, no matter its complexity or how hard it may be to guess."
+% - "any direct use of a password, today, means that the password must be handled in the clear"
+
+% - "but my password is transmitted securely over HTTPS"
+% - "but I know the server stores my password in hashed form" (lot of faith in the server
+% - Anyway, the password is processed in cleartext
+% - accidental logging or caching !!!
+% - Hardware vulnerability. "password reside in memory". "Transmitted over a shared bus to the CPU". "Attack vectors far less likely but no less severe" (Spectre, Meltdown).
+% - "Ideally, servers should never see a plaintext password at all"
+
+
+\paragraph{Get rid of password}
+
+\subsection{Password-Authenticated Key Exchange}
+\paragraph{PAKEs at the rescue}
+\paragraph{Why PAKEs have almost no adoption ?}
 
 
 \end{document}
