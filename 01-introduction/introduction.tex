@@ -221,7 +221,7 @@ This is where PAKE become interesting. It allow password-based authentication wi
 
 
 \subsection{Password-Authenticated Key Exchange}
-\paragraph{PAKEs at the rescue}
+\paragraph{PAKEs at the rescue (TODO WRITING)} % TODO
 
 % Password-Authentication Key Exchange (PAKE) are cryptographic primitive that allow a server to authenticate a client without ever knowing or storing client's password.
 % 
@@ -247,7 +247,7 @@ This is where PAKE become interesting. It allow password-based authentication wi
 % only vulnerable to inevitable attacks (online guess or offline dictionary attacks if server's data get leaked)
 % PKI-free
 
-Password-Authenticated Key Exchange (PAKE) are cryptographic primitive. There is two types of PAKEs: 
+Password-Authenticated Key Exchange (PAKE) is a cryptographic primitive. There is two types of PAKEs: 
 
 \begin{itemize}
  \item Symmetric (also known as balanced) PAKE where the two party knows the password in clear
@@ -259,7 +259,14 @@ For the moment, we will focus on asymmetric PAKE (aPAKE) because it is the one t
 aPAKE guarantee that the client's password is protected because it never leave the client's machine in cleartext.
 
 
+It is done by doing a key exchange between the client and the server.
+In majority of case, the server doesn't want to setup a key exchange with the client, he just want to authenticate the client.
 
+It allow mutual authentication in a client-server scenarios without requiring a PKI (except for the initial registration).
+
+"A secure aPAKE should provide the best possible security for a password protocol" \cite{OPAQUE_Standard_Draft}.
+
+only vulnerable to inevitable attacks (online guess or offline dictionary attacks if server's data get leaked).
 
 \paragraph{Why PAKEs have almost no adoption ?}
 
@@ -278,5 +285,26 @@ aPAKE guarantee that the client's password is protected because it never leave t
 % new generation, getting better, standards
 
 
+Despite existing for nearly 3 decades and providing better security guanrantees than traditional authentication method, PAKEs have almost no adoption. So why are they so rare in the industry now-a-day ?
+
+Firstly, for web site, it's easier to setup a password form and handle all the processing on the server than to implement complex cryptography in the browser. But even in native app PAKEs are rarely used to authenticate.
+
+This could be caused by the fact that many old PAKEs was either patented, got broken or both. % TODO need example
+It probably hurted the reputation and adoption of PAKEs.
+Another factor is the insufficiency of well-implemented PAKE library in some programming language % TODO example ?
+which make them difficult to use.
+
+One exception to that is SRP, the most used PAKE protocol in the world. % TODO cite Green ? "most widely-deployed PAKE in the world"
+ It is a TLS ciphersuite, is implemented in OpenSSL and used in Apple's iCloud Key Vault. Even though it has far more adoption than other PAKEs, is not the ideal PAKE.
+
+
+Today, new generation of PAKE are better and provide more security guarantees. Efforts are made to make PAKE a standard for password authentication. % TODO cite OPAQUE standard ?
+
+
+
+% - "most wiidely-deployed PAKE protocol in the world"
+% - TLS ciphersuite, implemented in OpenSSL
+% - used extensively in iCloud Key Vault ("make SRP one of the most widely used cryptographic protocols in the world, so vast is the number of devices that Apple ships. So this is nothing to sneer at")
+% - "SRP isn't the best PAKE we can deploy"
 \end{document}
 
