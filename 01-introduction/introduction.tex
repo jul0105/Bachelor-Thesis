@@ -167,7 +167,7 @@ When a user want to connect itself to a online service, he send its username (or
 
 Authentication can be based on multiple factors. Something that the user knows (e.g. password, PIN, ...), something that the user has (e.g. digital certificate, OTP token device, smartphone, ...) or something that the user is (e.g. fingerprint, iris, ...). Multiple factors can be combined to obtain a strong authentication.
 
-Traditionally, the user send the authentication value to the server through a secure channel to avoid eavesdropping and then the server compare the value that he received to the value that he store for the specific user.
+Traditionally, the user send the authentication value to the server through a secure channel (generally TLS) to avoid eavesdropping and then the server compare the value that he received to the value that he store for the specific user.
 
 This means that the server has to knows and store this sensible value before authentication (generally during register).
 
