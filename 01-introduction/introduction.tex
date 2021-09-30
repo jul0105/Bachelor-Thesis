@@ -191,7 +191,7 @@ When the user wants to login, he has to send its cleartext password to the serve
 
 \paragraph{Why passwords are bad ?}
 Passwords are a problem. They are hard to remember and to manage for the user. They are generally low-entropy and users are reusing the same passwords too often. A password manager can help to manages password but there is a greater underlying problem.
-The problem is that ``a password that leaves your possession is guaranteed to sacrifice security, no matter its complexity or how hard it may be to guess. Passwords are insecure by their very existence`` \cite{PAKE_Cloudflare_blog}. % cite
+The problem is that ``a password that leaves your possession is guaranteed to sacrifice security, no matter its complexity or how hard it may be to guess. Passwords are insecure by their very existence'' \cite{PAKE_Cloudflare_blog}. % cite
 Now-a-day, majority of password use require that the password is sent in cleartext.
 
 Even if the channel between the client and the server is appropriatly secured, generally with TLS (Can also fail: PKI attack, cert missconfiguration, ... TODO), and even if on the server-side every secure password storing techniques are implemented, the password still has to be processed in cleartext.
@@ -211,7 +211,7 @@ These solutions are a good replacement to passwords but they require a deep chan
 
 This is also because password are so ubiquitous due in part the ease of implementation and the familiarity for the users.
 
-If we cannot get rid of passwords for now, we need a way to make it ''as secure as possible while they persist''.
+If we cannot get rid of passwords for now, we need a way to make it ``as secure as possible while they persist''.
 
 
 
@@ -264,7 +264,7 @@ In majority of case, the server doesn't want to setup a key exchange with the cl
 
 It allow mutual authentication in a client-server scenarios without requiring a PKI (except for the initial registration).
 
-"A secure aPAKE should provide the best possible security for a password protocol" \cite{OPAQUE_Standard_Draft}.
+``A secure aPAKE should provide the best possible security for a password protocol'' \cite{OPAQUE_Standard_Draft}.
 
 only vulnerable to inevitable attacks (online guess or offline dictionary attacks if server's data get leaked).
 
