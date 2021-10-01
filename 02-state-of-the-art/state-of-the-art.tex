@@ -45,11 +45,19 @@
 % - "has a built-in facility for password-based storage-and-retrieval of secrets and credentials"
 % - "accommodates a user-transparent server-side threshold implementation."
 
+%%% Introduction :
+% - password are used everywhere, from the simpliest to the most sensitive app.
+% - attacker is forced to "run an exhaustive offline dictionary attack to find users' passwords given a set (dictionary) of candidate passwords"
+% - "Two obious disadvantages" of the classical auth method :
+%    1. "the password appears in cleatext at the server during login [ref]"
+%    2. "security breaks if the TLS channel is established with a compromised server's public key (a widespread concern given today's too-common PKI failures)". "PKI failures include stealing of server private keys, software that does not verify certificates correctly, users that accept invalid or suspicious certificates, certificates issued by rogue CAs, servers that share their TLS keys with others { e.g., CDN providers or security monitoring software, information (including passwords) that traverses networks in plaintext form after TLS termination; and more."
 
+
+% - "password-authenticated key exchange (PAKE), was first studied by Bellovin and Merritt [7] and later formalized by Bellare et al. [6] in the game-based indistinguishability approach. Canetti et al. [15] formalized PAKE in the Universally Composable (UC) framework [14], which better captures PAKE security issues such as the use of arbitrary password distributions, the inputting of wrong passwords by the user, and the common practice of using related passwords for different services."
 
 % -------------------- 06 Lets talk about PAKE ----------------
 
-% Advantages of OPAQUE:
+%%% Advantages of OPAQUE:
 % - "can be implemented in any setting where Diffie-Hellman and discrete log (type) problems are hard"
 % - "can be easily instantiated using efficient elliptic curves"
 % - "does not reveal the salt". No pre-commutation attack
