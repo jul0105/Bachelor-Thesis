@@ -119,7 +119,7 @@ Overall, the OPAQUE protocol allow to secure authentication from the simplest ap
  \centering
  \includegraphics[width=\textwidth]{OPAQUE.png}
  % OPAQUE.png: 2166x1206 px, 72dpi, 76.41x42.54 cm, bb=0 0 2166 1206
- \caption{OPAQUE protocol using OPRF and AKE.}
+ \caption{Login process with OPAQUE protocol using OPRF and AKE.}
  \label{fig:OPAQUE_AKE}
 \end{figure}
 
@@ -128,7 +128,8 @@ Overall, the OPAQUE protocol allow to secure authentication from the simplest ap
 
 \paragraph{Construction}
 
-Fig \ref{fig:OPAQUE_AKE} shows the OPAQUE protocol using OPRF and AKE.
+Fig \ref{fig:OPAQUE_AKE} shows the OPAQUE protocol using OPRF and AKE during login process.
+The steps are the following :
 
 (1) Generate a random value r to blind the hash of password so that the server cannot retrieve the password from the mapping.
 (2) Send result to server
@@ -141,8 +142,27 @@ Fig \ref{fig:OPAQUE_AKE} shows the OPAQUE protocol using OPRF and AKE.
 
 
 \paragraph{Register}
+When a client want to register, the client generate a public/private key pair. He then encrypt his private key and the server's public key with the secret key (OPRF's output).
+$C = Encrypt_rw_(client's private key | server's public key)$
+
+Then he send the ciphertext to the server to store.
+
 
 \paragraph{Login}
+For the login phase, the client enter it's password in the OPRF and the server send the ciphertext to the client.
+If the password entered is correct, the client can decrypt the ciphertext with OPRF output to obtain his private key and the server's public key.
+He then use these keys to run a authenticated key exchange with the server (like HMQV ?).
+
+In the other hand, if the password is wrong, the OPRF output is totally different and the ciphertext decryption make the keys uncorrect and the server will refuse it during the key exchange (?). % TODO confirmation
+
+
+
+% Login :
+% - When a client want to login, the server sends the stored ciphertext to the client
+% - If the password entered by the client is correct, he get the correct secret key from the OPRF
+% - He can then use the secret key to decrypt the ciphertext and retrieve his private key and server's public key
+% - He then use these keys to run a authenticated key exchange with the server (like HMQV ?)
+
 
 
 \section{Comparing mains solutions}
