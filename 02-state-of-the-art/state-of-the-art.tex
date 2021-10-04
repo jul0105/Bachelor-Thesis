@@ -112,6 +112,8 @@ The security of these two construction is based on Oblivious PRF (OPRF) function
 
 These functions allow for each party, namely the client and the server, to input a secret value and then the client can use the output as a key. Neither party can learn the other party's secret and the server cannot learn the output of the function.
 
+Overall, the OPAQUE protocol allow to secure authentication from the simplest applications to the most sensitive ones.
+
 
 \begin{figure}[h]
  \centering
@@ -124,7 +126,7 @@ These functions allow for each party, namely the client and the server, to input
 
 
 
-
+\paragraph{Construction}
 
 Fig \ref{fig:OPAQUE_AKE} shows the OPAQUE protocol using OPRF and AKE.
 
@@ -138,42 +140,9 @@ Fig \ref{fig:OPAQUE_AKE} shows the OPAQUE protocol using OPRF and AKE.
 (8) With both keys, clients and server can run an authenticated key exchange for mutual authentication.
 
 
+\paragraph{Register}
 
-
-\paragraph{Strength and weakness}
-
-
-\begin{itemize}
-%  \item Forward Secrecy
-%  \item Explicit mutual authentication
-%  \item PKI-free (registration ?)
- 
-%  \item "supports user-side password hardening"
-%  \item "has a built-in facility for password-based storage-and-retrieval of secrets and credentials"
-%  \item "accommodates a user-transparent server-side threshold implementation."
- 
- \item can be used from the simplest applications to the most sensitive ones
- 
-%  \item Secure against pre-commutation attack
-
- \item "What's needed is that upon a server compromised, and the stealing of the password file, an attacker is forced to perform an exhaustive offline dictionary attack."
- \item "No other attack, except for an inevitable online guessing attack, should be feasible (1. the password appears in "
- 
- 
-%  \item "password does NOT appears in cleatext at the server"
-%  \item "security does NOT break if the TLS channel is compromised" (?) (no TLS channel)
- 
-%  \item salt not sent in cleartext
- 
- \item modular
- \item Performances
- 
- \item allows to "store and retrieve users's secrets such a bitcoin wallet, auth creds, ..."
- 
- \item "far more secure alternative to the practice of deriving low-entropy secrets directly from a user's password"
- 
- \item threshold implementation
-\end{itemize}
+\paragraph{Login}
 
 
 \section{Comparing mains solutions}
@@ -188,7 +157,9 @@ Fig \ref{fig:OPAQUE_AKE} shows the OPAQUE protocol using OPRF and AKE.
      % Qualities (security guarantees)
      
      Avoid sending cleartext password to server (aPAKE) & x & x & Yes & x \\ \hline
-     Secure against pre-computation attacks (SaPAKE) & x & x & Yes & x \\ \hline
+     
+     Secure against pre-computation attacks {"What's needed is that upon a server compromised, and the stealing of the password file, an attacker is forced to perform an exhaustive offline dictionary attack."} (SaPAKE) & x & x & Yes & x \\ \hline
+     
      (Salt not sent in cleartext) & x & x & Yes & x \\ \hline
      Forward secrecy & x & x & Yes & x \\ \hline
      "Explicit mutual authentication" & x & x & Yes & x \\ \hline
@@ -199,9 +170,15 @@ Fig \ref{fig:OPAQUE_AKE} shows the OPAQUE protocol using OPRF and AKE.
      "far more secure alternative to the practice of deriving low-entropy secrets directly from a user's password" & x & x & Yes & x \\ \hline
      
      Vulnerable to Oblivious PRF compromise & x & x & Yes & x \\ \hline
+     Internet standard & x & x & Draft & x \\ \hline
      
+     "security proof in a very strong model" & x & x & Yes & x \\ \hline
      
      % Performances
+     
+     Easily adaptable to elliptics curves & x & x & Yes & x \\ \hline
+     Number of messages & x & x & 3 ? & x \\ \hline
+     Number of exponentiations & x & x & 3 or 4 ? & x \\ \hline
 
      \end{tabular}
  \end{center}
