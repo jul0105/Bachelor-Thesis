@@ -104,7 +104,108 @@
 
 % ============================================================
 
-\paragraph{design}
+\paragraph{Design}
+Jarecki and al. \cite{}. introduce the definition of Strong aPake (SaPAKE): an aPake secure against pre-computation attacks.
+
+They provides two modular constructions, called the OPAQUE protocol that allow to builds SaPake protocols. The first construction allow to enhance any aPake to a SaPAKE while the second allow to enhance any Authenticated Key-Exchange (AKE) protocol (that are secure against KCI attacks) to an SaPAKE.
+The security of these two construction is based on Oblivious PRF (OPRF) functions \cite{}.
+
+These functions allow for each party, namely the client and the server, to input a secret value and then the client can use the output as a key. Neither party can learn the other party's secret and the server cannot learn the output of the function.
+
+
+\begin{figure}[h]
+ \centering
+ \includegraphics[width=\textwidth]{OPAQUE.png}
+ % OPAQUE.png: 2166x1206 px, 72dpi, 76.41x42.54 cm, bb=0 0 2166 1206
+ \caption{OPAQUE protocol using OPRF and AKE.}
+ \label{fig:OPAQUE_AKE}
+\end{figure}
+
+
+
+
+
+
+Fig \ref{fig:OPAQUE_AKE} shows the OPAQUE protocol using OPRF and AKE.
+
+(1) Generate a random value r to blind the hash of password so that the server cannot retrieve the password from the mapping.
+(2) Send result to server
+(3) Server add the salt to the password
+(4) Client calculate the exponant of the inverse of r to unblind the value. He canno't retrieve salt.
+(5) With the secret salt salt2, client compute secret key sk.
+(6) Server send encrypted keys ek to clients. ek contains server's public key and client's private key encrypted with sk.
+(7) If the password entered is correct, client can use sk to decrypt ek and retrieve his private key privU
+(8) With both keys, clients and server can run an authenticated key exchange for mutual authentication.
+
+
+
+
+\paragraph{Strength and weakness}
+
+
+\begin{itemize}
+%  \item Forward Secrecy
+%  \item Explicit mutual authentication
+%  \item PKI-free (registration ?)
+ 
+%  \item "supports user-side password hardening"
+%  \item "has a built-in facility for password-based storage-and-retrieval of secrets and credentials"
+%  \item "accommodates a user-transparent server-side threshold implementation."
+ 
+ \item can be used from the simplest applications to the most sensitive ones
+ 
+%  \item Secure against pre-commutation attack
+
+ \item "What's needed is that upon a server compromised, and the stealing of the password file, an attacker is forced to perform an exhaustive offline dictionary attack."
+ \item "No other attack, except for an inevitable online guessing attack, should be feasible (1. the password appears in "
+ 
+ 
+%  \item "password does NOT appears in cleatext at the server"
+%  \item "security does NOT break if the TLS channel is compromised" (?) (no TLS channel)
+ 
+%  \item salt not sent in cleartext
+ 
+ \item modular
+ \item Performances
+ 
+ \item allows to "store and retrieve users's secrets such a bitcoin wallet, auth creds, ..."
+ 
+ \item "far more secure alternative to the practice of deriving low-entropy secrets directly from a user's password"
+ 
+ \item threshold implementation
+\end{itemize}
+
+
+\section{Comparing mains solutions}
+
+\begin{center}
+   \begin{tabular}{ | p{8cm} || c | c | c | c | c | }
+     \hline
+     \textbf{Criteria} & \textbf{EKE} & \textbf{SRP} & \textbf{OPAQUE} & \textbf{KHAPE} \\ \hline
+     
+     % Content :
+     
+     % Qualities (security guarantees)
+     
+     Avoid sending cleartext password to server (aPAKE) & x & x & Yes & x \\ \hline
+     Secure against pre-computation attacks (SaPAKE) & x & x & Yes & x \\ \hline
+     (Salt not sent in cleartext) & x & x & Yes & x \\ \hline
+     Forward secrecy & x & x & Yes & x \\ \hline
+     "Explicit mutual authentication" & x & x & Yes & x \\ \hline
+     "PKI-free (registration?)" & x & x & Yes & x \\ \hline
+     "supports user-side password hardening" & x & x & Yes & x \\ \hline
+     "has a built-in facility for password-based storage-and-retrieval of secrets and credentials" & x & x & Yes & x \\ \hline
+     "accommodates a user-transparent server-side threshold implementation" & x & x & Yes & x \\ \hline
+     "far more secure alternative to the practice of deriving low-entropy secrets directly from a user's password" & x & x & Yes & x \\ \hline
+     
+     Vulnerable to Oblivious PRF compromise & x & x & Yes & x \\ \hline
+     
+     
+     % Performances
+
+     \end{tabular}
+ \end{center}
+
 
 
 
