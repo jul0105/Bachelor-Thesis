@@ -128,7 +128,7 @@ Overall, the OPAQUE protocol allow to secure authentication from the simplest ap
 
 \paragraph{Construction}
 
-Fig \ref{fig:OPAQUE_AKE} shows the OPAQUE protocol using OPRF and AKE during login process.
+Figure \ref{fig:OPAQUE_AKE} shows the OPAQUE protocol using OPRF and AKE during login process.
 The steps are the following :
 
 (1) Generate a random value r to blind the hash of password so that the server cannot retrieve the password from the mapping.
@@ -167,41 +167,65 @@ In the other hand, if the password is wrong, the OPRF output is totally differen
 
 \section{Comparing mains solutions}
 
+This section compare the mains PAKEs on their security guarantees and performances. Details and comments on each criteria can be found on Section \ref{sec:comparison_details}.
+
 \begin{center}
-   \begin{tabular}{ | p{8cm} || c | c | c | c | c | }
+   \begin{tabular}{ | c | p{8cm} || c | c | c | c | c | }
      \hline
-     \textbf{Criteria} & \textbf{EKE} & \textbf{SRP} & \textbf{OPAQUE} & \textbf{KHAPE} \\ \hline
+     \textbf{\#} & \textbf{Criteria} & \textbf{EKE} & \textbf{SRP} & \textbf{OPAQUE} & \textbf{KHAPE} \\ \hline
      
      % Content :
      
      % Qualities (security guarantees)
      
-     Avoid sending cleartext password to server (aPAKE) & x & x & Yes & x \\ \hline
+     1 & Avoid sending cleartext password to server (aPAKE) & x & x & Yes & x \\ \hline
      
-     Secure against pre-computation attacks {"What's needed is that upon a server compromised, and the stealing of the password file, an attacker is forced to perform an exhaustive offline dictionary attack."} (SaPAKE) & x & x & Yes & x \\ \hline
+     2 & Secure against pre-computation attacks {"What's needed is that upon a server compromised, and the stealing of the password file, an attacker is forced to perform an exhaustive offline dictionary attack."} (SaPAKE) & x & x & Yes & x \\ \hline
      
-     (Salt not sent in cleartext) & x & x & Yes & x \\ \hline
-     Forward secrecy & x & x & Yes & x \\ \hline
-     "Explicit mutual authentication" & x & x & Yes & x \\ \hline
-     "PKI-free (registration?)" & x & x & Yes & x \\ \hline
-     "supports user-side password hardening" & x & x & Yes & x \\ \hline
-     "has a built-in facility for password-based storage-and-retrieval of secrets and credentials" & x & x & Yes & x \\ \hline
-     "accommodates a user-transparent server-side threshold implementation" & x & x & Yes & x \\ \hline
-     "far more secure alternative to the practice of deriving low-entropy secrets directly from a user's password" & x & x & Yes & x \\ \hline
+     3 & (Salt not sent in cleartext) & x & x & Yes & x \\ \hline
+     4 & Forward secrecy & x & x & Yes & x \\ \hline
+     5 & "Explicit mutual authentication" & x & x & Yes & x \\ \hline
+     6 & "PKI-free (registration?)" & x & x & Yes & x \\ \hline
+     7 & "supports user-side password hardening" & x & x & Yes & x \\ \hline
+     8 & "has a built-in facility for password-based storage-and-retrieval of secrets and credentials" & x & x & Yes & x \\ \hline
+     9 & "accommodates a user-transparent server-side threshold implementation" & x & x & Yes & x \\ \hline
+     10 &"far more secure alternative to the practice of deriving low-entropy secrets directly from a user's password" & x & x & Yes & x \\ \hline
      
-     Vulnerable to Oblivious PRF compromise & x & x & Yes & x \\ \hline
-     Internet standard & x & x & Draft & x \\ \hline
+     11 & Vulnerable to Oblivious PRF compromise & x & x & Yes & x \\ \hline
+     12 & Internet standard & x & x & Draft & x \\ \hline
      
-     "security proof in a very strong model" & x & x & Yes & x \\ \hline
+     13 & "security proof in a very strong model" & x & x & Yes & x \\ \hline
      
      % Performances
      
-     Easily adaptable to elliptics curves & x & x & Yes & x \\ \hline
-     Number of messages & x & x & 3 ? & x \\ \hline
-     Number of exponentiations & x & x & 3 or 4 ? & x \\ \hline
+     14 & Easily adaptable to elliptics curves & x & x & Yes & x \\ \hline
+     15 & Number of messages & x & x & 3 ? & x \\ \hline
+     16 & Number of exponentiations & x & x & 3 or 4 ? & x \\ \hline
 
      \end{tabular}
  \end{center}
+ 
+\subsection{Details} \label{sec:comparison_details}
+
+\begin{enumerate}
+ \item x
+ \item x
+ \item x
+ \item x
+ \item x
+ \item x
+ \item x
+ \item x
+ \item x
+ \item x
+ \item x
+ \item x
+ \item x
+ \item x
+ \item x
+ \item x
+\end{enumerate}
+
 
 
 
