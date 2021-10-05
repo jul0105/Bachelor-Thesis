@@ -96,6 +96,31 @@
 
 
 
+% ------------- Writing progression color in titles -------------
+
+\ifprogression
+
+\newcommand{\writingNotes}[1]{\colorbox{red!40}{#1}}
+\newcommand{\writingFormulationBrut}[1]{\colorbox{orange!90!red!40}{#1}}
+\newcommand{\writingFormulationClean}[1]{\colorbox{yellow!80!orange!50}{#1}}
+\newcommand{\writingOK}[1]{\colorbox{green!80!black!40}{#1}} % Antidote OK
+
+\colorlet{RED}{red}
+\colorlet{ORANGE}{orange}
+\colorlet{YELLOW}{yellow}
+\colorlet{GREEN}{green}
+\colorlet{BLACK}{black}
+
+\else
+
+\newcommand{\writingNotes}[1]{#1}
+\newcommand{\writingFormulationBrut}[1]{#1}
+\newcommand{\writingFormulationClean}[1]{#1}
+\newcommand{\writingOK}[1]{#1}
+
+\fi
+
+
 
 % +---------------------------------------------------------------+
 % | Section, subsection, subsubsection, paragraph, ...

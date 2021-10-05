@@ -18,7 +18,6 @@
 % Chapter OPAQUE or Chapter KHAPE (depending on the PAKE choice)
 % - detail construction (protocol) of the choosen PAKE
 
-
 \chapter{State of the art}
 
 \section{History of PAKEs}
@@ -39,10 +38,10 @@
 
 \section{Main PAKEs}
 
-\subsection{OPAQUE}
+\subsection{\writingFormulationBrut{OPAQUE}}
 
 
-\paragraph{Design}
+\paragraph{\writingFormulationBrut{Design}}
 Jarecki and al. \cite{}. introduce the definition of Strong aPake (SaPAKE): an aPake secure against pre-computation attacks.
 
 They provides two modular constructions, called the OPAQUE protocol that allow to builds SaPake protocols. The first construction allow to enhance any aPake to a SaPAKE while the second allow to enhance any Authenticated Key-Exchange (AKE) protocol (that are secure against KCI attacks) to an SaPAKE.
@@ -64,7 +63,7 @@ Overall, the OPAQUE protocol allow to secure authentication from the simplest ap
 
 
 
-\paragraph{Construction}
+\paragraph{\writingFormulationBrut{Construction}}
 
 Figure \ref{fig:OPAQUE_AKE} shows the OPAQUE protocol using OPRF and AKE during login process.
 The steps are the following :
@@ -79,14 +78,14 @@ The steps are the following :
 (8) With both keys, clients and server can run an authenticated key exchange for mutual authentication.
 
 
-\paragraph{Register}
+\paragraph{\writingFormulationBrut{Register}}
 When a client want to register, the client generate a public/private key pair. He then encrypt his private key and the server's public key with the secret key (OPRF's output).
 $C = Encrypt_rw_(client's private key | server's public key)$
 
 Then he send the ciphertext to the server to store.
 
 
-\paragraph{Login}
+\paragraph{\writingFormulationBrut{Login}}
 For the login phase, the client enter it's password in the OPRF and the server send the ciphertext to the client.
 If the password entered is correct, the client can decrypt the ciphertext with OPRF output to obtain his private key and the server's public key.
 He then use these keys to run a authenticated key exchange with the server (like HMQV ?).
@@ -96,7 +95,7 @@ In the other hand, if the password is wrong, the OPRF output is totally differen
 
 
 
-\section{Comparing mains solutions}
+\section{\writingNotes{Comparing mains solutions}}
 
 This section compare the mains PAKEs on their security guarantees and performances. Details and comments on each criteria can be found on Section \ref{sec:comparison_details}.
 

@@ -9,7 +9,7 @@
 %     - Contexte du travail, volume d'heure, dates, temps plein, etc...
 
 
-\chapter{Introduction}
+\chapter{\writingNotes{Introduction}}
 
 
 % Order:
@@ -30,10 +30,10 @@
 % 9. OPAQUE
 % 10. KHAPE ?
 
-\section{Problematic}
-\subsection{Authentication}
+\section{\writingNotes{Problematic}}
+\subsection{\writingFormulationBrut{Authentication}}
 
-\paragraph{How to authenticate a user ?}
+\paragraph{\writingFormulationBrut{How to authenticate a user ?}}
 
 When a user want to connect itself to a online service, he send its username (or email) for identification. Then, he need a way to prove to the server that he is indeed the person he pretend to be. This is what we call authentication. Without it, anybody can impersonate the account of someone else.
 
@@ -47,7 +47,7 @@ Traditionally on websites and softwares, passwords are used as authentication va
 
 
 
-\paragraph{Attacks and mitigations}
+\paragraph{\writingFormulationBrut{Attacks and mitigations}}
 This setup is not ideal and can lead to multiple attacks.
 
 In case where the server get compromised, since the server store the passwords, the attacker immediately obtain access to all passwords. This means that he can impersonate every user.
@@ -61,7 +61,7 @@ These techniques improve the security of storing password but they doesn't addre
 When the user wants to login, he has to send its cleartext password to the server in order for the server to authenticate the user. This necessity void any password storing improvement if the server is ever persistently compromised or if password are accidentally logged or cached.
 
 
-\paragraph{Why passwords are bad ?}
+\paragraph{\writingFormulationBrut{Why passwords are bad ?}}
 Passwords are a problem. They are hard to remember and to manage for the user. They are generally low-entropy and users are reusing the same passwords too often. A password manager can help to manages password but there is a greater underlying problem.
 The problem is that ``a password that leaves your possession is guaranteed to sacrifice security, no matter its complexity or how hard it may be to guess. Passwords are insecure by their very existence'' \cite{PAKE_Cloudflare_blog}. % cite
 Now-a-day, majority of password use require that the password is sent in cleartext.
@@ -72,7 +72,7 @@ As stated before, there can be some software issue like accidental logging or ca
 In a ideal world, the server should never see the user's password in cleartext at all.
 
 
-\paragraph{Get rid of password}
+\paragraph{\writingFormulationBrut{Get rid of password}}
 
 In summary, password are not ideal. They are difficult to remember, annoying to type and insecure.
 So why don't we try to get rid of them altogether ?
@@ -92,8 +92,8 @@ This is where PAKE become interesting. It allow password-based authentication wi
 
 
 
-\subsection{Password-Authenticated Key Exchange}
-\paragraph{PAKEs at the rescue (TODO WRITING)} % TODO
+\subsection{\writingNotes{Password-Authenticated Key Exchange}}
+\paragraph{\writingNotes{PAKEs at the rescue}}
 
 % Password-Authentication Key Exchange (PAKE) are cryptographic primitive that allow a server to authenticate a client without ever knowing or storing client's password.
 % 
@@ -140,7 +140,7 @@ It allow mutual authentication in a client-server scenarios without requiring a 
 
 only vulnerable to inevitable attacks (online guess or offline dictionary attacks if server's data get leaked).
 
-\paragraph{Why PAKEs have almost no adoption ?}
+\paragraph{\writingFormulationBrut{Why PAKEs have almost no adoption ?}}
 
 % Why PAKE have almost no adoption :
 
