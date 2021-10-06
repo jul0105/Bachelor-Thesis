@@ -77,6 +77,13 @@ The steps are the following :
 (7) If the password entered is correct, client can use sk to decrypt ek and retrieve his private key privU
 (8) With both keys, clients and server can run an authenticated key exchange for mutual authentication.
 
+\paragraph{\writingNotes{Additional features}}
+
+     "Supports user-side password hardening"
+     "has a built-in facility for password-based storage-and-retrieval of secrets and credentials"
+     "accommodates a user-transparent server-side threshold implementation"
+     "far more secure alternative to the practice of deriving low-entropy secrets directly from a user's password"
+
 
 \paragraph{\writingFormulationBrut{Register}}
 When a client want to register, the client generate a public/private key pair. He then encrypt his private key and the server's public key with the secret key (OPRF's output).
@@ -114,22 +121,22 @@ This section compare the mains PAKEs on their security guarantees and performanc
      4 & Forward secrecy & x & x & Yes & x \\ \hline
      5 & Mutual authentication & x & x & Yes & x \\ \hline
      6 & PKI-free & x & x & Yes, except during register & x \\ \hline
-     7 & "Supports user-side password hardening" & x & x & Yes & x \\ \hline
-     8 & "has a built-in facility for password-based storage-and-retrieval of secrets and credentials" & x & x & Yes & x \\ \hline
-     9 & "accommodates a user-transparent server-side threshold implementation" & x & x & Yes & x \\ \hline
-     10 & "far more secure alternative to the practice of deriving low-entropy secrets directly from a user's password" & x & x & Yes & x \\ \hline
-     
-     11 & Resistant to Oblivious PRF compromise & x & x & No & x \\ \hline
+     7 & User-side password hardening & x & x & Yes & x \\ \hline
+     8 & Built-in mechanism to store client's secrets server-side & x & x & Yes & x \\ \hline
+     9 & Server threshold implementation & x & x & Yes, user-transparent & x \\ \hline
+     11 & Resistant to Oblivious PRF compromise & x & x & No, entire security is compromised & Fall back to non-strong aPAKE \\ \hline
      12 & Internet standard & x & x & Draft & x \\ \hline
-     
-     13 & "security proof in a very strong model" & x & x & Yes & x \\ \hline
+     13 & Security proof & x & x & Yes, in a very strong model & x \\ \hline
      
      % Performances
      
-     14 & Easily adaptable to elliptics curves & x & x & Yes & x \\ \hline
+     14 & Easily adaptable to elliptic curves & x & x & Yes & x \\ \hline
      15 & Number of messages & x & x & 3 ? & x \\ \hline
      16 & Number of exponentiations & x & x & 3 or 4 ? & x \\ \hline
-     17 & Patented & x & x & No & x \\ \hline
+     17 & Patented & x & x & x & x \\ \hline
+     18 & Release date & x & x & x & x \\ \hline
+     19 & Version & x & x & x & x \\ \hline
+     20 & Got broken & x & x & x & x \\ \hline
 
      \end{tabular}
  \end{center}
@@ -144,14 +151,21 @@ This section compare the mains PAKEs on their security guarantees and performanc
  In details key-exchange protocol use long-lived keys to authenticate the user and short-lived keys to encrypt sessions. With Forward Secrecy, an attacker that successfully compromised a long-lived key cannot retrieve any previous session data even if he recorded the previous encrypted transmissions.
  
  \item Mutual authentication explicit that user must be authenticated to the server and also that the server must authenticate itself to the user to avoid that an adversary impersonate the server to maliciously communicate with the client.
- \item The transmissions between client and server doesn't require to be secured with PKI. This is a big improvement over classical authentication method (Password-over-TLS) considering the occurence of PKI failures nowadays ("PKI failures include stealing of server private keys, software that does not verify certificates correctly, users that accept invalid or suspicious certificates, certificates issued by rogue CAs, servers that share their TLS keys with others e.g., CDN providers or security monitoring software, information (including passwords) that traverses networks in plaintext form after TLS termination; and more.").
- \item User can use password hardening technique to "increase the cost of a dictionary attack in case of server compromise". This is done by using ressource-heavy functions such as PBKDF2, Scrypt or Argon2 instead of computing a simple and efficient hash. These functions allows to drastically slows down hashing process and so making offline attacks and online guessing attack much slower.
+ \item The transmissions between client and server doesn't require to be secured with PKI. This is a big improvement over classical authentication method (Password-over-TLS) considering the occurrence of PKI failures nowadays. % "PKI failures include stealing of server private keys, software that does not verify certificates correctly, users that accept invalid or suspicious certificates, certificates issued by rogue CAs, servers that share their TLS keys with others e.g., CDN providers or security monitoring software, information (including passwords) that traverses networks in plaintext form after TLS termination; and more."
+ \item User can use password hardening technique to "increase the cost of a dictionary attack in case of server compromise". This is done by using ressource-heavy functions such as Scrypt \cite{Script_Paper} or Argon2 \cite{Argon2_Paper} instead of computing a simple and efficient hash. These functions allows to drastically slows down hashing process and so making offline attacks and online guessing attack much slower.
+ \item OPAQUE "has a built-in facility for password-based storage-and-retrieval of secrets and credentials"
+ \item OPAQUE "accommodates a user-transparent server-side threshold implementation"
  \item x
+ \item ``There is a significant difference in the reliance on the security of
+OPRF. While the password security of OPAQUE breaks down with a
+compromise of the OPRF key (namely, it allows for an offline dictionary attack
+on the password), in KHAPE the effect of compromising the OPRF is only to
+fall back to the (non-strong) aPAKE setting. In particular, this distinction is
+relevant in the context of quantum-safe cryptography as there are currently no
+known efficient OPRFs considered to be quantum safe. This opens a path to
+quantum-safe aPAKEs based on KHAPE with key hiding quantum-safe KEMs.'' \cite{OPAQUE_Paper}.
  \item x
- \item x
- \item x
- \item x
- \item x
+ \item OPAQUE "security proof in a very strong model"
  \item x
  \item x
  \item x
