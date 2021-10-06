@@ -100,7 +100,7 @@ In the other hand, if the password is wrong, the OPRF output is totally differen
 This section compare the mains PAKEs on their security guarantees and performances. Details and comments on each criteria can be found on Section \ref{sec:comparison_details}.
 
 \begin{center}
-   \begin{tabular}{ | c | p{8cm} || c | c | c | c | c | }
+   \begin{tabular}{ | c | p{8cm} || p{1cm} | p{1cm} | p{2cm} | p{2cm} | }
      \hline
      \textbf{\#} & \textbf{Criteria} & \textbf{EKE} & \textbf{SRP} & \textbf{OPAQUE} & \textbf{KHAPE} \\ \hline
      
@@ -108,20 +108,18 @@ This section compare the mains PAKEs on their security guarantees and performanc
      
      % Qualities (security guarantees)
      
-     1 & Avoid sending cleartext password to server (aPAKE) & x & x & Yes & x \\ \hline
-     
-     2 & Secure against pre-computation attacks {"What's needed is that upon a server compromised, and the stealing of the password file, an attacker is forced to perform an exhaustive offline dictionary attack."} (SaPAKE) & x & x & Yes & x \\ \hline
-     
-     3 & (Salt not sent in cleartext) & x & x & Yes & x \\ \hline
+     1 & Avoid sending cleartext password to server & x & x & Yes & x \\ \hline
+     2 & Secure against pre-computation attacks & x & x & Yes & x \\ \hline
+     3 & Server doesn't send salt in cleartext & x & x & Yes & x \\ \hline
      4 & Forward secrecy & x & x & Yes & x \\ \hline
-     5 & "Explicit mutual authentication" & x & x & Yes & x \\ \hline
-     6 & "PKI-free (registration?)" & x & x & Yes & x \\ \hline
-     7 & "supports user-side password hardening" & x & x & Yes & x \\ \hline
+     5 & Mutual authentication & x & x & Yes & x \\ \hline
+     6 & PKI-free & x & x & Yes, except during register & x \\ \hline
+     7 & "Supports user-side password hardening" & x & x & Yes & x \\ \hline
      8 & "has a built-in facility for password-based storage-and-retrieval of secrets and credentials" & x & x & Yes & x \\ \hline
      9 & "accommodates a user-transparent server-side threshold implementation" & x & x & Yes & x \\ \hline
-     10 &"far more secure alternative to the practice of deriving low-entropy secrets directly from a user's password" & x & x & Yes & x \\ \hline
+     10 & "far more secure alternative to the practice of deriving low-entropy secrets directly from a user's password" & x & x & Yes & x \\ \hline
      
-     11 & Vulnerable to Oblivious PRF compromise & x & x & Yes & x \\ \hline
+     11 & Resistant to Oblivious PRF compromise & x & x & No & x \\ \hline
      12 & Internet standard & x & x & Draft & x \\ \hline
      
      13 & "security proof in a very strong model" & x & x & Yes & x \\ \hline
@@ -139,13 +137,15 @@ This section compare the mains PAKEs on their security guarantees and performanc
 \subsection{Details} \label{sec:comparison_details}
 
 \begin{enumerate}
- \item x
- \item x
- \item x
- \item x
- \item x
- \item x
- \item x
+ \item This is the principle of asymmetric PAKE. The server doesn't store the password in cleartext making it secure against password miss-handling vulnerabilities such as logging or caching cleartext password on the server.
+ \item This is the main principle of Strong aPAKE \cite{OPAQUE_Paper}. The server doesn't leak any data (generally the salt) that could allow an attacker to perform a pre-computation attack. This attack allow an attacker to compute a table \emph{before} the server even get compromised. Once the attacker succeed in compromising the server, he can use the pre-computed table to retrieve the passwords \emph{instantaneously}. So this protection force the attacker to perform an offline dictionary attack after successful server compromise. % This vulnerability weaken the initial benefit of using an aPAKE and even make password-over-TLS more secure (than aPAKE vulnerable to pre-computation attacks).
+ \item Same as 2.
+ \item In key-exchange protocol, Forward Secrecy (also called Full Forward Secrecy or Perfect Forward Secrecy) ensure that upon compromise of any long term key used to negotiate sessions key, an attacker cannot compromise previous session keys.
+ In details key-exchange protocol use long-lived keys to authenticate the user and short-lived keys to encrypt sessions. With Forward Secrecy, an attacker that successfully compromised a long-lived key cannot retrieve any previous session data even if he recorded the previous encrypted transmissions.
+ 
+ \item Mutual authentication explicit that user must be authenticated to the server and also that the server must authenticate itself to the user to avoid that an adversary impersonate the server to maliciously communicate with the client.
+ \item The transmissions between client and server doesn't require to be secured with PKI. This is a big improvement over classical authentication method (Password-over-TLS) considering the occurence of PKI failures nowadays ("PKI failures include stealing of server private keys, software that does not verify certificates correctly, users that accept invalid or suspicious certificates, certificates issued by rogue CAs, servers that share their TLS keys with others e.g., CDN providers or security monitoring software, information (including passwords) that traverses networks in plaintext form after TLS termination; and more.").
+ \item User can use password hardening technique to "increase the cost of a dictionary attack in case of server compromise". This is done by using ressource-heavy functions such as PBKDF2, Scrypt or Argon2 instead of computing a simple and efficient hash. These functions allows to drastically slows down hashing process and so making offline attacks and online guessing attack much slower.
  \item x
  \item x
  \item x
