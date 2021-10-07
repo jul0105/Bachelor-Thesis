@@ -122,9 +122,9 @@ This section compare the mains PAKEs on their security guarantees and performanc
      5 & Mutual authentication & x & x & Yes & x \\ \hline
      6 & PKI-free & x & x & Yes, except during register & x \\ \hline
      7 & User-side password hardening & x & x & Yes & x \\ \hline
-     8 & Built-in mechanism to store client's secrets server-side & x & x & Yes & x \\ \hline
+     8 & Built-in mechanism to store client's secrets on the server & x & x & Yes & x \\ \hline
      9 & Server threshold implementation & x & x & Yes, user-transparent & x \\ \hline
-     11 & Resistant to Oblivious PRF compromise & x & x & No, entire security is compromised & Fall back to non-strong aPAKE \\ \hline
+     11 & Resistant upon Oblivious PRF compromise & x & x & No, entire security is compromised & Fall back to non-strong aPAKE \\ \hline
      12 & Internet standard & x & x & Draft & x \\ \hline
      13 & Security proof & x & x & Yes, in a very strong model & x \\ \hline
      
@@ -143,20 +143,36 @@ This section compare the mains PAKEs on their security guarantees and performanc
  
 \subsection{Details} \label{sec:comparison_details}
 
-\begin{enumerate}
- \item This is the principle of asymmetric PAKE. The server doesn't store the password in cleartext making it secure against password miss-handling vulnerabilities such as logging or caching cleartext password on the server.
- \item This is the main principle of Strong aPAKE \cite{OPAQUE_Paper}. The server doesn't leak any data (generally the salt) that could allow an attacker to perform a pre-computation attack. This attack allow an attacker to compute a table \emph{before} the server even get compromised. Once the attacker succeed in compromising the server, he can use the pre-computed table to retrieve the passwords \emph{instantaneously}. So this protection force the attacker to perform an offline dictionary attack after successful server compromise. % This vulnerability weaken the initial benefit of using an aPAKE and even make password-over-TLS more secure (than aPAKE vulnerable to pre-computation attacks).
- \item Same as 2.
- \item In key-exchange protocol, Forward Secrecy (also called Full Forward Secrecy or Perfect Forward Secrecy) ensure that upon compromise of any long term key used to negotiate sessions key, an attacker cannot compromise previous session keys.
- In details key-exchange protocol use long-lived keys to authenticate the user and short-lived keys to encrypt sessions. With Forward Secrecy, an attacker that successfully compromised a long-lived key cannot retrieve any previous session data even if he recorded the previous encrypted transmissions.
- 
- \item Mutual authentication explicit that user must be authenticated to the server and also that the server must authenticate itself to the user to avoid that an adversary impersonate the server to maliciously communicate with the client.
- \item The transmissions between client and server doesn't require to be secured with PKI. This is a big improvement over classical authentication method (Password-over-TLS) considering the occurrence of PKI failures nowadays. % "PKI failures include stealing of server private keys, software that does not verify certificates correctly, users that accept invalid or suspicious certificates, certificates issued by rogue CAs, servers that share their TLS keys with others e.g., CDN providers or security monitoring software, information (including passwords) that traverses networks in plaintext form after TLS termination; and more."
- \item User can use password hardening technique to "increase the cost of a dictionary attack in case of server compromise". This is done by using ressource-heavy functions such as Scrypt \cite{Script_Paper} or Argon2 \cite{Argon2_Paper} instead of computing a simple and efficient hash. These functions allows to drastically slows down hashing process and so making offline attacks and online guessing attack much slower.
- \item OPAQUE "has a built-in facility for password-based storage-and-retrieval of secrets and credentials"
- \item OPAQUE "accommodates a user-transparent server-side threshold implementation"
- \item x
- \item ``There is a significant difference in the reliance on the security of
+\paragraph{\writingFormulationBrut{1. Avoid sending password in cleartext to server.}}
+This is the principle of asymmetric PAKE. The server doesn't store the password in cleartext making it secure against password miss-handling vulnerabilities such as logging or caching cleartext password on the server.
+
+\paragraph{\writingFormulationBrut{2. Secure against pre-computation attacks.}}
+This is the main principle of Strong aPAKE \cite{OPAQUE_Paper}. The server doesn't leak any data (generally the salt) that could allow an attacker to perform a pre-computation attack. This attack allow an attacker to compute a table \emph{before} the server even get compromised. Once the attacker succeed in compromising the server, he can use the pre-computed table to retrieve the passwords \emph{instantaneously}. So this protection force the attacker to perform an offline dictionary attack after successful server compromise. % This vulnerability weaken the initial benefit of using an aPAKE and even make password-over-TLS more secure (than aPAKE vulnerable to pre-computation attacks).
+
+\paragraph{\writingNotes{3. Server doesn't send salt in cleartext.}}
+Same as 2.
+
+\paragraph{\writingFormulationBrut{4. Forward secrecy.}}
+In key-exchange protocol, Forward Secrecy (also called Full Forward Secrecy or Perfect Forward Secrecy) ensure that upon compromise of any long term key used to negotiate sessions key, an attacker cannot compromise previous session keys.
+In details key-exchange protocol use long-lived keys to authenticate the user and short-lived keys to encrypt sessions. With Forward Secrecy, an attacker that successfully compromised a long-lived key cannot retrieve any previous session data even if he recorded the previous encrypted transmissions.
+
+\paragraph{\writingFormulationBrut{5. Mutual authentication.}}
+Mutual authentication explicit that user must be authenticated to the server and also that the server must authenticate itself to the user to avoid that an adversary impersonate the server to maliciously communicate with the client.
+
+\paragraph{\writingFormulationBrut{6. PKI-free.}}
+The transmissions between client and server doesn't require to be secured with PKI. This is a big improvement over classical authentication method (Password-over-TLS) considering the occurrence of PKI failures nowadays. % "PKI failures include stealing of server private keys, software that does not verify certificates correctly, users that accept invalid or suspicious certificates, certificates issued by rogue CAs, servers that share their TLS keys with others e.g., CDN providers or security monitoring software, information (including passwords) that traverses networks in plaintext form after TLS termination; and more."
+
+\paragraph{\writingFormulationBrut{7. User-side password hardening.}}
+User can use password hardening technique to "increase the cost of a dictionary attack in case of server compromise". This is done by using ressource-heavy functions such as Scrypt \cite{Script_Paper} or Argon2 \cite{Argon2_Paper} instead of computing a simple and efficient hash. These functions allows to drastically slows down hashing process and so making offline attacks and online guessing attack much slower.
+
+\paragraph{\writingNotes{8. Built-in mechanism to store client's secrets on the server.}}
+OPAQUE "has a built-in facility for password-based storage-and-retrieval of secrets and credentials"
+
+\paragraph{\writingNotes{9. Server threshold implementation.}}
+OPAQUE "accommodates a user-transparent server-side threshold implementation"
+
+\paragraph{\writingNotes{11. Resistant upon Oblivious PRF compromise.}}
+``There is a significant difference in the reliance on the security of
 OPRF. While the password security of OPAQUE breaks down with a
 compromise of the OPRF key (namely, it allows for an offline dictionary attack
 on the password), in KHAPE the effect of compromising the OPRF is only to
@@ -164,15 +180,31 @@ fall back to the (non-strong) aPAKE setting. In particular, this distinction is
 relevant in the context of quantum-safe cryptography as there are currently no
 known efficient OPRFs considered to be quantum safe. This opens a path to
 quantum-safe aPAKEs based on KHAPE with key hiding quantum-safe KEMs.'' \cite{OPAQUE_Paper}.
- \item x
- \item OPAQUE "security proof in a very strong model"
- \item x
- \item x
- \item x
-\end{enumerate}
+
+\paragraph{12. Internet standard.}
+
+\paragraph{\writingNotes{13. Security proof.}}
+OPAQUE "security proof in a very strong model"
+
+\paragraph{14. Easily adaptable to elliptic curves.}
 
 
+\paragraph{15. Number of messages.}
 
+
+\paragraph{16. Number of exponentiations.}
+
+
+\paragraph{17. Patented.}
+
+
+\paragraph{18. Release date.}
+
+
+\paragraph{19. Version.}
+
+
+\paragraph{20. Got broken.}
 
 
 
