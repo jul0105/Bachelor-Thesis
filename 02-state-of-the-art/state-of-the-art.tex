@@ -134,10 +134,9 @@ This section compare the mains PAKEs on their security guarantees and performanc
      14 & Easily adaptable to elliptic curves & x & x & Yes & x \\ \hline
      15 & Number of messages & x & x & 3 ? & x \\ \hline
      16 & Number of exponentiations & x & x & 3 or 4 ? & x \\ \hline
-     17 & Patented & x & x & x & x \\ \hline
-     18 & Release date & x & x & x & x \\ \hline
-     19 & Version & x & x & x & x \\ \hline
-     20 & Got broken & x & x & x & x \\ \hline
+     17 & Patented & Yes, expired in 2011 ? & x & No & No \\ \hline
+     18 & Year published & x & x & 2018 & 2021 \\ \hline
+     19 & Got broken & x & x & x & x \\ \hline
 
      \end{tabular}
  \end{center}
@@ -178,15 +177,10 @@ OPAQUE "has a built-in facility for password-based storage-and-retrieval of secr
 \paragraph{\writingNotes{9. Server threshold implementation.}}
 OPAQUE "accommodates a user-transparent server-side threshold implementation"
 
-\paragraph{\writingNotes{11. Resistant upon Oblivious PRF compromise.}}
-``There is a significant difference in the reliance on the security of
-OPRF. While the password security of OPAQUE breaks down with a
-compromise of the OPRF key (namely, it allows for an offline dictionary attack
-on the password), in KHAPE the effect of compromising the OPRF is only to
-fall back to the (non-strong) aPAKE setting. In particular, this distinction is
-relevant in the context of quantum-safe cryptography as there are currently no
-known efficient OPRFs considered to be quantum safe. This opens a path to
-quantum-safe aPAKEs based on KHAPE with key hiding quantum-safe KEMs.'' \cite{OPAQUE_Paper}.
+\paragraph{\writingFormulationClean{11. Resistant upon Oblivious PRF compromise.}}
+If OPRF breaks for exemple by cryptanalysis, security compromise or even quantum attacks, the consequences could be disastrous depending on the way it is used. This is especially important because there is ``currently no known efficient OPRFs considered to be quantum safe'' \cite{KHAPE_Paper}.
+OPAQUE use OPRF as a main tool to builds Strong aPAKE. If OPRF breaks, the client's password is vulnerable to a offline dictionary attack.
+On the other hand, KHAPE only fall back to a non-strong aPAKE if OPRF breaks (making it vulnerable to pre-computation attacks). This make KHAPE more resistant to OPRF compromise than OPAQUE. 
 
 \paragraph{12. Internet standard.}
 
