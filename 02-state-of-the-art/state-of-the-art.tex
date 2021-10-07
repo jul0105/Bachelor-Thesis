@@ -28,7 +28,6 @@
 \subsection{Symmetric PAKE}
 \subsection{Asymmetric PAKE}
 \paragraph{SRP}
-\subsection{Strong asymmetric PAKE}
 \paragraph{OPAQUE (2018)}
 \paragraph{KHAPE (2021)}
 
@@ -101,6 +100,45 @@ In the other hand, if the password is wrong, the OPRF output is totally differen
 
 
 
+% ====================================================================================
+
+
+
+\subsection{\writingNotes{KHAPE}}
+
+- KHAPE (for Key-Hiding Asymmetric PakE) \cite{KHAPE_Paper}.
+- Variant to the OPAQUE protocol
+- All OPAQUE security rely on the strength of the OPRF
+- "If OPRF is ever broken (by cryptanalysis, quantum attacks or security
+compromise), the user’s password is exposed to an offline dictionary attack."
+- to accomplish this KHAPE get (rid (partially) of OPRF and) use 2 mains concepts: non-committing encryption and key hiding AKE
+- KHAPE is not a Strong aPAKE like OPAQUE. But it can be made a SaPAKE following the aPAKE to SaPAKE compiler from \cite{OPAQUE_Paper} using OPRF
+- So OPRF is optional with KHAPE and just allow to make it a SaPAKE (secure againt pre-comuptation attacks, server threshold). If OPRF fails, KHAPE just loss these functionalities but the rest of the security remain in contrary to OPAQUE.
+
+%%% comparison with OPAQUE
+- KHAPE is computationally more performant than OPAQUE when the OPRF is not used and the performances become similar when OPRF is used.
+- "KHAPE seems more conducive to post-quantum security via post-quantum key-hiding KEMs."
+
+- KHAPE allow less AKEs (no signature-based protocols such as SIGMA)
+- KHAPE use ``idea cipher model'', OPAQUE use ``random oracle model'' (stronger ?)
+
+- with OPAQUE the client learns first if an authentication attempt is succeed or not. with KHAPE, the server learns first which make it easier to count failed attempt in case of an online password guessing attack.
+
+%%% implementation
+
+- \cite{KHAPE_Paper} prove that 3DH and HMQV are key-hiding AKE and can be used in KHAPE % TODO see citation in KHAPE_Paper for 3DH and HMQV
+- It also shows that (some KEM-based AKE like) SKEME can be adapted to archive similar result "if instantiated with a key-hiding KEM".
+
+
+
+% How Key-hiding AKE works ?
+% Practical KHAPE construction
+% Login and register steps
+
+
+% ====================================================================================
+
+
 
 \section{\writingNotes{Comparing mains solutions}}
 
@@ -132,7 +170,7 @@ This section compare the mains PAKEs on their security guarantees and performanc
      % Performances
      
      14 & Easily adaptable to elliptic curves & x & x & Yes & x \\ \hline
-     15 & Number of messages & x & x & 3 ? & x \\ \hline
+     15 & Number of messages & x & x & 3 & 4 (3 if client initiate) \\ \hline
      16 & Number of exponentiations & x & x & 3 or 4 ? & x \\ \hline
      17 & Patented & Yes, expired in 2011 ? & x & No & No \\ \hline
      18 & Year published & x & x & 2018 & 2021 \\ \hline
@@ -180,7 +218,8 @@ OPAQUE "accommodates a user-transparent server-side threshold implementation"
 \paragraph{\writingFormulationClean{11. Resistant upon Oblivious PRF compromise.}}
 If OPRF breaks for exemple by cryptanalysis, security compromise or even quantum attacks, the consequences could be disastrous depending on the way it is used. This is especially important because there is ``currently no known efficient OPRFs considered to be quantum safe'' \cite{KHAPE_Paper}.
 OPAQUE use OPRF as a main tool to builds Strong aPAKE. If OPRF breaks, the client's password is vulnerable to a offline dictionary attack.
-On the other hand, KHAPE only fall back to a non-strong aPAKE if OPRF breaks (making it vulnerable to pre-computation attacks). This make KHAPE more resistant to OPRF compromise than OPAQUE. 
+KHAPE has a weaker reliance on OPRF. It is optional and only used to archive Strong aPAKE. If OPRF breaks, KHAPE only fall back to a non-strong aPAKE (making it vulnerable to pre-computation attacks). 
+This make KHAPE more resistant to OPRF compromise than OPAQUE. 
 
 \paragraph{12. Internet standard.}
 
