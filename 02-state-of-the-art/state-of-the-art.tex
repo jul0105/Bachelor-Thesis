@@ -53,9 +53,12 @@ Overall, the OPAQUE protocol allow to secure authentication from the simplest ap
 
 \begin{figure}[h]
  \centering
- \includegraphics[width=\textwidth]{OPAQUE.png}
- % OPAQUE.png: 2166x1206 px, 72dpi, 76.41x42.54 cm, bb=0 0 2166 1206
- \caption{Login process with OPAQUE protocol using OPRF and AKE.}
+
+ \setlength{\fboxsep}{10pt}
+ \setlength{\fboxrule}{1pt}
+ \fbox{\includegraphics[width=\textwidth-22pt]{OPAQUE.png}}
+
+ \caption{Login process with generic OPAQUE (OPRF-AKE) protocol.}
  \label{fig:OPAQUE_AKE}
 \end{figure}
 
@@ -84,11 +87,31 @@ The steps are the following :
      "far more secure alternative to the practice of deriving low-entropy secrets directly from a user's password"
 
 
-\paragraph{\writingFormulationBrut{Register}}
+\paragraph{\writingNotes{Register}} \label{sec:opaque_register}
 When a client want to register, the client generate a public/private key pair. He then encrypt his private key and the server's public key with the secret key (OPRF's output).
 $C = Encrypt_rw_(client's private key | server's public key)$
 
-Then he send the ciphertext to the server to store.
+Then he send the ciphertext to the server to store. 
+
+
+% TODO TLS channel ???
+% TODO register on the server vs register client-side
+
+
+Client sends password to server via a secure channel. Server generate the salt and compute OPRF function with password and salt.
+Server also generate 2 privates keys (one for the client and one for the server) and their corresponding public key. He encrypt client's private key and server's public key with OPRF output as a key and store the ciphertext alongside with his keys.
+
+"Password registration is the only part of the protocol
+assumed to run over secure channels where parties can authenticate each other.
+We note that while OPAQUE is presented with S doing all the registration
+operations, in practice one may want to avoid that. Instead, we can let S choose
+an OPRF key ks and U choose pw, and then run the OPRF protocol between
+U and S so only U learns its secrets (pw; rw; pu). The server chooses its pair
+(ps; Ps) and provides Ps to U who builds the ciphertext c and sends to S. In this
+way the server never sees the user’s password, a major benefit, for example to
+avoid accidental storage of plaintext passwords that has affected also securityconscious companies [2, 3]. Note that this prevents S from checking password
+rules, an operation that can be moved to the client side (restricted server-side
+checks such as preventing the repeat of a recent password can be implemented)."
 
 
 \paragraph{\writingFormulationBrut{Login}}
@@ -136,18 +159,42 @@ compromise), the user’s password is exposed to an offline dictionary attack."
 
 
 
-%%% Practical KHAPE construction
+\paragraph{\writingNotes{Construction}}
 
-% TODO describe steps of the schema
 
 \begin{figure}[h]
  \centering
- \includegraphics[width=\textwidth]{KHAPE.png}
- \caption{Generic KHAPE protocol.}
+ 
+ \setlength{\fboxsep}{10pt}
+ \setlength{\fboxrule}{1pt}
+ \fbox{\includegraphics[width=\textwidth-22pt]{KHAPE.png}}
+ 
+ \caption{Login process withn generic KHAPE protocol.}
  \label{fig:Generic_KHAPE}
 \end{figure}
 
+
+% TODO describe steps of the schema
+
+
+
+(1) Optionaly, an OPRF can be used to archive Strong aPAKE following the aPAKE to SaPAKE compiler using OPRF from \cite{OPAQUE_Paper}. The OPRF take the client's password and server's salt as an input. Client use the output in place of his password for the rest of the protocol.
+(2) Server send the client's encrypted envelop containing the client's private key and server's public key.
+(3) Client decrypt the ciphertext using Ideal Cipher encryption schema. He use his password or OPRF output as a key.
+(4) Both party use the public/private keys to compute a Key-Hiding Authenticated Key-Exchange
+(5) Mutual key confirmation initiated by the client
+
 %%% Login and register steps
+\paragraph{\writingNotes{Login}}
+
+both client and server needs a public/private key pair to compute a AKE. The client encrypt it's credentials (his private key and server's public key) and store it in the server.
+
+When the client want to login, the server sends its encrytped credentials and the client use it's password to decrypt the credentials (with or without OPRF). Then he can us his credentials to compute a Key-Hiding AKE with the server.
+
+Both party finish with a mutual key confirmation initiated by the client.
+
+\paragraph{\writingNotes{Register}}
+Same problem addressed in \ref{sec:opaque_register} (client need to sends password to server-side register OR server send his public key for client-side register)
 
 
 % ====================================================================================
@@ -167,19 +214,19 @@ This section compare the mains PAKEs on their security guarantees and performanc
      
      % Qualities (security guarantees)
      
-     10 & Server doesn't store password in cleartext & x & x & Yes & x \\ \hline
-     1 & Avoid sending cleartext password to the server & x & x & Yes & x \\ \hline
-     2 & Secure against pre-computation attacks & x & x & Yes & x \\ \hline
-     3 & Server doesn't send salt in cleartext & x & x & Yes & x \\ \hline
+     10 & Server doesn't store password in cleartext & x & x & Yes & Yes \\ \hline
+     1 & Avoid sending cleartext password to the server & x & x & Yes (register?) & Yes (register?) \\ \hline
+     2 & Secure against pre-computation attacks & x & x & Yes & Yes, if using OPRF \\ \hline
+     3 & Server doesn't send salt in cleartext & x & x & Yes & -- (no salt) \\ \hline
      4 & Forward secrecy & x & x & Yes, Full FS & Yes, Full FS \\ \hline
-     5 & Mutual authentication & x & x & Yes & x \\ \hline
-     6 & PKI-free & x & x & Yes, except during register & x \\ \hline
+     5 & Mutual authentication & x & x & Yes & Yes ? \\ \hline
+     6 & PKI-free & x & x & Yes, except during register (client-side register ?) & Yes, except during register (client-side register ?) \\ \hline
      7 & User-side password hardening & x & x & Yes & x \\ \hline
      8 & Built-in mechanism to store client's secrets on the server & x & x & Yes & x \\ \hline
-     9 & Server threshold implementation & x & x & Yes, user-transparent & x \\ \hline
+     9 & Server threshold implementation & x & x & Yes, user-transparent & Yes, if using OPRF \\ \hline
      11 & Resistant upon Oblivious PRF compromise & x & x & No, entire security is compromised & Fall back to non-strong aPAKE \\ \hline
      12 & Internet standard & x & x & Draft & x \\ \hline
-     13 & Security proof & x & x & Yes, in a very strong model & x \\ \hline
+     13 & Security proof & x & x & Yes, in a very strong model (random oracle model ?) & Yes (idea cipher model) \\ \hline
      
      % Performances
      
