@@ -127,13 +127,27 @@ compromise), the user’s password is exposed to an offline dictionary attack."
 %%% implementation
 
 - \cite{KHAPE_Paper} prove that 3DH and HMQV are key-hiding AKE and can be used in KHAPE % TODO see citation in KHAPE_Paper for 3DH and HMQV
-- It also shows that (some KEM-based AKE like) SKEME can be adapted to archive similar result "if instantiated with a key-hiding KEM".
+- It also shows that (some KEM-based AKE like) SKEME can be adapted to archive similar result "if instantiated with a key-hiding KEM". % TODO cites 3DH, HMQV, SKEME papers
 
 
 
-% How Key-hiding AKE works ?
-% Practical KHAPE construction
-% Login and register steps
+%%% How Key-hiding AKE works ?
+%%% Ideal cipher ?
+
+
+
+%%% Practical KHAPE construction
+
+% TODO describe steps of the schema
+
+\begin{figure}[h]
+ \centering
+ \includegraphics[width=\textwidth]{KHAPE.png}
+ \caption{Generic KHAPE protocol.}
+ \label{fig:Generic_KHAPE}
+\end{figure}
+
+%%% Login and register steps
 
 
 % ====================================================================================
@@ -157,7 +171,7 @@ This section compare the mains PAKEs on their security guarantees and performanc
      1 & Avoid sending cleartext password to the server & x & x & Yes & x \\ \hline
      2 & Secure against pre-computation attacks & x & x & Yes & x \\ \hline
      3 & Server doesn't send salt in cleartext & x & x & Yes & x \\ \hline
-     4 & Forward secrecy & x & x & Yes & x \\ \hline
+     4 & Forward secrecy & x & x & Yes, Full FS & Yes, Full FS \\ \hline
      5 & Mutual authentication & x & x & Yes & x \\ \hline
      6 & PKI-free & x & x & Yes, except during register & x \\ \hline
      7 & User-side password hardening & x & x & Yes & x \\ \hline
