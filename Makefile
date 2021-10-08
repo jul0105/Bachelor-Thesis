@@ -10,8 +10,8 @@ target = report
 .PHONY: build
 build: ## Démarre toute l'application sur docker
 	pdflatex --shell-escape $(target).tex
-	pdflatex --shell-escape $(target).tex
 	bibtex $(target).aux
+	pdflatex --shell-escape $(target).tex
 	pdflatex --shell-escape $(target).tex
 
 
