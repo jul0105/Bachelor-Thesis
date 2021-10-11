@@ -41,7 +41,7 @@
 
 
 \paragraph{\writingFormulationBrut{Design}}
-Jarecki and al. \cite{}. introduce the definition of Strong aPake (SaPAKE): an aPake secure against pre-computation attacks.
+Jarecki and al. \cite{OPAQUE_Paper}. introduce the definition of Strong aPake (SaPAKE): an aPake secure against pre-computation attacks.
 
 They provides two modular constructions, called the OPAQUE protocol that allow to builds SaPake protocols. The first construction allow to enhance any aPake to a SaPAKE while the second allow to enhance any Authenticated Key-Exchange (AKE) protocol (that are secure against KCI attacks) to an SaPAKE.
 The security of these two construction is based on Oblivious PRF (OPRF) functions \cite{}.
@@ -100,7 +100,8 @@ $C = Encrypt_rw_(client's private key | server's public key)$
 This method is not ideal as it require the user to sends it's cleartext password to the server making it vulnerable to miss-handling or server-side vulnerabilities discussed in the introduction.
 
 
-Ideally, one want to implement a client-side registration where the client choose a password and the server choose a secret salt and input them in the OPRF function. The client generate a public/private key pair and the server do the same. Server sends his public key to the client. Client encrypt his private key and server's public key using OPRF output as a key. He then sends the ciphertext to the server with his public key.
+
+\cite{OPAQUE_Paper} also note that ideally, one want to implement a client-side registration where the client choose a password and the server choose a secret salt and input them in the OPRF function. The client generate a public/private key pair and the server do the same. Server sends his public key to the client. Client encrypt his private key and server's public key using OPRF output as a key. He then sends the ciphertext to the server with his public key.
 This way, the server never see the cleartext password, the OPRF output and the client's private key. This is a major improvement in term of security.
 
 However, this also come with a downside as the server is no longer able to check password rules. This operation needs to be done client-side.
@@ -167,7 +168,8 @@ It also shows that (some KEM-based AKE like) SKEME can be adapted to archive sim
  \label{fig:Generic_KHAPE}
 \end{figure}
 
-
+Figure \ref{fig:Generic_KHAPE} shows the KHAPE protocol during login process.
+The steps are the following :
 
 Both client and server needs a public/private key pair to compute a AKE. The client encrypt it's credentials (his private key and server's public key) and store it in the server.
 
@@ -179,17 +181,19 @@ Both client and server needs a public/private key pair to compute a AKE. The cli
 (5) Mutual key confirmation initiated by the client
 
 %%% Login and register steps
-\paragraph{\writingNotes{Login}}
-
+\paragraph{\writingFormulationBrut{Login}}
 
 When the client want to login, the server sends its encrypted credentials and the client use it's password to decrypt the credentials (with or without OPRF depending on the implementation). Then he can us his credentials to compute a Key-Hiding AKE with the server.
 
 Both party finish with a mutual key confirmation initiated by the client.
 
-\paragraph{\writingNotes{Register}}
-Same problem addressed in \ref{sec:opaque_register} (client need to sends password to server-side register OR server send his public key for client-side register)
-either client... but this means that
-% TODO
+
+\paragraph{\writingFormulationBrut{Register}}
+KHAPE has the same problem that is addressed in \ref{sec:opaque_register}.
+The protocol propose a server-side register which is less than ideal because the server can see client's password and client's private key in cleartext at register.
+
+Instead, the paper propose a client-side registration process.
+
 
 
 % ====================================================================================
