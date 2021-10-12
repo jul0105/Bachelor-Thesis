@@ -51,6 +51,19 @@ These functions allow for each party, namely the client and the server, to input
 Overall, the OPAQUE protocol allow to secure authentication from the simplest applications to the most sensitive ones.
 
 
+% \paragraph{\writingNotes{Additional features}}
+% 
+% In addition to providing a Strong aPAKE protocol, OPRF provides other interesting security features that can be used with OPAQUE.
+% 
+% 
+% "Supports user-side password hardening"
+% "has a built-in facility for password-based storage-and-retrieval of secrets and credentials"
+% "accommodates a user-transparent server-side threshold implementation"
+% "far more secure alternative to the practice of deriving low-entropy secrets directly from a user's password"
+
+
+\paragraph{\writingFormulationBrut{Construction}}
+
 \begin{figure}[h]
  \centering
 
@@ -62,29 +75,17 @@ Overall, the OPAQUE protocol allow to secure authentication from the simplest ap
  \label{fig:OPAQUE_AKE}
 \end{figure}
 
-
-
-
-\paragraph{\writingFormulationBrut{Construction}}
-
 Figure \ref{fig:OPAQUE_AKE} shows the OPAQUE protocol using OPRF and AKE during login process.
 The steps are the following :
 
 (1) Generate a random value r to blind the hash of password so that the server cannot retrieve the password from the mapping.
-(2) Send result to server
-(3) Server add the salt to the password
+(2) Send result to server.
+(3) Server add the salt to the password.
 (4) Client calculate the exponant of the inverse of r to unblind the value. He canno't retrieve salt.
 (5) With the secret salt salt2, client compute secret key sk.
 (6) Server send encrypted keys ek to clients. ek contains server's public key and client's private key encrypted with sk.
-(7) If the password entered is correct, client can use sk to decrypt ek and retrieve his private key privU
+(7) If the password entered is correct, client can use sk to decrypt ek and retrieve his private key privU.
 (8) With both keys, clients and server can run an authenticated key exchange for mutual authentication.
-
-\paragraph{\writingNotes{Additional features}}
-
-     "Supports user-side password hardening"
-     "has a built-in facility for password-based storage-and-retrieval of secrets and credentials"
-     "accommodates a user-transparent server-side threshold implementation"
-     "far more secure alternative to the practice of deriving low-entropy secrets directly from a user's password"
 
 
 \paragraph{\writingFormulationBrut{Register}} \label{sec:opaque_register}
@@ -120,7 +121,7 @@ In the other hand, if the password is wrong, the OPRF output is totally differen
 
 
 
-\subsection{\writingNotes{KHAPE}}
+\subsection{\writingFormulationBrut{KHAPE}}
 \paragraph{\writingFormulationBrut{Introduction}}
 
 OPAQUE security rely entirely on the strength of the OPRF. If OPRF get broken --- for example by cryptanalysis, quantum attacks or security compromise --- an adversary can compute an offline dictionary attack on the user's password. This is especially critical considering that there is currently no known quantum-safe OPRFs.
@@ -137,16 +138,19 @@ In term of implementation, \cite{KHAPE_Paper} prove that 3DH and HMQV are key-hi
 It also shows that (some KEM-based AKE like) SKEME can be adapted to archive similar result "if instantiated with a key-hiding KEM". % TODO cites 3DH, HMQV, SKEME papers
 
 
-%%% comparison with OPAQUE
-\paragraph{\writingNotes{Mains differences with OPAQUE}}
-- KHAPE is computationally more performant than OPAQUE when the OPRF is not used and the performances become similar when OPRF is used.
-- "KHAPE seems more conducive to post-quantum security via post-quantum key-hiding KEMs."
+% \paragraph{\writingNotes{Mains differences with OPAQUE}}
+% - KHAPE is computationally more performant than OPAQUE when the OPRF is not used and the performances become similar when OPRF is used.
+% - "KHAPE seems more conducive to post-quantum security via post-quantum key-hiding KEMs."
+% 
+% - KHAPE allow less AKEs (no signature-based protocols such as SIGMA)
+% - KHAPE use ``idea cipher model'', OPAQUE use ``random oracle model'' (stronger ?)
+% 
+% - with OPAQUE the client learns first if an authentication attempt is succeed or not. with KHAPE, the server learns first which make it easier to count failed attempt in case of an online password guessing attack.
+% - KHAPE (without OPRF) cost is ~= same cost as KE cost where OPAQUE cost is about the double of KE cost
 
-- KHAPE allow less AKEs (no signature-based protocols such as SIGMA)
-- KHAPE use ``idea cipher model'', OPAQUE use ``random oracle model'' (stronger ?)
 
-- with OPAQUE the client learns first if an authentication attempt is succeed or not. with KHAPE, the server learns first which make it easier to count failed attempt in case of an online password guessing attack.
-- KHAPE (without OPRF) cost is ~= same cost as KE cost where OPAQUE cost is about the double of KE cost
+% Both client and server needs a public/private key pair to compute a AKE. The client encrypt it's credentials (his private key and server's public key) and store it in the server.
+
 
 
 %%% How Key-hiding AKE works ?
@@ -154,7 +158,7 @@ It also shows that (some KEM-based AKE like) SKEME can be adapted to archive sim
 
 
 
-\paragraph{\writingNotes{Construction}}
+\paragraph{\writingFormulationBrut{Construction}}
 
 
 \begin{figure}[h]
@@ -171,14 +175,11 @@ It also shows that (some KEM-based AKE like) SKEME can be adapted to archive sim
 Figure \ref{fig:Generic_KHAPE} shows the KHAPE protocol during login process.
 The steps are the following :
 
-Both client and server needs a public/private key pair to compute a AKE. The client encrypt it's credentials (his private key and server's public key) and store it in the server.
-
-
 (1) Optionally, an OPRF can be used to archive Strong aPAKE following the aPAKE to SaPAKE compiler using OPRF from \cite{OPAQUE_Paper}. The OPRF take the client's password and server's salt as an input. Client use the output in place of his password for the rest of the protocol.
 (2) Server send the client's encrypted envelop containing the client's private key and server's public key.
 (3) Client decrypt the ciphertext using Ideal Cipher encryption schema. He use his password or OPRF output as a key.
-(4) Both party use the public/private keys to compute a Key-Hiding Authenticated Key-Exchange
-(5) Mutual key confirmation initiated by the client
+(4) Both party use the public/private keys to compute a Key-Hiding Authenticated Key-Exchange.
+(5) Mutual key confirmation initiated by the client.
 
 %%% Login and register steps
 \paragraph{\writingFormulationBrut{Login}}
