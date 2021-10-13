@@ -1,0 +1,6 @@
+First OPRF paper :
+https://dblp.org/search?q=Number-theoretic%20constructions%20of%20efficient%20pseudo-random%20functions
+
+
+OPRF secret sharing and threshold :
+https://eprint.iacr.org/2017/363
