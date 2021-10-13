@@ -150,6 +150,21 @@ OPAQUE security rely entirely on the strength of the OPRF. If OPRF get broken --
 
 KHAPE (for Key-Hiding Asymmetric PakE) \cite{KHAPE_Paper} is a variant to the OPAQUE protocol. Instead of using OPRF as a main tool to archive security, it become an optional part of the protocol and KHAPE use two other concepts to archive security: non-commiting encryption and key-hiding AKE. % TODO non-commiting encryption ??
 
+% Like OPAQUE, in KHAPE each party has a private/public key pair that they use to compute the key exchange and the client store it's private key (and server's public key) on the server, encrypted by his password.
+% Since KHAPE doesn't require a OPRF run before decrypting the ciphertext containing the client's private key, an adversary could eavsedrop an exchange between the client and the server. He can save the ciphertext and save the public key used by the client during the AKE. He can then compute an offline dictionary attack using a list of candidat password to decrypt the ciphertext until he find a match with the server's public key that he recorded sooner.
+% To avoid this kind of attacks, KHAPE use 2 mains mechanisms. 1) Non-commiting encryption, 2) Key-hiding AKE.
+
+
+% ``Two key ideas are: (i) dispense with authentication of the
+% credentials4 and instead use a non-committing encryption where decryption of
+% a given ciphertext under different keys cannot help identify which key from a
+% candidate set was used to produce that ciphertext; and (ii) using a key-hiding
+% AKE. The latter refers to AKE protocols that require that no adversary, not even
+% active one, can identify the long-term keys used by the peers to an exchange even
+% if provided with a list of candidate keys (a notion reminiscent of key anonymity
+% for public key encryption [8]).'' \cite{KHAPE_Paper}
+
+
 KHAPE is not a Strong aPAKE like OPAQUE. But it can be made a SaPAKE following the aPAKE to SaPAKE compiler from \cite{OPAQUE_Paper} using OPRF.
 
 So OPRF is optional with KHAPE and just allow to make it a SaPAKE. In addition, it also allow to use OPRF features such as server-side threshold implementation that doesn't require client's change. If OPRF fails, KHAPE just loss these functionalities but the rest of the security remain in contrary to OPAQUE.
