@@ -40,9 +40,44 @@
 
 
 \subsection{\writingNotes{EKE}}
+\paragraph{\writingNotes{Introduction}}
 
-- EKE (for Encrypted Key Exchange)
-- 1992
+EKE (for Encrypted Key Exchange) was proposed in 1992 by Bellovin and Merritt \cite{EKE_Paper} and is the first PAKE protocol. 
+It is a simple protocol that is designed to prevent offline dictionary attacks on the password.
+It use a combination of asymmetric and symmetric cryptography.
+The asymmetric keys are ephemeral and are exchanged between the client and the server by encrypting it with the shared symmetric key --- which is derived from the password.
+This allow to secure the exchange against Man-in-the-Middle attack. % more ?
+However, this protocol require that both party share a secret --- namely the password. This means that the server has to store and process the password in cleartext which is strong discouraged. % details ?
+
+
+Multiple cryptographic primitive can be used for the asymmetric part such as RSA, ElGamal or DH but the majority of EKE variants use DH \cite{17-2005}. % more ? why ?
+
+Overall, EKE got broken and therefore should not be used. % TODO source
+
+
+\paragraph{\writingNotes{Construction}}
+
+\begin{figure}[h]
+ \centering
+
+ \setlength{\fboxsep}{10pt}
+ \setlength{\fboxrule}{1pt}
+ \fbox{\includegraphics[width=\textwidth-22pt]{EKE.png}}
+
+ \caption{Login process with EKE (using DH) protocol.}
+ \label{fig:EKE_DH}
+\end{figure}
+
+Figure \ref{fig:EKE_DH} shows the EKE protocol using DH during login process.
+The steps are the following :
+
+(1) Like a standard DH exchange, both client and server pick a random secret value $a$ and $b$.
+(2) Client compute $A$, encrypt it using the password and send the result to the server in addition to it identify (e.g. username).
+(3) Server decrypt ciphertext using the password to obtain $A$. He compute $B$ and $K$. He encrypt $B$ using the password and encrypt a randomly generated challenge $c1$ using $K$. He sends the resulting ciphertext to the client.
+(4) Client decrypt $B$ using the password and compute $K$. He decrypt $c1$ with $K$ and also generate a random challenge $c2$. He concat the two challenges, encrypt them using $K$ and send the result to the server.
+(5) Server decrypt the ciphertext and check if the $c1$ that he sent is the same as the one received. If it's the case, the server is assured that the client possess the same password. The server has authenticated the client. He finish by encrypting $c2$ and sending the result.
+(6) Client decrypt the ciphertext and check if the $c2$ that he sent is the same as the one received. If it's the case, the client is assured that the server possess the same password and therefore is authenticated. The client has authenticated the server.
+
 
 
 % ====================================================================================
