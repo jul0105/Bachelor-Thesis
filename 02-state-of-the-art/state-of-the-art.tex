@@ -43,6 +43,7 @@
 \paragraph{\writingNotes{Introduction}}
 
 EKE (for Encrypted Key Exchange) was proposed in 1992 by Bellovin and Merritt \cite{EKE_Paper} and is the first PAKE protocol. 
+It allow two party that share a common password to exchange information over an insecure channel.
 It is a simple protocol that is designed to prevent offline dictionary attacks on the password.
 It use a combination of asymmetric and symmetric cryptography.
 The asymmetric keys are ephemeral and are exchanged between the client and the server by encrypting it with the shared symmetric key --- which is derived from the password.
@@ -52,7 +53,7 @@ However, this protocol require that both party share a secret --- namely the pas
 
 Multiple cryptographic primitive can be used for the asymmetric part such as RSA, ElGamal or DH but the majority of EKE variants use DH \cite{17-2005}. % more ? why ?
 
-Overall, EKE got broken and therefore should not be used. % TODO source
+Overall, EKE got broken and therefore should not be used. % TODO source. all EKE ? EKE-DH also ?
 
 
 \paragraph{\writingNotes{Construction}}
@@ -78,6 +79,8 @@ The steps are the following :
 (5) Server decrypt the ciphertext and check if the $c1$ that he sent is the same as the one received. If it's the case, the server is assured that the client possess the same password. The server has authenticated the client. He finish by encrypting $c2$ and sending the result.
 (6) Client decrypt the ciphertext and check if the $c2$ that he sent is the same as the one received. If it's the case, the client is assured that the server possess the same password and therefore is authenticated. The client has authenticated the server.
 
+\paragraph{\writingNotes{Register}}
+The protocol mention registration. It is assumed that both party already share a common secret, the password. A secure channel is therefore necessary to share the password in the first place.
 
 
 % ====================================================================================
@@ -286,19 +289,19 @@ This section compare the mains PAKEs on their security guarantees and performanc
      
      % Qualities (security guarantees)
      
-     10 & Server doesn't store password in cleartext & x & x & Yes & Yes \\ \hline
-     1 & Avoid sending cleartext password to the server & x & x & Yes (May be required during register depending on the implementation) & Yes (May be required during register depending on the implementation) \\ \hline
-     2 & Secure against pre-computation attacks & x & x & Yes & Yes, if using OPRF \\ \hline
-     3 & Server doesn't send salt in cleartext & x & x & Yes & Yes (OPRF) (without OPRF there is no salt) \\ \hline
-     4 & Forward secrecy & x & x & Yes, Full FS & Yes, Full FS \\ \hline
-     5 & Mutual authentication & x & x & Yes & Yes \\ \hline
-     6 & PKI-free & x & x & Yes, except during register & Yes, except during register \\ \hline
-     7 & User-side password hardening & x & x & Yes & Yes, if using OPRF \\ \hline
-     8 & Built-in mechanism to store client's secrets on the server & x & x & Yes & Yes \\ \hline
-     9 & Server threshold implementation & x & x & Yes, user-transparent & Yes, if using OPRF \\ \hline
-     11 & Resistant upon Oblivious PRF compromise & x & x & No, entire security is compromised & Fall back to non-strong aPAKE \\ \hline
-     12 & Standardization status & x & x & Internet standard draft \cite{OPAQUE_Standard_Draft} & Crypto 2021 Paper \cite{KHAPE_Paper} \\ \hline
-     13 & Security proof & x & x & Yes, in a very strong model (random oracle model ?) & Yes (idea cipher model) \\ \hline
+     10 & Server doesn't store password in cleartext & No & x & Yes & Yes \\ \hline
+     1 & Avoid sending cleartext password to the server & No & x & Yes (May be required during register depending on the implementation) & Yes (May be required during register depending on the implementation) \\ \hline
+     2 & Secure against pre-computation attacks & - (no hash) & x & Yes & Yes, if using OPRF \\ \hline
+     3 & Server doesn't send salt in cleartext & - (no salt) & x & Yes & Yes (OPRF) (without OPRF there is no salt) \\ \hline
+     4 & Forward secrecy & Yes ? & x & Yes, Full FS & Yes, Full FS \\ \hline
+     5 & Mutual authentication & Yes & x & Yes & Yes \\ \hline
+     6 & PKI-free & Yes, except during register & x & Yes, except during register & Yes, except during register \\ \hline
+     7 & User-side password hardening & No\footnote{It could be possible to compute a KDF function on the password before using it as a symmetrical key but this is closer to Augmented EKE \cite{AEKE_Paper} where the password is hashed client-side and server store the hash result.} & x & Yes & Yes, if using OPRF \\ \hline
+     8 & Built-in mechanism to store client's secrets on the server & No & x & Yes & Yes \\ \hline
+     9 & Server threshold implementation & No & x & Yes, user-transparent & Yes, if using OPRF \\ \hline
+     11 & Resistant upon Oblivious PRF compromise & - (no OPRF) & x & No, entire security is compromised & Fall back to non-strong aPAKE \\ \hline
+     12 & Standardization status & RFC for EAP-EKE (relevant? cite) & x & Internet standard draft \cite{OPAQUE_Standard_Draft} & Crypto 2021 Paper \cite{KHAPE_Paper} \\ \hline
+     13 & Security proof & No & x & Yes, in a very strong model (random oracle model ?) & Yes (idea cipher model) \\ \hline
      
      \end{tabular}
  \end{center}
@@ -309,13 +312,13 @@ This section compare the mains PAKEs on their security guarantees and performanc
      \textbf{\#} & \textbf{Criteria} & \textbf{EKE} & \textbf{SRP} & \textbf{OPAQUE} & \textbf{KHAPE} \\ \hline
      % Performances
      
-     14 & Easily adaptable to elliptic curves & x & x & Yes & Yes ? \\ \hline
-     15 & Number of messages & x & x & 3 & 4 (3 if client initiate) \\ \hline
-     16 & Number of exponentiations & x & x & 3 or 4 ? & 2 + 1 hash-to-curve \\ \hline
+     14 & Easily adaptable to elliptic curves & Yes ? & x & Yes & Yes ? \\ \hline
+     15 & Number of messages & 4 ? & x & 3 & 4 (3 if client initiate) \\ \hline
+     16 & Number of exponentiations & 4 ? & x & 3 or 4 ? & 2 + 1 hash-to-curve \\ \hline
      20 & Computational cost compared to a KE (see \cite{KHAPE_Paper} presentation) & 1x & x & 2x & 1x without OPRF, 2x with OPRF \\ \hline
-     17 & Patented & Yes, expired in 2011 ? & x & No & No \\ \hline
-     18 & Year published & x & x & 2018 & 2021 \\ \hline
-     19 & Got broken & x & x & x & x \\ \hline
+     17 & Patented & Yes, expired in 2011 & x & No & No \\ \hline
+     18 & Year published & 1992 & 1998 & 2018 & 2021 \\ \hline
+     19 & Got broken & Yes (source ?) & x & x & x \\ \hline
 
      \end{tabular}
  \end{center}
