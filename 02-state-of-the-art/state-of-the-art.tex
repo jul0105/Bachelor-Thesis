@@ -24,7 +24,9 @@
 
 \section{History of PAKEs}
 % citer, annee, artuble, ce qu0il fait, patent?, cassé ?, ce qu'il apport en plus, citer l'article et citer l'arcile qui l'a cassé. pourquoi il y a un saut entre SRP et OPAQUE (dans le temps) ?
+
 \paragraph{EKE (1992)}
+% Evolution and variants ?  in particular A-EKE which is the first aPAKE
 \paragraph{EKE variants (PAK, PPK, PAK-X)}
 \paragraph{OKE}
 \paragraph{SNAPI}
@@ -56,7 +58,8 @@ However, this protocol requires that both party share a secret --- namely the pa
 
 Multiple cryptographic primitive can be used for the asymmetric part such as RSA, ElGamal or DH but the majority of EKE variants use DH \cite{Breaking_EKE}. % more ? why ?
 
-Overall, EKE got broken and therefore should not be used. % TODO source. all EKE ? EKE-DH also ?
+Overall, EKE got broken and therefore should not be used. % TODO source. all EKE ? DH-EKE also ? See http://www.jablon.org/jab96.pdf chapter 4
+
 
 
 \paragraph{\writingFormulationClean{Construction}}
@@ -77,7 +80,7 @@ Overall, EKE got broken and therefore should not be used. % TODO source. all EKE
  \setlength{\fboxrule}{1pt}
  \fbox{\includegraphics[width=\textwidth-22pt]{EKE.png}}
 
- \caption{Login process with EKE (EKE-DH) protocol. (See Fig. \ref{fig:notation} for notations)}
+ \caption{Login process with EKE (DH-EKE) protocol. (See Fig. \ref{fig:notation} for notations)}
  \label{fig:EKE_DH}
 \end{figure}
 
@@ -108,6 +111,66 @@ The protocol doesn't mention registration. It is assumed that both parties alrea
 SRP (for Secure Remote Password), 1998.
 
 % TODO citer le papier initiale et aussi le site web pour avoir la dernier version (ou le papier de la derniere version)
+
+% ---------- SRP Stanford homepage -------------------
+
+% - widly standaridized (3 RFC, IEEE, ISO ): http://srp.stanford.edu/doc.html#standards
+% - SRP ciphersuite
+% - multiple versions. SRP-3 (1998), evolved in SRP-6, now SRP-6a
+% - no patent, royalty-free license, open source project. An exception because most of the PAKE in this time were patented (source ? CAA)
+% - Adaptable to EC : Y. K. Lee, J. K. Lee, "EC-SRP Protocol: Elliptic Curve Secure Remote Password Protocol", Korea Institute of Information Security and Cryptology, Vol 9, No. 1, pp. 85-102, 1999.
+
+% - "SRP borrows some elements from other key-exchange and identification protcols and adds some subtle modifications and refinements. The result is a protocol that preserves the strength and efficiency of the EKE family protocols while fixing some of their shortcomings"
+% - design of SRP-6 : http://srp.stanford.edu/design.html
+
+
+%%% The Project 
+% - "The primary goal of the SRP Project is to provide standards, technologies, and implementations that improve password security of existing protocols and applications while preserving the ease-of-use associated with passwords and integrating cleanly with these systems. SRP accomplishes these objectives because it was designed with a number of considerations in mind."
+% - "SRP has been deployed as a secure, free password authentication solution in commercial, non-commercial, and standalone configurations in universities, companies, and organizations worldwide."
+% - "SRP was designed to protect passwords against both passive and active network attacks"
+% - "SRP has been extensively analyzed and studied in the open, and all analysis to date has confirmed its security"
+
+% - "Convenience - From the perspective of some users, the fact that SRP keeps password interfaces exactly the same while delivering secure authentication is perhaps the greatest of its technical advances. Until now, users have had to compromise - either put up with some added inconvenience or accept an imperfect security model. SRP advances the status quo in both directions, achieving the best of both worlds in one package." Blackbox that doesn't require major interface changes.
+% "Security, convenience, openness and simplicity"
+
+
+%%% Abstract
+% "This paper presents a new password authentication and key-exchange protocol suitable for authenticating users and exchanging keys over an untrusted network. The new protocol resists dictionary attacks mounted by either passive or active network intruders, allowing, in principle, even weak passphrases to be used safely. It also offers perfect forward secrecy, which protects past sessions and passwords against future compromises. Finally, user passwords are stored in a form that is not plaintext-equivalent to the password itself, so an attacker who captures the password database cannot use it directly to compromise security and gain immediate access to the host. This new protocol combines techniques of zero-knowledge proofs with asymmetric key exchange protocols and offers significantly improved performance over comparably strong extended methods that resist stolen-verifier attacks such as Augmented EKE or B-SPEKE."
+
+
+
+
+% ---------------- CAA 06 passwords ---------------------
+
+% - "Goal: avoid patent"
+% - interessant mais pas idéal
+% - schema of the exchange
+
+% Citation:
+%• Many broken versions (we are now at 6a). Old and patched many times.
+%• Cannot directly be adapted to elliptic curves (Zp seen as a field, not a group).
+%• No valuable security proof (passive adversaries).
+%• Weird maths, biases, . . .
+%• Working implementations (even integration in OpenSSL).
+%• Used in industry.
+%• Vulnerable to pre-computation attacks.
+
+
+% ------ 06 A Few Thoughts on Cryptographic Engineering -------------
+
+% One of the exception: SRP
+% - "most wiidely-deployed PAKE protocol in the world"
+% - TLS ciphersuite, implemented in OpenSSL
+% - used extensively in iCloud Key Vault ("make SRP one of the most widely used cryptographic protocols in the world, so vast is the number of devices that Apple ships. So this is nothing to sneer at")
+% - "SRP isn't the best PAKE we can deploy"
+
+% SRP TLDR: (copy/paste)
+% 1. SRP does some stuff “right”. For one thing, unlike early PAKEs it does not require you to store a raw password on the server (or, equivalently, a hash that could be used by a malicious client in place of the password). Instead, the server stores a “verifier” which is a one-way function (https://en.wikipedia.org/wiki/One-way_function) of the password hash. This means a leak of the password database does not (immediately) allow the attacker to impersonate the user — unless they conduct further expensive dictionary attacks. (The technical name for this is “asymmetric” PAKE.)
+% 2. Even better, the current version of SRP (v4 v6a) isn’t obviously broken!
+% 3. However (and with no offense to the designers) the SRP protocol design is completely bonkers, and earlier versions have been broken several times — which is why we’re now at revision 6a. Plus the “security proof” in the original research paper doesn’t really prove anything meaningful (https://blog.cryptographyengineering.com/should-you-use-srp/).
+% 4. SRP currently relies on integer (finite field) arithmetic, and for various reasons (see point 3 above) the construction is not obviously transferable to the elliptic curve (https://blog.cryptographyengineering.com/should-you-use-srp/) setting. This requires more bandwidth and computation, and thus SRP can’t take advantage of the many efficiency improvements we’ve developed in settings like Curve25519 (https://en.wikipedia.org/wiki/Curve25519).
+% 5. SRP is vulnerable to pre-computation attacks, due to the fact that it hands over the user’s “salt” to any attacker who can start an SRP session. This means I can ask a server for your salt, and build a dictionary of potential password hashes even before the server is compromised.24/09/2021 17:32 Let’s talk about PAKE – A Few Thoughts on Cryptographic Engineering https://blog.cryptographyengineering.com/2018/10/19/lets-talk-about-pake/ 4/13
+% 6. Despite all these drawbacks, SRP is simple — and actually ships with working code. Plus there’s working code in OpenSSL that even integrates with TLS, which makes it relatively easy to adopt.
 
 
 % ====================================================================================
@@ -311,20 +374,20 @@ This section compares the main PAKEs on their security guarantees and performanc
      
      % Qualities (security guarantees)
      
-     1 & Server doesn't store passwords in cleartext & No & x & Yes & Yes \\ \hline
-     2 & Avoid sending cleartext password to the server & No & x & Yes\footnote{May be required during register depending on the implementation} & Yes\footnote{May be required during register depending on the implementation} \\ \hline
+     1 & Server doesn't store passwords in cleartext & No & Yes & Yes & Yes \\ \hline
+     2 & Avoid sending cleartext password to the server & No & Yes & Yes\footnote{May be required during register depending on the implementation} & Yes\footnote{May be required during register depending on the implementation} \\ \hline
      
-     3 & Secure against pre-computation attacks & - (no hash) & x & Yes & Yes, if using OPRF \\ \hline
+     3 & Secure against pre-computation attacks & - (no hash) & No & Yes & Yes, if using OPRF \\ \hline
 %      3 & Server doesn't send salt in cleartext & - (no salt) & x & Yes & Yes (OPRF) (without OPRF there is no salt) \\ \hline
-     4 & Forward secrecy & Yes ? & x & Yes, Full FS & Yes, Full FS \\ \hline
+     4 & Forward secrecy & Yes ? & Yes & Yes, Full FS & Yes, Full FS \\ \hline
      5 & Mutual authentication & Yes & x & Yes & Yes \\ \hline
-     6 & PKI-free & Yes, except during register & x & Yes, except during register & Yes, except during register \\ \hline
+     6 & PKI-free & Yes, except during register & Yes, except during register ? & Yes, except during register & Yes, except during register \\ \hline
      7 & User-side password hardening & No\footnote{It could be possible to compute a KDF function on the password before using it as a symmetrical key but this is closer to Augmented EKE \cite{AEKE_Paper} where the password is hashed client side and the server store the hash results.} & x & Yes & Yes, if using OPRF \\ \hline
      8 & Built-in mechanism to store client's secrets on the server & No & x & Yes & Yes \\ \hline
      9 & Server threshold implementation & No & x & Yes, user-transparent & Yes, if using OPRF \\ \hline
-     11 & Resistant upon Oblivious PRF compromise & - (no OPRF) & x & No, entire security is compromised & Fall back to non-strong aPAKE \\ \hline
+     11 & Resistant upon Oblivious PRF compromise & - (no OPRF) & - (no OPRF) & No, entire security is compromised & Fall back to non-strong aPAKE \\ \hline
      12 & Standardization status & RFC for EAP-EKE \cite{EAP_EKE_RFC} & x & Internet standard draft \cite{OPAQUE_Standard_Draft} & Crypto 2021 Paper \cite{KHAPE_Paper} \\ \hline
-     13 & Security proof & No \footnote{EKE only provide informal security analysis \cite{``https://eprint.iacr.org/2000/014.pdf''}} & x & Yes, in a very strong model (random oracle model ?) & Yes (idea cipher model) \\ \hline
+     13 & Security proof & No \footnote{EKE only provide informal security analysis \cite{``https://eprint.iacr.org/2000/014.pdf''}} & No valuable security proof (passive adversaries \cite{CAA} & Yes, in a very strong model (random oracle model ?) & Yes (idea cipher model) \\ \hline
      
      \end{tabular}
  \end{center}
@@ -335,13 +398,13 @@ This section compares the main PAKEs on their security guarantees and performanc
      \textbf{\#} & \textbf{Criteria} & \textbf{EKE} & \textbf{SRP} & \textbf{OPAQUE} & \textbf{KHAPE} \\ \hline
      % Performances
      
-     14 & Easily adaptable to elliptic curves & Yes ? & x & Yes & Yes ? \\ \hline
+     14 & Easily adaptable to elliptic curves & Yes ? & No ("Cannot directly be adapted to elliptic curves (Zp seen as a field, not a group)." \cite{CAA}) & Yes & Yes ? \\ \hline
      15 & Number of messages & 4 ? & x & 3 & 4 (3 if client initiate) \\ \hline
      16 & Number of exponentiations & 4 ? & x & 3 or 4 ? & 2 + 1 hash-to-curve \\ \hline
      20 & Computational cost compared to a KE (see \cite{KHAPE_Paper} presentation) & 1x & x & 2x & 1x without OPRF, 2x with OPRF \\ \hline
-     17 & Patented & Yes, expired in 2011 & x & No & No \\ \hline
+     17 & Patented & Yes, expired in 2011 & No & No & No \\ \hline
      18 & Year published & 1992 & 1998 & 2018 & 2021 \\ \hline
-     19 & Got broken & Yes (source ?) & x & x & x \\ \hline
+     19 & Got broken & Yes (source ?) & Yes and patched \cite{CAA} & x & x \\ \hline
 
      \end{tabular}
  \end{center}
@@ -358,7 +421,7 @@ Even though it seems similar to criteria 1, it's not. Criterion 1 is about passw
 The server doesn't receive passwords in cleartext which avoid any miss-handling vulnerabilities such as logging or caching cleartext passwords on the server.
 
 \paragraph{\writingFormulationClean{3. Secure against pre-computation attacks.}}
-This is the main security property of Strong aPAKE \cite{OPAQUE_Paper}. The server doesn't leak any data (generally the salt) that could allow an attacker to perform a pre-computation attack. This attack allows an attacker to compute a table \emph{before} the server even get compromised. Once the attacker succeeds in compromising the server, he can use the precomputed table to retrieve the passwords \emph{instantaneously}. So this protection force the attacker to perform an offline dictionary attack after successful server compromise. % This vulnerability weaken the initial benefit of using an aPAKE \cite{aPAKE_Formalized} and even make password-over-TLS more secure \cite{OPAQUE_Paper} (than aPAKE vulnerable to pre-computation attacks).
+This is the main security property of Strong aPAKE \cite{OPAQUE_Paper}. The server doesn't leak any data that could allow an attacker to perform a pre-computation attack (for example SRP send the salt in cleartext in the first message). This attack allows an attacker to compute a table \emph{before} the server even get compromised. Once the attacker succeeds in compromising the server, he can use the precomputed table to retrieve the passwords \emph{instantaneously}. So this protection force the attacker to perform an offline dictionary attack after successful server compromise. % This vulnerability weaken the initial benefit of using an aPAKE \cite{aPAKE_Formalized} and even make password-over-TLS more secure \cite{OPAQUE_Paper} (than aPAKE vulnerable to pre-computation attacks).
 
 % \paragraph{\writingNotes{3. Server doesn't send salt in cleartext.}}
 % Same as 2.
