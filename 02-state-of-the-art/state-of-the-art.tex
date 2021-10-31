@@ -108,7 +108,8 @@ The protocol doesn't mention registration. It is assumed that both parties alrea
 
 
 \subsection{\writingNotes{SRP}}
-SRP (for Secure Remote Password), 1998.
+SRP (for Secure Remote Password) was proposed in 1998 with the goal to provide standards and technologies to improve security of existing password protocols while keeping the ease-of-use
+The main goal is to provide a technology to improve the security of existing password protocols while keeping the ease-of-use of passwords. In other words, the goal is to provide a drop-in replacement to the classical auth method where the implementation doesn't require a deep change in contrary to EKE the shared secret (the password) need to be stored in cleartext on the server (...).
 
 % TODO citer le papier initiale et aussi le site web pour avoir la dernier version (ou le papier de la derniere version)
 
@@ -118,7 +119,7 @@ SRP (for Secure Remote Password), 1998.
 % - SRP ciphersuite
 % - multiple versions. SRP-3 (1998), evolved in SRP-6, now SRP-6a
 % - no patent, royalty-free license, open source project. An exception because most of the PAKE in this time were patented (source ? CAA)
-% - Adaptable to EC : Y. K. Lee, J. K. Lee, "EC-SRP Protocol: Elliptic Curve Secure Remote Password Protocol", Korea Institute of Information Security and Cryptology, Vol 9, No. 1, pp. 85-102, 1999.
+% - Adaptable to EC (NOT EASILY) : Y. K. Lee, J. K. Lee, "EC-SRP Protocol: Elliptic Curve Secure Remote Password Protocol", Korea Institute of Information Security and Cryptology, Vol 9, No. 1, pp. 85-102, 1999.
 
 % - "SRP borrows some elements from other key-exchange and identification protcols and adds some subtle modifications and refinements. The result is a protocol that preserves the strength and efficiency of the EKE family protocols while fixing some of their shortcomings"
 % - design of SRP-6 : http://srp.stanford.edu/design.html
