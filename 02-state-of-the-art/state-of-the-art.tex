@@ -440,8 +440,8 @@ This makes KHAPE more resistant to OPRF compromise than OPAQUE.
 %OPAQUE "security proof in a very strong model"
 COMMENT: EKE only provide informal security analysis \cite{``https://eprint.iacr.org/2000/014.pdf''}
 
-\paragraph{13. Easily adaptable to elliptic curves.}
-
+\paragraph{\writingNotes{13. Easily adaptable to elliptic curves.}}
+COMMENT: In SRP, $\mathbb{Z}_p$ is used as a field, not a group. Therefore, SRP cannot be easily adapted to elliptic curves \cite{CAA}.
 
 \paragraph{14. Number of messages.}
 
@@ -495,7 +495,7 @@ For value where there is an ``*'', please refer to the appropriate comment in Se
      9 & Server threshold implementation & No & No & Yes, user-transparent & Yes, if using OPRF \\ \hline
      10 & Resistant upon Oblivious PRF compromise & - (no OPRF) & - (no OPRF) & No, entire security is compromised & Fall back to non-strong aPAKE \\ \hline
      11 & Standardization status & RFC for EAP-EKE \cite{EAP_EKE_RFC} & 3 RFC \cite{SRP_RFC_1, SRP_RFC_2, SRP_RFC_3}, 1 ISO \cite{SRP_ISO}, 1 IEEE \cite{SRP_IEEE} & Internet standard draft \cite{OPAQUE_Standard_Draft} & CRYPTO 2021 Paper \cite{KHAPE_Paper} \\ \hline
-     12 & Security proof & No* & No valuable security proof (passive adversaries \cite{CAA} & Yes, in a very strong model (random oracle model ?) & Yes (idea cipher model) \\ \hline
+     12 & Security proof & No* & No valuable security proof \cite{CAA} & Yes, in the random oracle model & Yes, in the ideal cipher model \\ \hline
      
      \end{tabular}
  \end{center}
@@ -506,16 +506,16 @@ For value where there is an ``*'', please refer to the appropriate comment in Se
      \textbf{\#} & \textbf{Criteria} & \textbf{EKE} & \textbf{SRP} & \textbf{OPAQUE} & \textbf{KHAPE} \\ \hline
      % Performances
      
-     13 & Easily adaptable to elliptic curves & Yes ? & No ("Cannot directly be adapted to elliptic curves (Zp seen as a field, not a group)." \cite{CAA}) & Yes & Yes ? \\ \hline
-     14 & Number of messages & 4 ? & TBD & 3 & 4 (3 if client initiate) \\ \hline
-     15 & Number of exponentiations & 4 ? & TBD & 3 or 4 ? & 2 + 1 hash-to-curve \\ \hline
+     13 & Easily adaptable to elliptic curves & Yes ? & No* & Yes & Yes ? \\ \hline
+     14 & Number of messages & 4 ? & 4 ? & 3 & 4 (3 if client initiate) \\ \hline
+     15 & Number of exponentiations & 4 ? & 4 ? & 3 or 4 ? & 2 + 1 hash-to-curve \\ \hline
      16 & Computational cost compared to a KE (see \cite{KHAPE_Paper} presentation) & 1x & TBD & 2x & 1x without OPRF, 2x with OPRF \\ \hline
      17 & Communication size & TBD & TBD & TBD & TBD \\ \hline
      18 & Server-side storage size & TBD & TBD & TBD & TBD \\ \hline
      
      19 & Patented & Yes, expired in 2011 & No & No & No \\ \hline
      20 & Year published & 1992 & 1998 & 2018 & 2021 \\ \hline
-     21 & Got broken & Yes (source ?) & Yes and patched \cite{CAA} & TBD & TBD \\ \hline
+     21 & Got broken & Some versions got broken & Yes and patched \cite{CAA} & No & No \\ \hline
 
      \end{tabular}
  \end{center}
