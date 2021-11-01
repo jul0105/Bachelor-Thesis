@@ -386,28 +386,35 @@ This section compares the main PAKEs on their security guarantees and performanc
 \paragraph{\writingFormulationClean{1. Server doesn't process passwords in cleartext.}}
 This is the main security property of asymmetric PAKE \cite{aPAKE_Formalized}. Server doesn't have to store passwords in cleartext which should make it more resilient in case of server compromise. Adversary has to compute an offline attack to retrieve passwords from the compromised server.
 
-\paragraph{\writingFormulationBrut{2. Avoid sending cleartext password to the server.}}
-Even though it seems similar to criteria 1, it's not. Criterion 1 is about password storage, but this criterion is about password transmission. Transmissions and storage of the password are vulnerable to different attacks vectors.
+\paragraph{\writingFormulationClean{2. Avoid sending cleartext password to the server.}}
+Even though it seems similar to criteria 1, it's not. Criterion 1 is about password processing, but this criterion is about password transmission. Transmission and processing of passwords are vulnerable to different attacks vectors.
 The server doesn't receive passwords in cleartext which avoid any miss-handling vulnerabilities such as logging or caching cleartext passwords on the server.
+
+COMMENT: May be required during register depending on the implementation (See Section \ref{sec:opaque_register}).
 
 \paragraph{\writingFormulationClean{3. Secure against pre-computation attacks.}}
 This is the main security property of Strong aPAKE \cite{OPAQUE_Paper}. The server doesn't leak any data that could allow an attacker to perform a pre-computation attack (for example SRP send the salt in cleartext in the first message). This attack allows an attacker to compute a table \emph{before} the server even get compromised. Once the attacker succeeds in compromising the server, he can use the precomputed table to retrieve the passwords \emph{instantaneously}. So this protection force the attacker to perform an offline dictionary attack after successful server compromise. % This vulnerability weaken the initial benefit of using an aPAKE \cite{aPAKE_Formalized} and even make password-over-TLS more secure \cite{OPAQUE_Paper} (than aPAKE vulnerable to pre-computation attacks).
 
-% \paragraph{\writingNotes{3. Server doesn't send salt in cleartext.}}
-% Same as 2.
+
 
 \paragraph{\writingFormulationClean{4. Forward secrecy.}}
 In key-exchange protocol, Forward Secrecy (also called Full Forward Secrecy or Perfect Forward Secrecy) ensures that upon compromise of any long-term key used to negotiate sessions key, an attacker cannot compromise previous session keys.
 In detail key-exchange protocol use long-lived keys to authenticate the user and short-lived keys to encrypt sessions. With Forward Secrecy, an attacker that successfully compromised a long-lived key cannot retrieve any previous session data even if he recorded the previous encrypted transmissions. % TODO cite Duc CAA 05-password ?
 
+COMMENT: For EKE, only DH-EKE provide forward secrecy. ElGamal-EKE and RSA-EKE doesn't.
+
 \paragraph{\writingFormulationClean{5. Mutual authentication.}}
 Mutual authentication explicit that users must be authenticated to the server but also that the server must authenticate itself to the user to avoid that an adversary impersonates the server to maliciously communicate with the client.
 
-\paragraph{\writingFormulationBrut{6. PKI-free.}}
-The transmissions between client and server doesn't require to be secured with PKI. This is a big improvement over classical authentication method (password-over-TLS) considering the occurrence of PKI failures nowadays. % "PKI failures include stealing of server private keys, software that does not verify certificates correctly, users that accept invalid or suspicious certificates, certificates issued by rogue CAs, servers that share their TLS keys with others e.g., CDN providers or security monitoring software, information (including passwords) that traverses networks in plaintext form after TLS termination; and more."
+\paragraph{\writingFormulationBrut{6. PKI-free.}} % TODO rename to: Doesn't require transmission over a secure channel
+The transmissions between client and server doesn't require to be secured with Public Key Infrastructure (PKI). This is a big improvement over classical authentication method (password-over-TLS) considering the occurrence of PKI failures nowadays. % "PKI failures include stealing of server private keys, software that does not verify certificates correctly, users that accept invalid or suspicious certificates, certificates issued by rogue CAs, servers that share their TLS keys with others e.g., CDN providers or security monitoring software, information (including passwords) that traverses networks in plaintext form after TLS termination; and more."
 
 \paragraph{\writingFormulationClean{7. User-side password hardening.}}
 Users can use password hardening technique to increase the cost of an offline attack if the server gets compromised. This is done by using resource-heavy functions such as Scrypt \cite{Scrypt_Paper} or Argon2 \cite{Argon2_Paper} instead of computing a simple and efficient hash. These functions allow to drastically slows down hashing process and so making offline attacks and online guessing attack much slower.
+
+COMMENT: For EKE, it could be possible to compute a KDF function on the password before using it as a symmetrical key but this is closer to Augmented EKE \cite{AEKE_Paper} where the password is hashed client side and the server store the hash results.
+
+For SRP, the client-side operation $x = H(salt||pwd)$ can be modified to use a resource-heavy hashing function \cite{https://blog.1password.com/developers-how-we-use-srp-and-you-can-too/}
 
 \paragraph{\writingNotes{8. Built-in mechanism to store client's secrets on the server.}}
 %OPAQUE "has a built-in facility for password-based storage-and-retrieval of secrets and credentials"
@@ -415,6 +422,7 @@ Users can use password hardening technique to increase the cost of an offline at
 
 \paragraph{\writingNotes{9. Server threshold implementation.}}
 %OPAQUE "accommodates a user-transparent server-side threshold implementation."
+Another feature provided by OPRF
 
 \paragraph{\writingFormulationClean{10. Resistant upon Oblivious PRF compromise.}}
 This criterion is a bit arbitrary because only the two recent PAKE use an OPRF but it is still an important criterion because it is the main difference of security guarantees between OPAQUE and KHAPE.
@@ -430,6 +438,7 @@ This makes KHAPE more resistant to OPRF compromise than OPAQUE.
 
 \paragraph{\writingNotes{12. Security proof.}}
 %OPAQUE "security proof in a very strong model"
+COMMENT: EKE only provide informal security analysis \cite{``https://eprint.iacr.org/2000/014.pdf''}
 
 \paragraph{13. Easily adaptable to elliptic curves.}
 
@@ -462,8 +471,10 @@ This makes KHAPE more resistant to OPRF compromise than OPAQUE.
 
 \subsection{Table}
 
+For value where there is an ``*'', please refer to the appropriate comment in Section \cite{sec:comparison_details} for precision.
+
 \begin{center}
-   \begin{tabular}{ | c | p{6cm} || p{2cm} | p{1cm} | p{2cm} | p{2cm} | }
+   \begin{tabular}{ | c | p{5cm} || p{2cm} | p{2cm} | p{2cm} | p{2cm} | }
      \hline
      \textbf{\#} & \textbf{Criteria} & \textbf{EKE} & \textbf{SRP} & \textbf{OPAQUE} & \textbf{KHAPE} \\ \hline
      
@@ -472,25 +483,25 @@ This makes KHAPE more resistant to OPRF compromise than OPAQUE.
      % Qualities (security guarantees)
      
      1 & Server doesn't process passwords in cleartext & No & Yes & Yes & Yes \\ \hline
-     2 & Avoid sending cleartext password to the server & No & Yes & Yes\footnote{May be required during register depending on the implementation} & Yes\footnote{May be required during register depending on the implementation} \\ \hline
+     2 & Avoid sending cleartext password to the server & No & Yes & Yes* & Yes* \\ \hline
      
      3 & Secure against pre-computation attacks & - (no hash) & No & Yes & Yes, if using OPRF \\ \hline
 %      3 & Server doesn't send salt in cleartext & - (no salt) & x & Yes & Yes (OPRF) (without OPRF there is no salt) \\ \hline
-     4 & Forward secrecy & Yes ? & Yes & Yes, Full FS & Yes, Full FS \\ \hline
-     5 & Mutual authentication & Yes & TBD & Yes & Yes \\ \hline
-     6 & PKI-free & Yes, except during register & Yes, except during register ? & Yes, except during register & Yes, except during register \\ \hline
-     7 & User-side password hardening & No\footnote{It could be possible to compute a KDF function on the password before using it as a symmetrical key but this is closer to Augmented EKE \cite{AEKE_Paper} where the password is hashed client side and the server store the hash results.} & TBD & Yes & Yes, if using OPRF \\ \hline
-     8 & Built-in mechanism to store client's secrets on the server & No & TBD & Yes & Yes \\ \hline
-     9 & Server threshold implementation & No & TBD & Yes, user-transparent & Yes, if using OPRF \\ \hline
+     4 & Forward secrecy & Yes* & Yes & Yes & Yes \\ \hline
+     5 & Mutual authentication & Yes & Yes & Yes & Yes \\ \hline
+     6 & PKI-free & Yes, except during register & Yes, except during register & Yes, except during register & Yes, except during register \\ \hline
+     7 & User-side password hardening & No* & Yes* & Yes & Yes, if using OPRF \\ \hline
+     8 & Built-in mechanism to store client's secrets on the server & No & No & Yes & Yes \\ \hline
+     9 & Server threshold implementation & No & No & Yes, user-transparent & Yes, if using OPRF \\ \hline
      10 & Resistant upon Oblivious PRF compromise & - (no OPRF) & - (no OPRF) & No, entire security is compromised & Fall back to non-strong aPAKE \\ \hline
-     11 & Standardization status & RFC for EAP-EKE \cite{EAP_EKE_RFC} & TBD & Internet standard draft \cite{OPAQUE_Standard_Draft} & Crypto 2021 Paper \cite{KHAPE_Paper} \\ \hline
-     12 & Security proof & No \footnote{EKE only provide informal security analysis \cite{``https://eprint.iacr.org/2000/014.pdf''}} & No valuable security proof (passive adversaries \cite{CAA} & Yes, in a very strong model (random oracle model ?) & Yes (idea cipher model) \\ \hline
+     11 & Standardization status & RFC for EAP-EKE \cite{EAP_EKE_RFC} & 3 RFC \cite{SRP_RFC_1, SRP_RFC_2, SRP_RFC_3}, 1 ISO \cite{SRP_ISO}, 1 IEEE \cite{SRP_IEEE} & Internet standard draft \cite{OPAQUE_Standard_Draft} & CRYPTO 2021 Paper \cite{KHAPE_Paper} \\ \hline
+     12 & Security proof & No* & No valuable security proof (passive adversaries \cite{CAA} & Yes, in a very strong model (random oracle model ?) & Yes (idea cipher model) \\ \hline
      
      \end{tabular}
  \end{center}
  
 \begin{center}
-   \begin{tabular}{ | c | p{6cm} || p{2cm} | p{1cm} | p{2cm} | p{2cm} | }
+   \begin{tabular}{ | c | p{5cm} || p{2cm} | p{2cm} | p{2cm} | p{2cm} | }
      \hline
      \textbf{\#} & \textbf{Criteria} & \textbf{EKE} & \textbf{SRP} & \textbf{OPAQUE} & \textbf{KHAPE} \\ \hline
      % Performances
