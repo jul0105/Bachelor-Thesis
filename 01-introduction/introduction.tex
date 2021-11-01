@@ -11,6 +11,8 @@
 
 \chapter{\writingNotes{Introduction}}
 
+This chapter describe the context of this project. We discuss about classical authentication method, their weakness and the necessity to use stronger construction such as PAKE.
+
 
 % Order:
 
@@ -31,13 +33,13 @@
 % 10. KHAPE ?
 
 \section{\writingNotes{Problematic}}
-\subsection{\writingFormulationBrut{Authentication}}
+% \subsection{\writingFormulationBrut{Authentication}}
 
 \paragraph{\writingFormulationClean{How to authenticate a user ?}}
 
-When a user want to connect itself to a online service, he send its username or email for identification. Then, he need a way to prove to the server that he is indeed the person he pretend to be. This is what we call authentication. Without it, anybody can impersonate the account of someone else.
+When a user want to connect itself to a online service, he send its username or email for identification. Then, he needs a way to prove to the server that he is indeed the person he pretends to be. This is what we call authentication. Without it, anybody can impersonate the account of someone else.
 
-Authentication can be based on multiple factors. Something that the user \emph{knows} (e.g. password, PIN, ...), something that the user \emph{has} (e.g. digital certificate, OTP token device, smartphone, ...) or something that the user \emph{is} (e.g. fingerprint, iris, ...). Multiple factors can be combined to obtain a strong authentication.
+Authentication can be based on multiple factors. Something that the user \emph{knows} (e.g. passwords, PINs, ...), something that the user \emph{has} (e.g. digital certificates, OTP token devices, smartphones, ...) or something that the user \emph{is} (e.g. fingerprints, iris, ...). Multiple factors can be combined to obtain a strong authentication.
 
 Traditionally, the user send the authentication value to the server through a secure channel --- generally TLS --- to avoid eavesdropping and then the server compare the value that he received to the value that he stored for the specific user.
 This means that the server has to knows and store this sensible value before authentication --- generally during register.
@@ -46,11 +48,11 @@ Currently on the vast majority of websites and softwares, passwords are used as 
 
 
 
-\paragraph{\writingFormulationClean{Attacks and mitigations}}
+\paragraph{\writingFormulationClean{Attacks and mitigations.}}
 This setup is not ideal and can lead to multiple attacks.
 In case where the server get compromised, the attacker immediately obtain access to all passwords since the server store the passwords. This means that the adversary can impersonate every user.
 
-To avoid this scenario, numerous technique has been developed.
+To avoid this scenario, numerous techniques have been developed.
 Mainly, adding salt, adding pepper --- a secret salt --- and using memory-hard password hashing function such as Scrypt \cite{Scrypt_Paper} or Argon2 \cite{Argon2_Paper}.
 
 
@@ -61,7 +63,7 @@ When the user wants to login, he has to send its \emph{cleartext} password to th
 \paragraph{\writingFormulationClean{Why passwords are bad ?}}
 Passwords are a problem. They are hard to remember and to manage for the user. They are generally low-entropy and users are reusing the same passwords too often. A password manager can help the client to handle this problem but there is a greater underlying problem.
 The problem is that ``a password that leaves your possession is guaranteed to sacrifice security, no matter its complexity or how hard it may be to guess. Passwords are insecure by their very existence'' \cite{PAKE_Cloudflare_blog}. % cite
-Now-a-day, majority of password use require that the password is sent in cleartext.
+Now-a-day, a majority of passwords use require that the password is sent in cleartext.
 
 Even if the channel between the client and the server is appropriately secured, generally with TLS (PKI attack, cert miss-configuration, etc.), % TODO
 and even if on the server-side every secure password storing techniques are implemented, the password still has to be processed in cleartext.
@@ -70,7 +72,7 @@ As stated before, there can be some software issue like accidental logging or ca
 In a ideal world, the server should never see the user's password in cleartext at all.
 
 
-\paragraph{\writingFormulationBrut{Get rid of password}}
+\paragraph{\writingFormulationBrut{Get rid of password.}}
 
 In summary, password are not ideal. They are difficult to remember, annoying to type and insecure.
 So why don't we try to get rid of them altogether ?
@@ -89,8 +91,8 @@ This is where PAKE become interesting. It allow password-based authentication wi
 
 
 
-\subsection{\writingNotes{Password-Authenticated Key Exchange}}
-\paragraph{\writingNotes{PAKEs at the rescue}}
+% \subsection{\writingNotes{Password-Authenticated Key Exchange}}
+\paragraph{\writingNotes{PAKEs at the rescue.}}
 
 % Password-Authentication Key Exchange (PAKE) are cryptographic primitive that allow a server to authenticate a client without ever knowing or storing client's password.
 % 
@@ -116,7 +118,7 @@ This is where PAKE become interesting. It allow password-based authentication wi
 % only vulnerable to inevitable attacks (online guess or offline dictionary attacks if server's data get leaked)
 % PKI-free
 
-Password-Authenticated Key Exchange (PAKE) is a cryptographic primitive. There is two types of PAKEs: 
+Password-Authenticated Key Exchange (PAKE) is a cryptographic primitive. There are two types of PAKEs: 
 
 \begin{itemize}
  \item Symmetric (also known as balanced) PAKE where the two party knows the password in clear

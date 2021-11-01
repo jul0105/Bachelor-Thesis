@@ -20,22 +20,35 @@
 
 \chapter{State of the art}
 
+This chapter aim to provide an detailed view of the current PAKE landscape from the oldest to the most recent construction.
+
 \section{Notation}
+
+Schemas in the sections will use the notation described in Fig \ref{fig:notation}.
+
+\begin{figure}[h]
+ \centering
+ \includegraphics[width=10cm]{notation.png}
+ \caption{Schema notation.}
+ \label{fig:notation}
+\end{figure}
+
+
 
 \section{History of PAKEs}
 % citer, annee, artuble, ce qu0il fait, patent?, cassé ?, ce qu'il apport en plus, citer l'article et citer l'arcile qui l'a cassé. pourquoi il y a un saut entre SRP et OPAQUE (dans le temps) ?
 
-\paragraph{EKE (1992)}
+\paragraph{EKE (1992).}
 % Evolution and variants ?  in particular A-EKE which is the first aPAKE
-\paragraph{EKE variants (PAK, PPK, PAK-X)}
-\paragraph{OKE}
-\paragraph{SNAPI}
-\paragraph{PEKEP}
+\paragraph{EKE variants (PAK, PPK, PAK-X).}
+\paragraph{OKE.}
+\paragraph{SNAPI.}
+\paragraph{PEKEP.}
 \subsection{Symmetric PAKE}
 \subsection{Asymmetric PAKE}
-\paragraph{SRP (1998)}
-\paragraph{OPAQUE (2018)}
-\paragraph{KHAPE (2021)}
+\paragraph{SRP (1998).}
+\paragraph{OPAQUE (2018).}
+\paragraph{KHAPE (2021).}
 
 
 % TODO section explication du choix des PAKE principaux
@@ -43,9 +56,16 @@
 
 \section{Main PAKEs}
 
+This section describe in more details four fundamental PAKE construction. 
+EKE as it is the first ever PAKE. 
+SRP because it's the most used. 
+OPAQUE because it is very promising, in the process of standardization and the first construction of this new generation of Strong aPAKE.
+OPAQUE because it is the first construction of Srong aPAKE
+KHAPE because it is very recent and provide slightly better security guarantees than OPAQUE in certain conditions.
+
 
 \subsection{\writingFormulationClean{EKE}}
-\paragraph{\writingFormulationClean{Introduction}}
+\paragraph{\writingFormulationClean{Introduction.}}
 
 EKE (for Encrypted Key Exchange) was proposed in 1992 by Bellovin and Merritt \cite{EKE_Paper} and is the first PAKE protocol. 
 It allows two parties that share a common password to exchange information over an insecure channel.
@@ -62,15 +82,7 @@ Overall, EKE got broken and therefore should not be used. % TODO source. all EKE
 
 
 
-\paragraph{\writingFormulationClean{Construction}}
-
-\begin{figure}[h]
- \centering
- \includegraphics[width=10cm]{notation.png}
- \caption{Schema notation.}
- \label{fig:notation}
-\end{figure}
-
+\paragraph{\writingFormulationClean{Construction.}}
 
 
 \begin{figure}[h]
@@ -80,7 +92,7 @@ Overall, EKE got broken and therefore should not be used. % TODO source. all EKE
  \setlength{\fboxrule}{1pt}
  \fbox{\includegraphics[width=\textwidth-22pt]{EKE.png}}
 
- \caption{Login process with EKE (DH-EKE) protocol. (See Fig. \ref{fig:notation} for notations)}
+ \caption{Login process with EKE (DH-EKE) protocol.}
  \label{fig:EKE_DH}
 \end{figure}
 
@@ -99,7 +111,7 @@ The steps are the following :
 
 %%% Login ?
 
-\paragraph{\writingFormulationClean{Register}}
+\paragraph{\writingFormulationClean{Register.}}
 The protocol doesn't mention registration. It is assumed that both parties already share a common secret, the password. A secure channel is therefore necessary to share the password in the first place.
 
 
@@ -181,7 +193,7 @@ The main goal is to provide a technology to improve the security of existing pas
 \subsection{\writingFormulationClean{OPAQUE}}
 
 
-\paragraph{\writingFormulationClean{Design}}
+\paragraph{\writingFormulationClean{Design.}}
 Jarecki et al. \cite{OPAQUE_Paper}. introduce the definition of Strong aPAKE (SaPAKE): an aPAKE secure against pre-computation attacks.
 
 They provide two modular constructions, called the OPAQUE protocol that allow building SaPAKE protocols. The first construction allows enhancing any aPAKE to a SaPAKE while the second allows enhancing any Authenticated Key-Exchange (AKE) protocol (that are secure against KCI attacks) to a SaPAKE.
@@ -208,7 +220,7 @@ Overall, the OPAQUE protocol allows to secure authentication from the simplest a
 % "far more secure alternative to the practice of deriving low-entropy secrets directly from a user's password"
 
 
-\paragraph{\writingFormulationClean{Construction}}
+\paragraph{\writingFormulationClean{Construction.}}
 
 \begin{figure}[h]
  \centering
@@ -217,7 +229,7 @@ Overall, the OPAQUE protocol allows to secure authentication from the simplest a
  \setlength{\fboxrule}{1pt}
  \fbox{\includegraphics[width=\textwidth-22pt]{OPAQUE.png}}
 
- \caption{Login process with generic OPAQUE (OPRF-AKE) protocol. (See Fig. \ref{fig:notation} for notations)}
+ \caption{Login process with generic OPAQUE (OPRF-AKE) protocol.}
  \label{fig:OPAQUE_AKE}
 \end{figure}
 
@@ -237,7 +249,7 @@ The steps are the following :
 \end{enumerate}
 
 
-\paragraph{\writingFormulationClean{Register}} \label{sec:opaque_register}
+\paragraph{\writingFormulationClean{Register.}} \label{sec:opaque_register}
 The client registration is the only part of the protocol that requires a secure channel where both parties can authenticate each other.
 
 
@@ -253,7 +265,7 @@ This way, the server never see the cleartext password, the OPRF output and the c
 However, this also comes with a downside as the server is no longer able to check password rules. This operation needs to be done client side.
 
 
-\paragraph{\writingFormulationClean{Login}}
+\paragraph{\writingFormulationClean{Login.}}
 For the login phase, the client enters its password in the OPRF and the server send the ciphertext to the client.
 If the password entered is correct, the client can decrypt the ciphertext with OPRF output to obtain his private key and the server's public key.
 He then uses these keys to run an authenticated key exchange with the server.
@@ -267,7 +279,7 @@ On the other hand, if the password is wrong, the OPRF output is totally differen
 
 
 \subsection{\writingFormulationBrut{KHAPE}}
-\paragraph{\writingFormulationBrut{Introduction}}
+\paragraph{\writingFormulationBrut{Introduction.}}
 
 OPAQUE security relies entirely on the strength of the OPRF. If OPRF gets broken --- for example by cryptanalysis, quantum attacks or security compromise --- an adversary can compute an offline dictionary attack on the user's password. This is especially critical considering that there are currently no known quantum-safe OPRFs.
 
@@ -318,7 +330,7 @@ It also shows that some KEM-based AKE like SKEME can be adapted to archive simil
 
 
 
-\paragraph{\writingFormulationClean{Construction}}
+\paragraph{\writingFormulationClean{Construction.}}
 
 
 \begin{figure}[h]
@@ -328,7 +340,7 @@ It also shows that some KEM-based AKE like SKEME can be adapted to archive simil
  \setlength{\fboxrule}{1pt}
  \fbox{\includegraphics[width=\textwidth-22pt]{KHAPE.png}}
  
- \caption{Login process with generic KHAPE protocol. (See Fig. \ref{fig:notation} for notations)}
+ \caption{Login process with generic KHAPE protocol.}
  \label{fig:Generic_KHAPE}
 \end{figure}
 
@@ -344,13 +356,13 @@ The steps are the following :
 \end{enumerate}
 
 %%% Login and register steps
-\paragraph{\writingFormulationBrut{Login}}
+\paragraph{\writingFormulationBrut{Login.}}
 
 When the client wants to login, the server sends its encrypted credentials and the client use its password to decrypt the credentials (with or without OPRF depending on the implementation). Then he can use his credentials to compute a Key-Hiding AKE with the server.
 Both party finish with a mutual key confirmation initiated by the client.
 
 
-\paragraph{\writingFormulationBrut{Register}}
+\paragraph{\writingFormulationBrut{Register.}}
 KHAPE has the same problem that is addressed in \ref{sec:opaque_register}.
 The protocol proposes a server-side register which is less than ideal because the server can see the client’s password and client's private key in cleartext at registration.
 
@@ -362,7 +374,7 @@ Instead, the paper proposes a client-side registration process.
 
 
 
-\section{\writingNotes{Comparing mains solutions}}
+\section{\writingNotes{Comparing main solutions}}
 
 This section compares the main PAKEs on their security guarantees and performances. Details and comments on each criterion can be found on Section \ref{sec:comparison_details}.
 
