@@ -24,7 +24,7 @@ This chapter aim to provide an detailed view of the current PAKE landscape from 
 
 \section{Notation}
 
-Schemas in the sections will use the notation described in Fig \ref{fig:notation}.
+Schemas will use the notation described in Fig \ref{fig:notation}.
 
 \begin{figure}[h]
  \centering
@@ -79,6 +79,11 @@ However, this protocol requires that both party share a secret --- namely the pa
 Multiple cryptographic primitive can be used for the asymmetric part such as RSA, ElGamal or DH but the majority of EKE variants use DH \cite{Breaking_EKE}. % more ? why ?
 
 Overall, EKE got broken and therefore should not be used. % TODO source. all EKE ? DH-EKE also ? See http://www.jablon.org/jab96.pdf chapter 4
+
+
+% ``Diffie-Hellman Encrypted Key Exchange (DH-EKE) is the earliest widely deployed PAKE. It works by encrypting the public keys of a Diffie-Hellman key exchange with a shared secret. However, it requires both that unauthenticated encryption be used and that the public keys be indistinguishable from random data. This last requirement makes it impossible to use this form of PAKE with elliptic curve cryptography. For these reasons, DH-EKE is not a good fit.'' Source : https://tools.ietf.org/id/draft-ietf-kitten-krb-spake-preauth-00.html#rfc.section.1.2
+
+% TODO main problem of EKE: its patent
 
 
 
@@ -416,17 +421,18 @@ COMMENT: For EKE, it could be possible to compute a KDF function on the password
 
 For SRP, the client-side operation $x = H(salt||pwd)$ can be modified to use a resource-heavy hashing function \cite{https://blog.1password.com/developers-how-we-use-srp-and-you-can-too/}
 
-\paragraph{\writingNotes{8. Built-in mechanism to store client's secrets on the server.}}
+\paragraph{\writingFormulationBrut{8. Built-in mechanism to store client's secrets on the server.}}
 %OPAQUE "has a built-in facility for password-based storage-and-retrieval of secrets and credentials"
 %~~New protocol such as OPAQUE and KHAPE use client-side decryption of server-stored ciphertext to retrieve the key. This allows running exchange in an unsecured channel because...
+Securely store client's sensible data such as secrets or credentials in the server without the server being able to read it. With OPAQUE and KHAPE, the user credentials (private/public keys) are encrypted with the password or OPRF output and then stored in the server. Additional secrets specific to the application could be added to this encrypted envelope and stored on the server.
 
-\paragraph{\writingNotes{9. Server threshold implementation.}}
+\paragraph{\writingFormulationBrut{9. Server threshold implementation.}}
 %OPAQUE "accommodates a user-transparent server-side threshold implementation."
-Another feature provided by OPRF
+Require the interaction with $n$ server to authenticate. This means that $n$ server has to be compromised in order for an adversary to compute an offline dictionary attack on the password. This scenario can be useful in the case of an highly sensitive application.
+OPRF transparently provide this functionality where each server add its independent secret salt to the blinded password hash before sending it back to the client.
 
 \paragraph{\writingFormulationClean{10. Resistant upon Oblivious PRF compromise.}}
 This criterion is a bit arbitrary because only the two recent PAKE use an OPRF but it is still an important criterion because it is the main difference of security guarantees between OPAQUE and KHAPE.
-
 
 If OPRF breaks for example by cryptanalysis, security compromise or even quantum attacks, the consequences could be disastrous depending on the way it is used. This is especially important because there is ``currently no known efficient OPRFs considered to be quantum safe'' \cite{KHAPE_Paper}.
 OPAQUE use OPRF as a main tool to builds Strong aPAKE. If OPRF breaks, the client's password is vulnerable to an offline dictionary attack.
@@ -434,16 +440,32 @@ KHAPE has a weaker reliance on OPRF. It is optional and only used to archive Str
 This makes KHAPE more resistant to OPRF compromise than OPAQUE. 
 
 
-\paragraph{11. Standardization status.}
+\paragraph{\writingNotes{11. Standardization status.}}
+The standardization status is a good indicator to the maturity and adoption of an construction.
+% As it show that the construction is discussed. Generally, standard are far more precise 
+% Standards allow a better inter operability and easier implementation.
 
 \paragraph{\writingNotes{12. Security proof.}}
 %OPAQUE "security proof in a very strong model"
 COMMENT: EKE only provide informal security analysis \cite{``https://eprint.iacr.org/2000/014.pdf''}
 
 \paragraph{\writingNotes{13. Easily adaptable to elliptic curves.}}
-COMMENT: In SRP, $\mathbb{Z}_p$ is used as a field, not a group. Therefore, SRP cannot be easily adapted to elliptic curves \cite{CAA}.
+Elliptic curves cryptography allow to greatly reduce the size of asymmetric key.
+This is crucial in term of performance because keys size recommendation are always growing to ensure security and asymmetrical key are getting giant and difficult to manage --- in particular for key that require long-term protection (up to 50 years). For example, for such a long-term protection, the discrete logarithm group is recommended to be 15'360 bits according to ECRYPT-CSA \cite{https://www.keylength.com/en/3/}.
+In comparison, with elliptic curves, only 512 bits are recommended to archive similar security level.
+
+COMMENT: 
+In SRP, $\mathbb{Z}_p$ is used as a field, not a group. Therefore, SRP cannot be easily adapted to elliptic curves \cite{CAA}.
+% TODO ``SRP requires a ring as it mixes addition and multiplication operations, and thus does not work over plain elliptic curves''
+
+
+For DH-EKE, it is required that the content that will be encrypted --- namely $A$ and $B$ --- must be indistinguishable from random data. 
+This requirement make it impossible to implement it on elliptic curves\cite{https://tools.ietf.org/id/draft-ietf-kitten-krb-spake-preauth-00.html}. %source : https://tools.ietf.org/id/draft-ietf-kitten-krb-spake-preauth-00.html#rfc.section.1.2
+% An implementation on elliptic curve wouldn't satisfy this requirement.
+
 
 \paragraph{14. Number of messages.}
+more messages means ``increasing latency and load on the network''
 
 
 \paragraph{15. Number of exponentiations.}
@@ -506,7 +528,7 @@ For value where there is an ``*'', please refer to the appropriate comment in Se
      \textbf{\#} & \textbf{Criteria} & \textbf{EKE} & \textbf{SRP} & \textbf{OPAQUE} & \textbf{KHAPE} \\ \hline
      % Performances
      
-     13 & Easily adaptable to elliptic curves & Yes ? & No* & Yes & Yes ? \\ \hline
+     13 & Easily adaptable to elliptic curves & No* & No* & Yes & Yes \\ \hline
      14 & Number of messages & 4 ? & 4 ? & 3 & 4 (3 if client initiate) \\ \hline
      15 & Number of exponentiations & 4 ? & 4 ? & 3 or 4 ? & 2 + 1 hash-to-curve \\ \hline
      16 & Computational cost compared to a KE (see \cite{KHAPE_Paper} presentation) & 1x & TBD & 2x & 1x without OPRF, 2x with OPRF \\ \hline
