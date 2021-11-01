@@ -383,10 +383,10 @@ This section compares the main PAKEs on their security guarantees and performanc
 
 
 
-\paragraph{\writingFormulationClean{1. Server doesn't store password in cleartext.}}
+\paragraph{\writingFormulationClean{1. Server doesn't process passwords in cleartext.}}
 This is the main security property of asymmetric PAKE \cite{aPAKE_Formalized}. Server doesn't have to store passwords in cleartext which should make it more resilient in case of server compromise. Adversary has to compute an offline attack to retrieve passwords from the compromised server.
 
-\paragraph{\writingFormulationBrut{2. Avoid sending password in cleartext to the server.}}
+\paragraph{\writingFormulationBrut{2. Avoid sending cleartext password to the server.}}
 Even though it seems similar to criteria 1, it's not. Criterion 1 is about password storage, but this criterion is about password transmission. Transmissions and storage of the password are vulnerable to different attacks vectors.
 The server doesn't receive passwords in cleartext which avoid any miss-handling vulnerabilities such as logging or caching cleartext passwords on the server.
 
@@ -416,7 +416,7 @@ Users can use password hardening technique to increase the cost of an offline at
 \paragraph{\writingNotes{9. Server threshold implementation.}}
 %OPAQUE "accommodates a user-transparent server-side threshold implementation."
 
-\paragraph{\writingFormulationClean{11. Resistant upon Oblivious PRF compromise.}}
+\paragraph{\writingFormulationClean{10. Resistant upon Oblivious PRF compromise.}}
 This criterion is a bit arbitrary because only the two recent PAKE use an OPRF but it is still an important criterion because it is the main difference of security guarantees between OPAQUE and KHAPE.
 
 
@@ -426,30 +426,36 @@ KHAPE has a weaker reliance on OPRF. It is optional and only used to archive Str
 This makes KHAPE more resistant to OPRF compromise than OPAQUE. 
 
 
-\paragraph{12. Standardization status.}
+\paragraph{11. Standardization status.}
 
-\paragraph{\writingNotes{13. Security proof.}}
+\paragraph{\writingNotes{12. Security proof.}}
 %OPAQUE "security proof in a very strong model"
 
-\paragraph{14. Easily adaptable to elliptic curves.}
+\paragraph{13. Easily adaptable to elliptic curves.}
 
 
-\paragraph{15. Number of messages.}
+\paragraph{14. Number of messages.}
 
 
-\paragraph{16. Number of exponentiations.}
+\paragraph{15. Number of exponentiations.}
 
 
-\paragraph{17. Patented.}
+\paragraph{16. Computational cost compared to a KE (see \cite{KHAPE_Paper} presentation).}
 
 
-\paragraph{18. Release date.}
+\paragraph{17. Communication size.}
 
 
-\paragraph{19. Version.}
+\paragraph{18. Server-side storage size.}
 
 
-\paragraph{20. Got broken.}
+\paragraph{19. Patented.}
+
+
+\paragraph{20. Year published.}
+
+
+\paragraph{21. Got broken.}
 
 
 
@@ -476,9 +482,9 @@ This makes KHAPE more resistant to OPRF compromise than OPAQUE.
      7 & User-side password hardening & No\footnote{It could be possible to compute a KDF function on the password before using it as a symmetrical key but this is closer to Augmented EKE \cite{AEKE_Paper} where the password is hashed client side and the server store the hash results.} & TBD & Yes & Yes, if using OPRF \\ \hline
      8 & Built-in mechanism to store client's secrets on the server & No & TBD & Yes & Yes \\ \hline
      9 & Server threshold implementation & No & TBD & Yes, user-transparent & Yes, if using OPRF \\ \hline
-     11 & Resistant upon Oblivious PRF compromise & - (no OPRF) & - (no OPRF) & No, entire security is compromised & Fall back to non-strong aPAKE \\ \hline
-     12 & Standardization status & RFC for EAP-EKE \cite{EAP_EKE_RFC} & TBD & Internet standard draft \cite{OPAQUE_Standard_Draft} & Crypto 2021 Paper \cite{KHAPE_Paper} \\ \hline
-     13 & Security proof & No \footnote{EKE only provide informal security analysis \cite{``https://eprint.iacr.org/2000/014.pdf''}} & No valuable security proof (passive adversaries \cite{CAA} & Yes, in a very strong model (random oracle model ?) & Yes (idea cipher model) \\ \hline
+     10 & Resistant upon Oblivious PRF compromise & - (no OPRF) & - (no OPRF) & No, entire security is compromised & Fall back to non-strong aPAKE \\ \hline
+     11 & Standardization status & RFC for EAP-EKE \cite{EAP_EKE_RFC} & TBD & Internet standard draft \cite{OPAQUE_Standard_Draft} & Crypto 2021 Paper \cite{KHAPE_Paper} \\ \hline
+     12 & Security proof & No \footnote{EKE only provide informal security analysis \cite{``https://eprint.iacr.org/2000/014.pdf''}} & No valuable security proof (passive adversaries \cite{CAA} & Yes, in a very strong model (random oracle model ?) & Yes (idea cipher model) \\ \hline
      
      \end{tabular}
  \end{center}
@@ -489,16 +495,16 @@ This makes KHAPE more resistant to OPRF compromise than OPAQUE.
      \textbf{\#} & \textbf{Criteria} & \textbf{EKE} & \textbf{SRP} & \textbf{OPAQUE} & \textbf{KHAPE} \\ \hline
      % Performances
      
-     14 & Easily adaptable to elliptic curves & Yes ? & No ("Cannot directly be adapted to elliptic curves (Zp seen as a field, not a group)." \cite{CAA}) & Yes & Yes ? \\ \hline
-     15 & Number of messages & 4 ? & TBD & 3 & 4 (3 if client initiate) \\ \hline
-     16 & Number of exponentiations & 4 ? & TBD & 3 or 4 ? & 2 + 1 hash-to-curve \\ \hline
-     20 & Computational cost compared to a KE (see \cite{KHAPE_Paper} presentation) & 1x & TBD & 2x & 1x without OPRF, 2x with OPRF \\ \hline
-     21 & Communication size & TBD & TBD & TBD & TBD \\ \hline
-     22 & Server-side storage size & TBD & TBD & TBD & TBD \\ \hline
+     13 & Easily adaptable to elliptic curves & Yes ? & No ("Cannot directly be adapted to elliptic curves (Zp seen as a field, not a group)." \cite{CAA}) & Yes & Yes ? \\ \hline
+     14 & Number of messages & 4 ? & TBD & 3 & 4 (3 if client initiate) \\ \hline
+     15 & Number of exponentiations & 4 ? & TBD & 3 or 4 ? & 2 + 1 hash-to-curve \\ \hline
+     16 & Computational cost compared to a KE (see \cite{KHAPE_Paper} presentation) & 1x & TBD & 2x & 1x without OPRF, 2x with OPRF \\ \hline
+     17 & Communication size & TBD & TBD & TBD & TBD \\ \hline
+     18 & Server-side storage size & TBD & TBD & TBD & TBD \\ \hline
      
-     17 & Patented & Yes, expired in 2011 & No & No & No \\ \hline
-     18 & Year published & 1992 & 1998 & 2018 & 2021 \\ \hline
-     19 & Got broken & Yes (source ?) & Yes and patched \cite{CAA} & TBD & TBD \\ \hline
+     19 & Patented & Yes, expired in 2011 & No & No & No \\ \hline
+     20 & Year published & 1992 & 1998 & 2018 & 2021 \\ \hline
+     21 & Got broken & Yes (source ?) & Yes and patched \cite{CAA} & TBD & TBD \\ \hline
 
      \end{tabular}
  \end{center}
