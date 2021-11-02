@@ -125,10 +125,39 @@ The protocol doesn't mention registration. It is assumed that both parties alrea
 
 
 \subsection{\writingNotes{SRP}}
-SRP (for Secure Remote Password) was proposed in 1998 with the goal to provide standards and technologies to improve security of existing password protocols while keeping the ease-of-use
-The main goal is to provide a technology to improve the security of existing password protocols while keeping the ease-of-use of passwords. In other words, the goal is to provide a drop-in replacement to the classical auth method where the implementation doesn't require a deep change in contrary to EKE the shared secret (the password) need to be stored in cleartext on the server (...).
+
+SRP \cite{SRP_Paper, SRP_6_Paper} (for Secure Remote Password) was proposed in 1998 and is the most widely-implemented PAKE protocol in the world \cite{PAKE_Green_blog}.
+It's largely used in iCloud Key Vault --- which could make it one of the most widely-used cryptographic protocols \cite{PAKE_Green_blog} considering the number of active Apple devices worldwide --- and in 1Password's password manager.
+
+It is well standardized --- including multiple RFC --- and has numerous implementation in different programming languages \cite{http://srp.stanford.edu/links.html}.
+It is even implemented in OpenSSLt's also implemented in OpenSSL as a Ciphersuite
+It is even a TLS ciphersuite \cite{SRP_RFC_3}, implemented in OpenSSL.
+
+This success is (in part) due to the SRP's creators to avoid patent --- unlike most of the PAKE of its time --- and ``avoid export controls by not using encryption'' \cite{Formal Methods Analysis of the Secure Remote Password Protocol (2020)}.
+Their goal was to provide a technology that improve the security of existing password protocols while keeping the ease-of-use of passwords. In other words, provide a drop-in replacement to the classical authentication methods where the implementation doesn't require a deep change in contrary to EKE where the shared secret --- the password --- need to be stored in cleartext on the server making it difficult to manage correctly.
+
+This make SRP easy to implement for developers and transparent for the user.
+
+
+Even though SRP is in interesting construction, it is not ideal.
+It got broken and patched multiple time --- current version is SRP v6a. 
+
+The construction is complex.
+It doesn't really have security proof.
+No ECC
+
+Last be not least, it is vulnerable to pre-computation attack because the server send the cleartext salt to the client at the start of the exchange. With the salt, an adversary could build a table of password hashes --- a time-consuming process --- before compromising the server making it able to retrieve passwords instantaneously upon server compromise.
+
 
 % TODO citer le papier initiale et aussi le site web pour avoir la dernier version (ou le papier de la derniere version)
+
+
+
+% ------------- Formal Methods Analysis of the Secure Remote Password Protocol (2020) -----------------
+% "avoid export controls by not using encryption"
+% "Formal analysis of SRP is challenging in part because existing tools provide no simple way to reason about its use of the mathematical expression   v+gbmodq ."
+
+
 
 % ---------- SRP Stanford homepage -------------------
 
@@ -460,7 +489,7 @@ In SRP, $\mathbb{Z}_p$ is used as a field, not a group. Therefore, SRP cannot be
 
 
 For DH-EKE, it is required that the content that will be encrypted --- namely $A$ and $B$ --- must be indistinguishable from random data. 
-This requirement make it impossible to implement it on elliptic curves\cite{https://tools.ietf.org/id/draft-ietf-kitten-krb-spake-preauth-00.html}. %source : https://tools.ietf.org/id/draft-ietf-kitten-krb-spake-preauth-00.html#rfc.section.1.2
+This requirement make it impossible to implement it on elliptic curves \cite{https://tools.ietf.org/id/draft-ietf-kitten-krb-spake-preauth-00.html}. %source : https://tools.ietf.org/id/draft-ietf-kitten-krb-spake-preauth-00.html#rfc.section.1.2
 % An implementation on elliptic curve wouldn't satisfy this requirement.
 
 
