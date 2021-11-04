@@ -1,0 +1,14 @@
+\documentclass[../report.tex]{subfiles}
+
+\begin{document}
+
+\chapter{\writingNotes{Use case}}
+\section{Context}
+Online password manager are among the most sensitive site out there because the compromise of user's data cascade into numerous account compromisation on other services such as email account, social media, banking, etc.
+
+Using an asymmetric PAKE for an online password manager make a lot of sense because the client doesn't have to disclose it's master password to the password manager host. In other words, the client doesn't have to trust the password manager host to not decrypt its personal data and/or leak the master password (or any other intentional or unintentional miss-handling).
+
+In fact multiple well known online password manager such as iCloud Key Vault or 1Password use aPAKE (SRP).
+
+\end{document}
+
