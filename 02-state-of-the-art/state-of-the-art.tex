@@ -130,7 +130,6 @@ SRP \cite{SRP_Paper, SRP_6_Paper} (for Secure Remote Password) was proposed in 1
 It's largely used in iCloud Key Vault --- which could make it one of the most widely-used cryptographic protocols \cite{PAKE_Green_blog} considering the number of active Apple devices worldwide --- and in 1Password's password manager.
 
 It is well standardized --- including multiple RFC --- and has numerous implementation in different programming languages \cite{http://srp.stanford.edu/links.html}.
-It is even implemented in OpenSSLt's also implemented in OpenSSL as a Ciphersuite
 It is even a TLS ciphersuite \cite{SRP_RFC_3}, implemented in OpenSSL.
 
 This success is (in part) due to the SRP's creators to avoid patent --- unlike most of the PAKE of its time --- and ``avoid export controls by not using encryption'' \cite{Formal Methods Analysis of the Secure Remote Password Protocol (2020)}.
@@ -138,16 +137,23 @@ Their goal was to provide a technology that improve the security of existing pas
 
 This make SRP easy to implement for developers and transparent for the user.
 
+- No password storage, no password hash storage, instead use a password verifier that is a one-way function of the password
+- SRP-6a is not broken
 
-Even though SRP is in interesting construction, it is not ideal.
+Even though SRP is in interesting construction and does some things right, it is not ideal and i.
 It got broken and patched multiple time --- current version is SRP v6a. % TODO cite website
 
-The construction is complex.
+The construction is complex. ``SRP protocol design is completely bonkers''
 It doesn't really have security proof.
 No ECC
 
-Last be not least, it is vulnerable to pre-computation attack because the server send the cleartext salt to the client at the start of the exchange. With the salt, an adversary could build a table of password hashes --- a time-consuming process --- before compromising the server making it able to retrieve passwords instantaneously upon server compromise.
+It is vulnerable to pre-computation attack because the server send the cleartext salt to the client at the start of the exchange. With the salt, an adversary could build a table of password hashes --- a time-consuming process --- before compromising the server making it able to retrieve passwords instantaneously upon server compromise.
 
+
+SRP protocol mix addition and multiplication in calculation. Using both operations require a ring rather that a cyclic group. This requirement make it impossible to easily transfert the integer-based algorithm to elliptic curve. % because in integer-based group like DH, multiplication become EC point addition in ECC. SRP use both mutliplication and addition
+
+This requirement, also make it challenging to provide a formal analysis of SRP because 
+``existing tools provide no simple way to reason about its use of the mathematical expression $v+g^b \mod{q}$'' \cite{Formal Methods Analysis of the Secure Remote Password Protocol (2020)}. % TODO rephraase and add this to comparison details
 
 
 \paragraph{\writingFormulationClean{Construction.}}
@@ -260,6 +266,17 @@ If the password is correct, the client and the server end up with having the sam
 % 4. SRP currently relies on integer (finite field) arithmetic, and for various reasons (see point 3 above) the construction is not obviously transferable to the elliptic curve (https://blog.cryptographyengineering.com/should-you-use-srp/) setting. This requires more bandwidth and computation, and thus SRP can’t take advantage of the many efficiency improvements we’ve developed in settings like Curve25519 (https://en.wikipedia.org/wiki/Curve25519).
 % 5. SRP is vulnerable to pre-computation attacks, due to the fact that it hands over the user’s “salt” to any attacker who can start an SRP session. This means I can ask a server for your salt, and build a dictionary of potential password hashes even before the server is compromised.24/09/2021 17:32 Let’s talk about PAKE – A Few Thoughts on Cryptographic Engineering https://blog.cryptographyengineering.com/2018/10/19/lets-talk-about-pake/ 4/13
 % 6. Despite all these drawbacks, SRP is simple — and actually ships with working code. Plus there’s working code in OpenSSL that even integrates with TLS, which makes it relatively easy to adopt.
+
+% ------------ Shoul you use SRP ? --------------------
+% https://blog.cryptographyengineering.com/should-you-use-srp/
+
+
+% - "the specification mandates that you use only approved g,p values, each of which is tuned to generate exactly the right group."
+
+% - "Note that you cannot safely use standard Diffie-Hellman groups with SRP! So be aware of that."
+% - 5 prior versions that each contains vulnerabilities
+% - The construction we have today is not really by design but more by patching ~~
+
 
 
 % ====================================================================================
@@ -520,13 +537,15 @@ The standardization status is a good indicator to the maturity and adoption of a
 %OPAQUE "security proof in a very strong model"
 COMMENT: EKE only provide informal security analysis \cite{``https://eprint.iacr.org/2000/014.pdf''}
 
+SRP provide no valuable security proof \cite{CAA, SRP_Green_blog}. It only prove that it can stands up to passive attacks, which is not enough for an authentication protocol. A proof against active attacks would be welcomed for a such widely-used protocol.
+
 \paragraph{\writingNotes{13. Easily adaptable to elliptic curves.}}
 Elliptic curves cryptography allow to greatly reduce the size of asymmetric key.
 This is crucial in term of performance because keys size recommendation are always growing to ensure security and asymmetrical key are getting giant and difficult to manage --- in particular for key that require long-term protection (up to 50 years). For example, for such a long-term protection, the discrete logarithm group is recommended to be 15'360 bits according to ECRYPT-CSA \cite{https://www.keylength.com/en/3/}.
 In comparison, with elliptic curves, only 512 bits are recommended to archive similar security level.
 
 COMMENT: 
-In SRP, $\mathbb{Z}_p$ is used as a field, not a group. Therefore, SRP cannot be easily adapted to elliptic curves \cite{CAA}.
+In SRP, $\mathbb{Z}_p$ is used as a field, not a group. Therefore, SRP cannot be easily adapted to elliptic curves \cite{CAA}. % TODO voir SRP_Green_blog
 % TODO ``SRP requires a ring as it mixes addition and multiplication operations, and thus does not work over plain elliptic curves''
 
 
@@ -588,7 +607,7 @@ For value where there is an ``*'', please refer to the appropriate comment in Se
      9 & Server threshold implementation & No & No & Yes, user-transparent & Yes, if using OPRF \\ \hline
      10 & Resistant upon Oblivious PRF compromise & - (no OPRF) & - (no OPRF) & No, entire security is compromised & Fall back to non-strong aPAKE \\ \hline
      11 & Standardization status & RFC for EAP-EKE \cite{EAP_EKE_RFC} & 3 RFC \cite{SRP_RFC_1, SRP_RFC_2, SRP_RFC_3}, 1 ISO \cite{SRP_ISO}, 1 IEEE \cite{SRP_IEEE} & Internet standard draft \cite{OPAQUE_Standard_Draft} & CRYPTO 2021 Paper \cite{KHAPE_Paper} \\ \hline
-     12 & Security proof & No* & No valuable security proof \cite{CAA} & Yes, in the random oracle model & Yes, in the ideal cipher model \\ \hline
+     12 & Security proof & No* & No valuable security proof & Yes, in the random oracle model & Yes, in the ideal cipher model \\ \hline
      
      \end{tabular}
  \end{center}
