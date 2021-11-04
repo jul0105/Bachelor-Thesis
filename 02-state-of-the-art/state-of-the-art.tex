@@ -160,11 +160,11 @@ Last be not least, it is vulnerable to pre-computation attack because the server
  \setlength{\fboxrule}{1pt}
  \fbox{\includegraphics[width=\textwidth-22pt]{SRP.png}}
 
- \caption{Login process with SRP protocol.}
+ \caption{Login process with SRP-6a protocol.}
  \label{fig:SRP}
 \end{figure}
 
-The figure \ref{fig:SRP} shows the SRP protocol during login process.
+The figure \ref{fig:SRP} shows the SRP-6a\cite{http://srp.stanford.edu/design.html} protocol during login process.
 The steps are the following :
 
 \begin{enumerate}
@@ -174,8 +174,9 @@ The steps are the following :
  \item $v$ is computed at registration and is equal to $v = g^x$ where $x = H(s, pw)$
  \item Server also pick a random $b$ and compute $B$.
  \item Server sends $s$ and $B$ to the client.
- \item Client and server both compute $u$, $S$ and $K$ with the shared values.
- \item Mutual key confirmation initiated by the client
+ \item Client and server both compute $u$, $S$ and $K$ with their own values.
+ \item They finish with a mutual key confirmation where the client sends his proof of $K$ first.
+ \item If the server find that the user's proof is incorrect, he stop the exchange and doesn't sends its own proof of $K$.
 \end{enumerate}
 
 If the password is correct, the client and the server end up with having the same $S$ --- and so the same key. The derivation of $S$ is less straightforward than other constructions so it is detailed below.
