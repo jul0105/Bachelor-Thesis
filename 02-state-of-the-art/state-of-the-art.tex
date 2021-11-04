@@ -149,7 +149,30 @@ No ECC
 Last be not least, it is vulnerable to pre-computation attack because the server send the cleartext salt to the client at the start of the exchange. With the salt, an adversary could build a table of password hashes --- a time-consuming process --- before compromising the server making it able to retrieve passwords instantaneously upon server compromise.
 
 
-% TODO citer le papier initiale et aussi le site web pour avoir la dernier version (ou le papier de la derniere version)
+
+\paragraph{\writingFormulationClean{Construction.}}
+
+
+\begin{figure}[h]
+ \centering
+
+ \setlength{\fboxsep}{10pt}
+ \setlength{\fboxrule}{1pt}
+ \fbox{\includegraphics[width=\textwidth-22pt]{SRP.png}}
+
+ \caption{Login process with SRP protocol.}
+ \label{fig:SRP}
+\end{figure}
+
+The figure \ref{fig:SRP} shows the SRP protocol during login process.
+The steps are the following :
+
+\begin{enumerate}
+ \item Client picks a random $a$ and compute $A$
+ \item Client sends $A$ and its identity $I$ (username) to the server
+ \item Server also pick a random $b$ and compute $B$
+\end{enumerate}
+
 
 
 
