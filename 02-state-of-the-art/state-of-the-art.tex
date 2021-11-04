@@ -168,10 +168,28 @@ The figure \ref{fig:SRP} shows the SRP protocol during login process.
 The steps are the following :
 
 \begin{enumerate}
- \item Client picks a random $a$ and compute $A$
- \item Client sends $A$ and its identity $I$ (username) to the server
- \item Server also pick a random $b$ and compute $B$
+ \item Client picks a random $a$ and compute $A$.
+ \item Client sends $A$ and its identity $I$ (username) to the server.
+ \item Server retrieves user's salt $s$ and password verifier $v$ from its database using the user's identity.
+ \item $v$ is computed at registration and is equal to $v = g^x$ where $x = H(s, pw)$
+ \item Server also pick a random $b$ and compute $B$.
+ \item Server sends $s$ and $B$ to the client.
+ \item Client and server both compute $u$, $S$ and $K$ with the shared values.
+ \item Mutual key confirmation initiated by the client
 \end{enumerate}
+
+If the password is correct, the client and the server end up with having the same $S$ --- and so the same key. The derivation of $S$ is less straightforward than other constructions so it is detailed below.
+
+\begin{align*}
+ S_{client}
+ &\equiv (B - H(p, g) g^x)^{(a+ux)}\notag\\
+ &\equiv ((H(p, g) g^x + g^b) - H(p, g) g^x)^{(a+ux)}\notag\\
+ &\equiv (g^b)^{a+ux}\notag\\
+ &\equiv g^{ab+bux}\notag\\
+ &\equiv (g^a (g^x)^u)^b\notag\\
+ &\equiv (Av^u)^b\notag\\
+ &\equiv S_{server} \pmod{p}
+\end{align*}
 
 
 
