@@ -8,13 +8,102 @@
 
 
 \begin{algorithm}
-\caption{Euclid’s algorithm}
+\caption{KHAPE : Authentication on the client (using KHAPE-3DH)}
 \label{euclid}
 \begin{algorithmic}
+\Require Knows username \verb|uid| and password $pw$
+\State Sends authentication request to the server with \verb|uid|
+
+% C on (CltSession; sid; S; pw) ??
+\State $x \gets$ randomNumber in $Zp$
+\State $X \gets g^x$
+\State Wait to receive $e$ and $Y$ from the server
+\State $(a, B) \gets$ Decrypt($pw$, $e$)
+
+% \If {HMQV}
+%     \State $d_c \gets$ Hash'(sid, C, S, 1, $X$)
+%     \State $e_c \gets$ Hash'(sid, C, S, 2, $Y$)
+%     \State $o_c \gets (Y \cdot B^{e_c})^{x+d_c \cdot a}$
+% \ElsIf {3DH}
+    \State $o_c \gets B^x || Y^a || Y^x$
+% \EndIf
+
+\State $k_1 \gets$ Hash(sid, C, S, $X$, $Y$, $o_c$)
+\State $t_1 \gets$ prf($k_1$, 1)
+\State Sends $t_1$ and $X$ to the server
 
 
+\State Wait to receive $t_2$ from the server
+\If {$t_2 \neq$ prf($k_1$, 2)}
+    \State $K_1 \gets$ False
+\Else
+    \State $K_1 \gets$ prf($k_1$, 0)
+\EndIf
+
+\State output $K_1$
 \end{algorithmic}
 \end{algorithm}
+
+
+\begin{algorithm}
+\caption{KHAPE : Authentication on the server (using KHAPE-3DH)}
+\label{euclid}
+\begin{algorithmic}
+\Require Store password file $file$
+\State Wait to receive authentication request from the client with \verb|uid|
+
+% S on (SvrSession; sid; C; uid)
+\State $y \gets$ randomNumber in $Zp$
+\State $Y \gets g^y$
+\State ($e$, $b$, $A$) $\gets$ file[\verb|uid|, S] % TODO S ?
+\State Sends $e$ and $Y$ to the client
+
+
+\State Wait to receive $t_1$ and $X$ from the client
+\State $o_s \gets X^b || A^y || X^y$
+\State $k_2 \gets$ Hash(sid, C, S, $X$, $Y$, $o_s$)
+
+
+\If {$t_1 \neq$ prf($k_2$, 1)}
+    \State $t_2 \gets$ False
+\Else
+    \State $t_2 \gets$ prf($k_2$, 2)
+\EndIf
+
+
+\State Sends $t_2$ to the client
+
+
+\If {$t_1 \neq$ prf($k_2$, 1)}
+    \State $K_2 \gets$ False
+\Else
+    \State $K_2 \gets$ prf($k_2$, 0)
+\EndIf
+
+\State output $K_2$
+\end{algorithmic}
+\end{algorithm}
+
+% TODO Toutes les opération mod p ?
+
+% Notes:
+% - x, y : ephemeral sessions secrets
+% - a, b : long-term keys
+% - d, e :  hashes of (session state identifiers and) resp. X = g^x and Y = g^y.
+
+% To understand :
+% - sid = Session identifiers (generated randomly for a new session)
+% - uid = user id ?
+% - C, S = each party identity ?? ("These identities could be e.g. domain names, user names, or any other identifiers. They have no other semantics except that the two parties can establish the same session key only if they assume matching identifiers, i.e. (P1; CP1) = (CP2; P2)")
+% - CltSession
+% - SvrSession
+
+% functions :
+% - Decrypt/Encrypt
+% - Hash'
+% - Hash
+% - prf
+
 
 
 \end{document}
