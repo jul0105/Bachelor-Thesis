@@ -73,7 +73,7 @@ It is a simple protocol that is designed to prevent offline dictionary attacks o
 It uses a combination of asymmetric and symmetric cryptography.
 The asymmetric keys are ephemeral and are exchanged between the client and the server by encrypting it with the shared symmetric key --- which is derived from the password.
 This allows securing the exchange against Man-in-the-Middle attack. % more ?
-However, this protocol requires that both party share a secret --- namely the password. This means that the server has to store and process the password in cleartext which is strongly discouraged. % details ?
+It is a symmetric PAKE so it requires that both party share a secret --- namely the password. This means that the server has to store and process the password in cleartext which is strongly discouraged. % details ?
 
 
 Multiple cryptographic primitive can be used for the asymmetric part such as RSA, ElGamal or DH but the majority of EKE variants use DH \cite{Breaking_EKE}. % more ? why ?
@@ -130,29 +130,23 @@ The protocol doesn't mention registration. It is assumed that both parties alrea
 
 SRP \cite{SRP_Paper, SRP_6_Paper} (for Secure Remote Password) was proposed in 1998 and is the most widely-implemented PAKE protocol in the world \cite{PAKE_Green_blog}.
 It's largely used in iCloud Key Vault --- which could make it one of the most widely-used cryptographic protocols \cite{PAKE_Green_blog} considering the number of active Apple devices worldwide --- and in 1Password's password manager.
+It is well standardized and has numerous implementation in different programming languages \cite{http://srp.stanford.edu/links.html}.
+It is in fact a TLS ciphersuite \cite{SRP_RFC_3}, implemented in OpenSSL.
 
-It is well standardized --- including multiple RFC --- and has numerous implementation in different programming languages \cite{http://srp.stanford.edu/links.html}.
-It is even a TLS ciphersuite \cite{SRP_RFC_3}, implemented in OpenSSL.
-
-This success is (in part) due to the SRP's creators to avoid patent --- unlike most of the PAKE of its time --- and ``avoid export controls by not using encryption'' \cite{Formal Methods Analysis of the Secure Remote Password Protocol (2020)}.
+This success is partly due to the SRP's creators will to avoid patent --- unlike most of the PAKE of its time --- but also to avoid export restriction imposed by US law by not using any encryption schema \cite{Formal Methods Analysis of the Secure Remote Password Protocol (2020)}.
 Their goal was to provide a technology that improve the security of existing password protocols while keeping the ease-of-use of passwords. In other words, provide a drop-in replacement to the classical authentication methods where the implementation doesn't require a deep change in contrary to EKE where the shared secret --- the password --- need to be stored in cleartext on the server making it difficult to manage correctly.
-
 This make SRP easy to implement for developers and transparent for the user.
 
-- No password storage, no password hash storage, instead use a password verifier that is a one-way function of the password
-- SRP-6a is not broken
+One of the main strength of SRP is that the server doesn't store the cleartext password or the hashed password. Instead it store a password verifier that is a discrete logarithm one-way function of the password.
 
-Even though SRP is in interesting construction and does some things right, it is not ideal and i.
-It got broken and patched multiple time --- current version is SRP v6a. % TODO cite website
 
-The construction is complex. ``SRP protocol design is completely bonkers''
-It doesn't really have security proof.
-No ECC
+Even though SRP is in interesting construction and does some things right, it is not ideal.
+It got broken and patched multiple time --- current version is SRP v6a (which is not broken). % TODO cite website
 
 It is vulnerable to pre-computation attack because the server send the cleartext salt to the client at the start of the exchange. With the salt, an adversary could build a table of password hashes --- a time-consuming process --- before compromising the server making it able to retrieve passwords instantaneously upon server compromise.
 
-
-SRP protocol mix addition and multiplication in calculation. Using both operations require a ring rather that a cyclic group. This requirement make it impossible to easily transfert the integer-based algorithm to elliptic curve. % because in integer-based group like DH, multiplication become EC point addition in ECC. SRP use both mutliplication and addition
+In addition, the construction is weirdly complex. ``SRP protocol design is completely bonkers''
+The protocol mix addition and multiplication in calculation. Using both operations require a ring rather that a cyclic group. This requirement make it impossible to easily transfer the integer-based algorithm to elliptic curve. % because in integer-based group like DH, multiplication become EC point addition in ECC. SRP use both mutliplication and addition
 
 This requirement, also make it challenging to provide a formal analysis of SRP because 
 ``existing tools provide no simple way to reason about its use of the mathematical expression $v+g^b \mod{q}$'' \cite{Formal Methods Analysis of the Secure Remote Password Protocol (2020)}. % TODO rephraase and add this to comparison details
@@ -199,6 +193,17 @@ If the password is correct, the client and the server end up with having the sam
  &\equiv (Av^u)^b\notag\\
  &\equiv S_{server} \pmod{p}
 \end{align*}
+
+\paragraph{\writingFormulationClean{Register.}}
+Registration process is not covered in SRP papers.
+Client must come with a password, and server need to generate a random salt. One of them also need to compute the verifier $v = g^x$ where $x = H(salt, password)$.
+
+This means that either the server sends the salt to the client and the client compute the verifier and send it back to the server through a secure channel (more secure as the server never see the user's password but more complicated to implement).
+Or the client sends its password to the server with it's register request --- through a secure channel --- and the server generate a salt and compute the verifier (Easier to implement server-side, less transmission, but password is handled in cleartext on the server).
+Either way, the registration require to use a secure channel.
+
+Upon a successful registration, the server store the following triplet : \\
+\verb|<username, verifier, salt>|
 
 
 
