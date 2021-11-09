@@ -130,10 +130,10 @@ The protocol doesn't mention registration. It is assumed that both parties alrea
 
 SRP \cite{SRP_Paper, SRP_6_Paper} (for Secure Remote Password) was proposed in 1998 and is the most widely-implemented PAKE protocol in the world \cite{PAKE_Green_blog}.
 It's largely used in iCloud Key Vault --- which could make it one of the most widely-used cryptographic protocols \cite{PAKE_Green_blog} considering the number of active Apple devices worldwide --- and in 1Password's password manager.
-It is well standardized and has numerous implementation in different programming languages \cite{http://srp.stanford.edu/links.html}.
+It is well standardized and has numerous implementation in different programming languages. %\cite{http://srp.stanford.edu/links.html}.
 It is in fact a TLS ciphersuite \cite{SRP_RFC_3}, implemented in OpenSSL.
 
-This success is partly due to the SRP's creators will to avoid patent --- unlike most of the PAKE of its time --- but also to avoid export restriction imposed by US law by not using any encryption schema \cite{Formal Methods Analysis of the Secure Remote Password Protocol (2020)}.
+This success is partly due to the SRP's creators will to avoid patent --- unlike most of the PAKE of its time --- but also to avoid export restriction imposed by US law by not using any encryption schema \cite{SRP_Formal_Analysis}.
 Their goal was to provide a technology that improve the security of existing password protocols while keeping the ease-of-use of passwords. In other words, provide a drop-in replacement to the classical authentication methods where the implementation doesn't require a deep change in contrary to EKE where the shared secret --- the password --- need to be stored in cleartext on the server making it difficult to manage correctly.
 This make SRP easy to implement for developers and transparent for the user.
 
@@ -149,7 +149,7 @@ In addition, the construction is weirdly complex. ``SRP protocol design is compl
 The protocol mix addition and multiplication in calculation. Using both operations require a ring rather that a cyclic group. This requirement make it impossible to easily transfer the integer-based algorithm to elliptic curve. % because in integer-based group like DH, multiplication become EC point addition in ECC. SRP use both mutliplication and addition
 
 This requirement, also make it challenging to provide a formal analysis of SRP because 
-``existing tools provide no simple way to reason about its use of the mathematical expression $v+g^b \mod{q}$'' \cite{Formal Methods Analysis of the Secure Remote Password Protocol (2020)}. % TODO rephraase and add this to comparison details
+``existing tools provide no simple way to reason about its use of the mathematical expression $v+g^b \mod{q}$'' \cite{SRP_Formal_Analysis}. % TODO rephraase and add this to comparison details
 
 
 \paragraph{\writingFormulationClean{Construction.}}
@@ -166,7 +166,7 @@ This requirement, also make it challenging to provide a formal analysis of SRP b
  \label{fig:SRP}
 \end{figure}
 
-The figure \ref{fig:SRP} shows the SRP-6a\cite{http://srp.stanford.edu/design.html} protocol during login process.
+The figure \ref{fig:SRP} shows the SRP-6a protocol during login process.
 The steps are the following :
 
 \begin{enumerate}
@@ -514,7 +514,7 @@ Users can use password hardening technique to increase the cost of an offline at
 
 COMMENT: For EKE, it could be possible to compute a KDF function on the password before using it as a symmetrical key but this is closer to Augmented EKE \cite{AEKE_Paper} where the password is hashed client side and the server store the hash results.
 
-For SRP, the client-side operation $x = H(salt||pwd)$ can be modified to use a resource-heavy hashing function \cite{https://blog.1password.com/developers-how-we-use-srp-and-you-can-too/}
+For SRP, the client-side operation $x = H(salt||pwd)$ can be modified to use a resource-heavy hashing function \cite{SRP_1Password_blog}.
 
 \paragraph{\writingFormulationBrut{8. Built-in mechanism to store client's secrets on the server.}}
 %OPAQUE "has a built-in facility for password-based storage-and-retrieval of secrets and credentials"
@@ -542,13 +542,13 @@ The standardization status is a good indicator to the maturity and adoption of a
 
 \paragraph{\writingNotes{12. Security proof.}}
 %OPAQUE "security proof in a very strong model"
-COMMENT: EKE only provide informal security analysis \cite{``https://eprint.iacr.org/2000/014.pdf''}
+COMMENT: EKE only provide informal security analysis \cite{EKE_Informal_Security_Analysis}
 
 SRP provide no valuable security proof \cite{CAA, SRP_Green_blog}. It only prove that it can stands up to passive attacks, which is not enough for an authentication protocol. A proof against active attacks would be welcomed for a such widely-used protocol.
 
 \paragraph{\writingNotes{13. Easily adaptable to elliptic curves.}}
 Elliptic curves cryptography allow to greatly reduce the size of asymmetric key.
-This is crucial in term of performance because keys size recommendation are always growing to ensure security and asymmetrical key are getting giant and difficult to manage --- in particular for key that require long-term protection (up to 50 years). For example, for such a long-term protection, the discrete logarithm group is recommended to be 15'360 bits according to ECRYPT-CSA \cite{https://www.keylength.com/en/3/}.
+This is crucial in term of performance because keys size recommendation are always growing to ensure security and asymmetrical key are getting giant and difficult to manage --- in particular for key that require long-term protection (up to 50 years). For example, for such a long-term protection, the discrete logarithm group is recommended to be 15'360 bits according to ECRYPT-CSA \cite{ECRYPT_Keylength}.
 In comparison, with elliptic curves, only 512 bits are recommended to archive similar security level.
 
 COMMENT: 
@@ -557,7 +557,7 @@ In SRP, $\mathbb{Z}_p$ is used as a field, not a group. Therefore, SRP cannot be
 
 
 For DH-EKE, it is required that the content that will be encrypted --- namely $A$ and $B$ --- must be indistinguishable from random data. 
-This requirement make it impossible to implement it on elliptic curves \cite{https://tools.ietf.org/id/draft-ietf-kitten-krb-spake-preauth-00.html}. %source : https://tools.ietf.org/id/draft-ietf-kitten-krb-spake-preauth-00.html#rfc.section.1.2
+This requirement make it impossible to implement it on elliptic curves \cite{EKE_ECC}. %also source : https://tools.ietf.org/id/draft-ietf-kitten-krb-spake-preauth-00.html#rfc.section.1.2
 % An implementation on elliptic curve wouldn't satisfy this requirement.
 
 
@@ -590,7 +590,7 @@ more messages means ``increasing latency and load on the network''
 
 \subsection{Table}
 
-For value where there is an ``*'', please refer to the appropriate comment in Section \cite{sec:comparison_details} for precision.
+For value where there is an ``*'', please refer to the appropriate comment in Section \ref{sec:comparison_details} for precision.
 
 \begin{center}
    \begin{tabular}{ | c | p{5cm} || p{2cm} | p{2cm} | p{2cm} | p{2cm} | }

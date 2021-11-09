@@ -1,29 +1,3 @@
-@online{PAKE_Green_blog,
-  author = {Green, Matthew},
-  title = {Let’s talk about {PAKE}},
-  year = 2018,
-  url = {https://blog.cryptographyengineering.com/2018/10/19/lets-talk-about-pake/},
-  urldate = {2021-09-25}
-}
-
-@online{SRP_Green_blog,
-  author = {Green, Matthew},
-  title = {Should you use {SRP} ?},
-  year = 2018,
-  url = {https://blog.cryptographyengineering.com/should-you-use-srp/},
-  urldate = {2021-09-25}
-}
-
-@online{PAKE_Cloudflare_blog,
-  author = {Bradley, Tatiana},
-  title = {{OPAQUE:} The Best Passwords Never Leave
-your Device},
-  year = 2020,
-  url = {https://blog.cloudflare.com/opaque-oblivious-passwords/},
-  urldate = {2021-09-25},
-  organization = {cloudflare}
-}
-
 @inproceedings{OPAQUE_Paper,
   author    = {Stanislaw Jarecki and
                Hugo Krawczyk and
@@ -140,6 +114,61 @@ your Device},
   year      = {2011}
 }
 
+@inproceedings{AEKE_Paper,
+  author    = {Steven M. Bellovin and
+               Michael Merritt},
+  title     = {Augmented Encrypted Key Exchange: {A} Password-Based Protocol Secure
+               against Dictionary Attacks and Password File Compromise},
+  booktitle = {{CCS}},
+  pages     = {244--250},
+  publisher = {{ACM}},
+  year      = {1993}
+}
+
+@inproceedings{EKE_Informal_Security_Analysis,
+  author    = {Mihir Bellare and
+               David Pointcheval and
+               Phillip Rogaway},
+  title     = {Authenticated Key Exchange Secure against Dictionary Attacks},
+  booktitle = {{EUROCRYPT}},
+  series    = {Lecture Notes in Computer Science},
+  volume    = {1807},
+  pages     = {139--155},
+  publisher = {Springer},
+  year      = {2000}
+}
+
+@article{EKE_ECC,
+  author    = {Julien Bringer and
+               Herv{\'{e}} Chabanne and
+               Thomas Icart},
+  title     = {Password Based Key Exchange with Hidden Elliptic Curve Public Parameters},
+  journal   = {{IACR} Cryptol. ePrint Arch.},
+  pages     = {468},
+  year      = {2009}
+}
+
+@inproceedings{SRP_Formal_Analysis,
+  author    = {Alan T. Sherman and
+               Erin Lanus and
+               Moses Liskov and
+               Edward Zieglar and
+               Richard Chang and
+               Enis Golaszewski and
+               Ryan Wnuk{-}Fink and
+               Cyrus J. Bonyadi and
+               Mario Yaksetig and
+               Ian Blumenfeld},
+  title     = {Formal Methods Analysis of the Secure Remote Password Protocol},
+  booktitle = {Logic, Language, and Security},
+  series    = {Lecture Notes in Computer Science},
+  volume    = {12300},
+  pages     = {103--126},
+  publisher = {Springer},
+  year      = {2020}
+}
+
+
 @article{SRP_RFC_1,
   author    = {Thomas Wu},
   title     = {Telnet Authentication: {SRP}},
@@ -170,10 +199,14 @@ your Device},
   year      = {2007}
 }
 
+
+
+% A revoir :
 @article{SRP_IEEE, 
     author={},  
+    organization={{IEEE}},
     journal={IEEE Std 1363.2-2008},   
-    title={IEEE Standard Specification for Password-Based Public-Key Cryptographic Techniques},   
+    title={{IEEE} Standard Specification for Password-Based Public-Key Cryptographic Techniques},   
     year={2009},  
     volume={},  
     number={},  
@@ -181,9 +214,10 @@ your Device},
     doi={10.1109/IEEESTD.2009.4773330}
 }
 
-% A revoir :
+
 @article{SRP_ISO,
   author    = {},
+  organization={{ISO}},
   title     = {Information technology — Security techniques — Key management — Part 4: Mechanisms based on weak secrets},
   journal   = {{ISO/IEC}},
   volume    = {11770-4},
@@ -191,15 +225,66 @@ your Device},
   year      = {2017}
 }
 
+@article{ECRYPT_Keylength,
+  author    = {},
+  organization={{ECRYPT-CSA}},
+  title     = {Algorithms, Key Size and Protocols Report},
+  journal   = {{ECRYPT-CSA}},
+  volume    = {{H2020-ICT-2014 –- Project 645421}},
+  chapter   = {D5.4},
+  pages     = {},
+  year      = {2018}
+}
+
+
+
 @book{OPAQUE_Standard_Draft,
     author      = {Krawczyk, Hugo and Bourdrez, D. and Lewi, K. and Wood, C.A.},
     year        = {2021},
     title       = {The OPAQUE Asymmetric PAKE Protocol},
     address     = {Fremont, California, USA},
-    edition     = {{draft-irtf-cfrg-opaque-06}},
+    edition     = {{draft-irtf-cfrg-opaque-07}},
     publisher   = {Internet Engineering Task Force},
     url         = {https://datatracker.ietf.org/doc/draft-irtf-cfrg-opaque/07/},
 }
+
+
+
+@online{PAKE_Green_blog,
+  author = {Green, Matthew},
+  title = {Let’s talk about {PAKE}},
+  year = 2018,
+  url = {https://blog.cryptographyengineering.com/2018/10/19/lets-talk-about-pake/},
+  urldate = {2021-09-25}
+}
+
+@online{SRP_Green_blog,
+  author = {Green, Matthew},
+  title = {Should you use {SRP} ?},
+  year = 2018,
+  url = {https://blog.cryptographyengineering.com/should-you-use-srp/},
+  urldate = {2021-09-25}
+}
+
+@online{SRP_1Password_blog,
+  author = {Fillion, Rick},
+  title = {Developers: How we use SRP, and you can too},
+  year = 2018,
+  url = {https://blog.1password.com/developers-how-we-use-srp-and-you-can-too/},
+  urldate = {2021-11-09}
+}
+
+@online{PAKE_Cloudflare_blog,
+  author = {Bradley, Tatiana},
+  title = {{OPAQUE:} The Best Passwords Never Leave
+your Device},
+  year = 2020,
+  url = {https://blog.cloudflare.com/opaque-oblivious-passwords/},
+  urldate = {2021-09-25},
+  organization = {cloudflare}
+}
+
+
 
 % Alexandre Duc, CAA, 05-passwords
 @unpublished{CAA,
@@ -207,5 +292,6 @@ your Device},
   Institution = {HEIG-VD -- Haute École d'Ingénierie et de Gestion du Canton de Vaud},
   Howpublished = {University Lecture},
   Year = {2021},
-  Title = {Cryptographie Avancée Appliquée [Advanced Applied Cryptography]}
+  Title = {Cryptographie Avancée Appliquée [Advanced Applied Cryptography]},
+  Note = {University Lecture at HEIG-VD -- Haute École d'Ingénierie et de Gestion du Canton de Vaud}
 }
