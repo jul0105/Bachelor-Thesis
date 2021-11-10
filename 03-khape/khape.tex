@@ -11,19 +11,19 @@
 
 
 \begin{algorithm}
-\caption{KHAPE : Authentication on the client (using KHAPE-3DH)}
+\caption{KHAPE : Authentication on the client (generic algorithm)}
 \label{euclid}
 \begin{algorithmic}
 \Require Knows username \verb|uid| and password $pw$
 \If {OPRF}
-    \State $r \gets$ randomNumber
-    \State $h_1 \gets$ Hash($pw$)$^r$
+    \State $r \gets$ generateRandomNumber in $\mathbb{Z}_p$
+    \State $h_1 \gets$ HeavyHash($pw$)$^r$
     \State Sends authentication request to the server with \verb|uid| and $h_1$
 \Else
     \State Sends authentication request to the server with \verb|uid|
 \EndIf
 % C on (CltSession; sid; S; pw) ??
-\State $x \gets$ randomNumber in $Zp$
+\State $x \gets$ generateRandomNumber in $\mathbb{Z}_p$
 \State $X \gets g^x$
 
 \If {OPRF}
@@ -36,24 +36,27 @@
     \State $(a, B) \gets$ Decrypt($pw$, $e$)
 \EndIf
 
-% \If {HMQV}
-%     \State $d_c \gets$ Hash'(sid, C, S, 1, $X$)
-%     \State $e_c \gets$ Hash'(sid, C, S, 2, $Y$)
-%     \State $o_c \gets (Y \cdot B^{e_c})^{x+d_c \cdot a}$
-% \ElsIf {3DH}
-    \State $o_c \gets B^x || Y^a || Y^x$
-% \EndIf
+% HMQV :
+% \State $d_c \gets$ Hash'(sid, C, S, 1, $X$)
+% \State $e_c \gets$ Hash'(sid, C, S, 2, $Y$)
+% \State $o_c \gets (Y \cdot B^{e_c})^{x+d_c \cdot a}$
+
+% 3DH :
+% \State $o_c \gets B^x || Y^a || Y^x$
+
+% Generic
+\State $o_c \gets$ KeyHidingAKE($X$, $Y$, $B$, $x$, $a$)
 
 \State $k_1 \gets$ Hash(sid, C, S, $X$, $Y$, $o_c$)
-\State $t_1 \gets$ prf($k_1$, 1)
+\State $t_1 \gets$ PRF($k_1$, 1)
 \State Sends $t_1$ and $X$ to the server
 
 
 \State Wait to receive $t_2$ from the server
-\If {$t_2 \neq$ prf($k_1$, 2)}
+\If {$t_2 \neq$ PRF($k_1$, 2)}
     \State $K_1 \gets$ False
 \Else
-    \State $K_1 \gets$ prf($k_1$, 0)
+    \State $K_1 \gets$ PRF($k_1$, 0)
 \EndIf
 
 \State output $K_1$
@@ -62,7 +65,7 @@
 
 
 \begin{algorithm}
-\caption{KHAPE : Authentication on the server (using KHAPE-3DH)}
+\caption{KHAPE : Authentication on the server (generic algorithm)}
 \label{euclid}
 \begin{algorithmic}
 \Require Store password file $file$
@@ -73,7 +76,7 @@
 \EndIf
 
 % S on (SvrSession; sid; C; uid)
-\State $y \gets$ randomNumber in $Zp$
+\State $y \gets$ generateRandomNumber in $\mathbb{Z}_p$
 \State $Y \gets g^y$
 
 \If {OPRF}
@@ -87,24 +90,30 @@
 
 
 \State Wait to receive $t_1$ and $X$ from the client
-\State $o_s \gets X^b || A^y || X^y$
+
+% 3DH :
+% \State $o_s \gets X^b || A^y || X^y$
+
+% Generic
+\State $o_s \gets$ KeyHidingAKE($X$, $Y$, $A$, $y$, $b$)
+
 \State $k_2 \gets$ Hash(sid, C, S, $X$, $Y$, $o_s$)
 
 
-\If {$t_1 \neq$ prf($k_2$, 1)}
+\If {$t_1 \neq$ PRF($k_2$, 1)}
     \State $t_2 \gets$ False
 \Else
-    \State $t_2 \gets$ prf($k_2$, 2)
+    \State $t_2 \gets$ PRF($k_2$, 2)
 \EndIf
 
 
 \State Sends $t_2$ to the client
 
 
-\If {$t_1 \neq$ prf($k_2$, 1)}
+\If {$t_1 \neq$ PRF($k_2$, 1)}
     \State $K_2 \gets$ False
 \Else
-    \State $K_2 \gets$ prf($k_2$, 0)
+    \State $K_2 \gets$ PRF($k_2$, 0)
 \EndIf
 
 \State output $K_2$
@@ -129,12 +138,22 @@
 % - Decrypt/Encrypt
 % - Hash'
 % - Hash
+% - HeavyHash
 % - prf
 
 
 \section{Design choices}
-- 3DH
+- 3DH (or HMQV)
 - OPRF (?)
+- calculation in Zp ??
+\paragraph{OPRF}
+\paragraph{KeyHidingAKE}
+\paragraph{Encrypt/Decrypt}
+\paragraph{Hash}
+\paragraph{HeavyHash}
+\paragraph{PRF}
+\paragraph{generateRandomNumber}
+
 
 
 \section{Precise algorithm}
