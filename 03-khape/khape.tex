@@ -16,15 +16,15 @@
 \begin{algorithmic}
 \Require Knows username \verb|uid| and password $pw$
 \If {OPRF}
-    \State $r \gets$ generateRandomNumber in $\mathbb{Z}_p$
+    \State $r \gets$ GenerateRandomNumber in $\mathbb{Z}_p$
     \State $h_1 \gets$ HeavyHash($pw$)$^r$
     \State Sends authentication request to the server with \verb|uid| and $h_1$
 \Else
     \State Sends authentication request to the server with \verb|uid|
 \EndIf
 % C on (CltSession; sid; S; pw) ??
-\State $x \gets$ generateRandomNumber in $\mathbb{Z}_p$
-\State $X \gets g^x$
+\State $x \gets$ GenerateRandomNumber in $\mathbb{Z}_p$
+\State $X \gets g^x \mod p$
 
 \If {OPRF}
     \State Wait to receive $e$, $Y$ and $h_2$ from the server
@@ -76,7 +76,7 @@
 \EndIf
 
 % S on (SvrSession; sid; C; uid)
-\State $y \gets$ generateRandomNumber in $\mathbb{Z}_p$
+\State $y \gets$ GenerateRandomNumber in $\mathbb{Z}_p$
 \State $Y \gets g^y$
 
 \If {OPRF}
@@ -146,17 +146,37 @@
 - 3DH (or HMQV)
 - OPRF (?)
 - calculation in Zp ??
+\paragraph{Setup of DH parameters $p$, $g$ and $q$}
+-
+
+in KHAPE paper: Group $\mathbb{G}$ of prime order $p$ with generator $g$
+x, y, a, b in Zp
+
+=> $\mathbb{Z}_p^{*}$ with generator $g$
+
+in OPAQUE paper: Group $G$ of prime order $q$; |$q$| = 2$t$ and generator $g$ ($t$ = security parameter)
+r and x in Zq
+
+
+in CRY: $g$ est un élément d’ordre $q$ du groupe multiplicatif $\mathbb{Z}_p^{*}$
+
+
+% espace Zp x G ?
+
+
 \paragraph{OPRF}
 \paragraph{KeyHidingAKE}
 \paragraph{Encrypt/Decrypt}
 \paragraph{Hash}
 \paragraph{HeavyHash}
 \paragraph{PRF}
-\paragraph{generateRandomNumber}
+\paragraph{GenerateRandomNumber}
 
 
 
 \section{Precise algorithm}
+
+\section{(Threat model)}
 
 
 
