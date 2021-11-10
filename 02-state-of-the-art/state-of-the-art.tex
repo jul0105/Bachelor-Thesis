@@ -20,7 +20,7 @@
 
 \chapter{State of the art}
 
-This chapter aim to provide an detailed view of the current PAKE landscape from the oldest to the most recent construction.
+This chapter aim to provide a detailed view of the current PAKE landscape from the oldest to the most recent construction.
 
 \section{Notation}
 
@@ -293,7 +293,7 @@ Upon a successful registration, the server store the following triplet : \\
 \subsection{\writingFormulationClean{OPAQUE}}
 
 
-\paragraph{\writingFormulationClean{Design.}}
+\paragraph{\writingFormulationClean{Introduction.}}
 Jarecki et al. \cite{OPAQUE_Paper}. introduce the definition of Strong aPAKE (SaPAKE): an aPAKE secure against pre-computation attacks.
 
 They provide two modular constructions, called the OPAQUE protocol that allow building SaPAKE protocols. The first construction allows enhancing any aPAKE to a SaPAKE while the second allows enhancing any Authenticated Key-Exchange (AKE) protocol (that are secure against KCI attacks) to a SaPAKE.
@@ -559,6 +559,27 @@ In SRP, $\mathbb{Z}_p$ is used as a field, not a group. Therefore, SRP cannot be
 For DH-EKE, it is required that the content that will be encrypted --- namely $A$ and $B$ --- must be indistinguishable from random data. 
 This requirement make it impossible to implement it on elliptic curves \cite{EKE_ECC}. %also source : https://tools.ietf.org/id/draft-ietf-kitten-krb-spake-preauth-00.html#rfc.section.1.2
 % An implementation on elliptic curve wouldn't satisfy this requirement.
+
+
+% ``One of the most well-known variant of EKE is Diffie-Hellman EKE
+% (DH-EKE) which is merely a DH key exchange where at least one message
+% exchanged under DH is encrypted via the password. Bellare et al. introduced in [3] a formal security model to grasp the specificity of passwordbased key exchange. This model was used later in [9, 10] to establish the
+% security of DH-EKE under ideal assumptions (namely the ideal cipher
+% model and the Random Oracle Model, ROM). However ideal cipher model
+% is not easily applicable to elliptic curves and thus in its classical version,
+% DH-EKE is not well adapted to elliptic curves. A naive application of the
+% encryption step of DH-EKE to elliptic curves points would lead to an insecure scheme. Indeed, due to the redundancy in a point representation,
+% partition attacks [15] are made possible to distinguish possible passwords
+% from impossible ones and the security against offline dictionary attacks
+% does not hold (the main idea is that a decryption with a bad password of
+% an encrypted point would most probably not be a point over the elliptic
+% curve). In [8], a modification of the scheme is suggested by using either
+% a point of the curve or a point over its twist. Although, this enables to
+% withstand the security issue, the scheme is not proved in the model of [3]
+% and becomes much less simple than DH-EKE.'' \cite{EKE_ECC}
+
+% ``Finally, in both cases, DH-EKE and SPEKE do not hide the curve
+% parameters as they can easily be deduced from 2 eavesdropped points.'' \cite{EKE_ECC}
 
 
 \paragraph{14. Number of messages.}
