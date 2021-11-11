@@ -12,12 +12,12 @@
 
 \begin{algorithm}
 \caption{KHAPE : Authentication on the client (generic algorithm)}
-\label{euclid}
+\label{login_client}
 \begin{algorithmic}
 \Require Knows username \verb|uid| and password $pw$
 \If {OPRF}
     \State $r \gets$ GenerateRandomNumber in $\mathbb{Z}_p$
-    \State $h_1 \gets$ HeavyHash($pw$)$^r$
+    \State $h_1 \gets$ HashToGroup($pw$)$^r$
     \State Sends authentication request to the server with \verb|uid| and $h_1$
 \Else
     \State Sends authentication request to the server with \verb|uid|
@@ -66,9 +66,9 @@
 
 \begin{algorithm}
 \caption{KHAPE : Authentication on the server (generic algorithm)}
-\label{euclid}
+\label{login_server}
 \begin{algorithmic}
-\Require Store password file $file$
+\Require Store password file $file$ containing <$e$, $b$, $A$[, $salt$]>
 \If {OPRF}
     \State Wait to receive authentication request from the client with \verb|uid| and $h_1$
 \Else
@@ -120,8 +120,6 @@
 \end{algorithmic}
 \end{algorithm}
 
-% TODO Toutes les opération mod p ?
-
 % Notes:
 % - x, y : ephemeral sessions secrets
 % - a, b : long-term keys
@@ -134,47 +132,134 @@
 % - CltSession
 % - SvrSession
 
-% functions :
-% - Decrypt/Encrypt
-% - Hash'
-% - Hash
-% - HeavyHash
-% - prf
+
+% TODO generate sid
+% TODO C and S ?
+
+
+\begin{algorithm}
+\caption{KHAPE : Registration on the client (generic algorithm)}
+\label{register_login}
+\begin{algorithmic}
+\Require Choose username \verb|uid| and password $pw$
+
+\If {OPRF}
+    \State $r \gets$ GenerateRandomNumber in $\mathbb{Z}_p$
+    \State $h_1 \gets$ HashToGroup($pw$)$^r$
+    \State Sends registration request to the server with \verb|uid| and $h_1$
+\Else
+    \State Sends registration request to the server with \verb|uid|
+\EndIf
+
+\State $a \gets$ GenerateRandomNumber in $\mathbb{Z}_p$
+\State $A \gets g^a$
+
+\If {OPRF}
+    \State Wait to receive $e$ and $h_2$ from the server
+    \State $salt_2 \gets$ $h_2^{\frac{1}{r}}$
+    \State $rw \gets$ Hash($salt_2$, $pw$)
+    \State $e \gets$ Encrypt($rw$, $(a, B)$)
+\Else
+    \State Wait to receive $e$ from the server
+    \State $e \gets$ Encrypt($pw$, $(a, B)$)
+\EndIf
+
+\State Sends $e$ to the server
+
+
+\end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}
+\caption{KHAPE : Registration on the server (generic algorithm)}
+\label{register_server}
+\begin{algorithmic}
+\Require 
+
+\If {OPRF}
+    \State Waits to receive registration request from a client with \verb|uid| and $h_1$
+\Else
+    \State Waits to receive registration request from a client with \verb|uid|
+\EndIf
+
+\State $b \gets$ GenerateRandomNumber in $\mathbb{Z}_p$
+\State $B \gets g^b$
+
+\If {OPRF}
+    \State $salt \gets$ GenerateRandomNumber in $\mathbb{Z}_p$
+    \State $h_2 \gets h_1^{salt}$    
+    \State Sends $B$ and $h_2$ to the client
+\Else
+    \State Sends $B$ to the client
+\EndIf
+
+\State Waits to receive $e$ from the client
+\State Store file[\verb|uid|, S] $\gets$ ($e$, $b$, $A$) % TODO S ?
+
+\end{algorithmic}
+\end{algorithm}
 
 
 
-% TODO registration (client-side)
 
 \section{Design choices}
-- 3DH (or HMQV)
-- OPRF (?)
-- calculation in Zp ??
-\paragraph{Setup of DH parameters $p$, $g$ and $q$}
--
 
-in KHAPE paper: Group $\mathbb{G}$ of prime order $p$ with generator $g$
-x, y, a, b in Zp
-
-=> $\mathbb{Z}_p^{*}$ with generator $g$
-
-in OPAQUE paper: Group $G$ of prime order $q$; |$q$| = 2$t$ and generator $g$ ($t$ = security parameter)
-r and x in Zq
+\subsection{Group $\mathbb{G}$}
 
 
-in CRY: $g$ est un élément d’ordre $q$ du groupe multiplicatif $\mathbb{Z}_p^{*}$
+
+KHAPE constructions are defined on a group $\mathbb{G}$ of prime order $p$ with generator $g$.
+The group is generic which means we are free to use an integer group or an elliptic curves group.
+% p in KHAPE = q in CRY
+% p in CRY is not defined in KHAPE because it's generic (integer or ECC) (no modulo in ECC)
+
+For performances reasons, ECC will be used.
+The curve must be compatible with the curve encoding algorithm selected (Elligator-squared, Elligator2, etc.).
 
 
-% espace Zp x G ?
 
-\paragraph{Client-side register}
+\subsection{Client-side register}
 
-\paragraph{OPRF}
-\paragraph{KeyHidingAKE}
-\paragraph{Encrypt/Decrypt}
-\paragraph{Hash}
-\paragraph{HeavyHash}
-\paragraph{PRF}
-\paragraph{GenerateRandomNumber}
+
+\subsection{OPRF}
+yes
+
+\subsection{KeyHidingAKE}
+3DH
+HMQV patented but more efficient
+
+\begin{algorithmic}
+ % HMQV :
+\State $d_c \gets$ Hash'(sid, C, S, 1, $X$)
+\State $e_c \gets$ Hash'(sid, C, S, 2, $Y$)
+\State $o_c \gets (Y \cdot B^{e_c})^{x+d_c \cdot a}$
+\State
+% 3DH :
+\State $o_c \gets B^x || Y^a || Y^x$
+\end{algorithmic}
+
+
+\subsection{Encrypt/Decrypt}
+non-commiting encryption: elligator2 + ideal cipher
+
+
+
+\subsection{Hash}
+
+\subsection{HashToGroup}
+Operation of hashing to the group. Since we use elliptic curves, this operation is an hash-to-curve.
+
+\subsection{HeavyHash}
+Optionaly, use Argon2, scrypt, etc. on the password before inputing in the algo
+
+\subsection{PRF}
+MAC
+
+\subsection{GenerateRandomNumber}
+Voir CAA
+
+\subsection{Session during authentication or registration ?}
+
 
 
 
