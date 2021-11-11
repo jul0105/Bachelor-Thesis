@@ -209,8 +209,11 @@
 
 \section{Design choices}
 
-\subsection{Group $\mathbb{G}$}
+\subsection{Client-side register}
 
+\subsection{Session during authentication or registration ?}
+
+\subsection{Group $\mathbb{G}$}
 
 
 KHAPE constructions are defined on a group $\mathbb{G}$ of prime order $p$ with generator $g$.
@@ -220,10 +223,6 @@ The group is generic which means we are free to use an integer group or an ellip
 
 For performances reasons, ECC will be used.
 The curve must be compatible with the curve encoding algorithm selected (Elligator-squared, Elligator2, etc.).
-
-
-
-\subsection{Client-side register}
 
 
 \subsection{OPRF}
@@ -244,7 +243,7 @@ HMQV patented but more efficient
 \end{algorithmic}
 
 
-\subsection{Encrypt/Decrypt}
+\subsection{Encryption schema}
 non-commiting encryption: elligator2 + ideal cipher
 
 
@@ -254,8 +253,6 @@ non-commiting encryption: elligator2 + ideal cipher
 \subsection{HashToGroup}
 Operation of hashing to the group. Since we use elliptic curves, this operation is an hash-to-curve.
 
-\subsection{HeavyHash}
-Optionaly, use Argon2, scrypt, etc. on the password before inputing in the algo
 
 \subsection{PRF}
 MAC
@@ -263,10 +260,18 @@ MAC
 \subsection{GenerateRandomNumber}
 Voir CAA
 
-\subsection{Session during authentication or registration ?}
 
 
 
+
+\section{Security consideration}
+% see OPAQUE standard chapter 10
+\subsection{Input validation}
+``We assume that parties verify public keys and ephemeral DH values, resp.
+B; Y for P1 and A; X for P2, as group G elements.''
+
+\subsection{SlowHash}
+Optionaly, use Argon2, scrypt, etc. on the password before inputting it in the algo
 
 
 \section{Precise algorithm}

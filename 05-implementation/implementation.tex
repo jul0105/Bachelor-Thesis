@@ -35,11 +35,11 @@
     % generate_asymetric_key
     % generate OPRF salt
     % compute OPRF h2
-    % return B and h2
+    % return B and h2 % TODO how to store salt and b (secret) ? Pre-store b and salt in file[uid] (remove it on server_register_finish) OR use a session_file[sid] <- (b, salt)
  \item \emph{Response B and h2}
  \item \emph{Receive e and A}
  \item \verb|server_register_finish(e, A, b, salt): file_entry|
-    % store (e, b, A, salt) % TODO how to store salt and b (secret) ?
+    % store (e, b, A, salt) 
 \end{itemize}
 
 
@@ -74,7 +74,7 @@
     % generate_asymetric_key
     % retrieve (e, salt) from file
     % compute OPRF h2 % TODO ensure that client-side attacker cannot retrieve salt (by inputing anoter user uid)
-    % return e, Y, y, h2 % TODO how to store y ?
+    % return e, Y, y, h2 % TODO how to store y ? Store in file[uid] (remove it on server_auth_finish) OR use a session_file[sid] <- (y)
  \item \emph{Response e, Y and h2}
  \item \emph{Receive t1 and X}
  \item \verb|server_auth_finish(X, Y, A, y, b, t1, file): (K2, t2)|
@@ -83,12 +83,21 @@
     % compute k2 % TODO sid, C, S ?
     % verify t1
     % compute t2 and K2
-    % return K2, t2 % TODO what to do with K2 (session key) ? Store in db ? Expiration ?
+    % return K2, t2 % TODO what to do with K2 (session key) ? Store in db ? Expiration ? use a session_file[sid] <- K
  \item \emph{Response t2}
 
 \end{itemize}
 
+\subsection{Structure}
+Ciphersuite
+file
+
 \section{Dependencies/Libraries choices}
+\begin{itemize}
+ \item OPRF : https://crates.io/crates/voprf
+ \item Curve : https://crates.io/crates/curve25519-dalek (Support Elligator2)
+\end{itemize}
+
 \section{Code structure}
 \section{Interesting functions}
 \subsection{Discharge password from RAM directly after use}
