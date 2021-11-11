@@ -155,16 +155,16 @@
 \State $A \gets g^a$
 
 \If {OPRF}
-    \State Wait to receive $e$ and $h_2$ from the server
+    \State Wait to receive $B$ and $h_2$ from the server
     \State $salt_2 \gets$ $h_2^{\frac{1}{r}}$
     \State $rw \gets$ Hash($salt_2$, $pw$)
     \State $e \gets$ Encrypt($rw$, $(a, B)$)
 \Else
-    \State Wait to receive $e$ from the server
+    \State Wait to receive $B$ from the server
     \State $e \gets$ Encrypt($pw$, $(a, B)$)
 \EndIf
 
-\State Sends $e$ to the server
+\State Sends $e$ and $A$ to the server
 
 
 \end{algorithmic}
@@ -193,8 +193,13 @@
     \State Sends $B$ to the client
 \EndIf
 
-\State Waits to receive $e$ from the client
-\State Store file[\verb|uid|, S] $\gets$ ($e$, $b$, $A$) % TODO S ?
+\State Waits to receive $e$ and $A$ from the client
+
+\If {OPRF}
+    \State Store file[\verb|uid|, S] $\gets$ ($e$, $b$, $A$, $salt$) % TODO S ?
+\Else
+    \State Store file[\verb|uid|, S] $\gets$ ($e$, $b$, $A$) % TODO S ?
+\EndIf
 
 \end{algorithmic}
 \end{algorithm}
