@@ -4,8 +4,90 @@
 
 \chapter{\writingNotes{Implementation}}
 \section{API}
-\subsection{Client}
-\subsection{Server}
+\subsection{Common}
+\begin{itemize}
+ \item \verb|generate_asymetric_key|
+    % generate a in Zp
+    % compute A
+    % return (a, A)
+\end{itemize}
+
+
+\subsection{Client register}
+\begin{itemize}
+ \item \verb|client_register_start(uid, pw): RegisterRequest|
+    % compute OPRF initialization
+    % add OPRF h1 and uid to a struct
+    % return struct
+ \item \emph{Sends uid and h1. Receive e and h2}
+ \item \verb|client_register_finish(B, a, pw, h2) : e|
+    % generate_asymetric_key
+    % compute OPRF output
+    % encrypt (a, B) with rw
+    % return ciphertext
+\end{itemize}
+
+
+\subsection{Server register}
+\begin{itemize}
+ \item \emph{Receive uid and h1}
+ \item \verb|server_register_start(uid, h1): (b, B, salt, h2)|
+    % generate_asymetric_key
+    % generate OPRF salt
+    % compute OPRF h2
+    % return B and h2
+ \item \emph{Response B and h2}
+ \item \emph{Receive e and A}
+ \item \verb|server_register_finish(e, A, b, salt): file_entry|
+    % store (e, b, A, salt) % TODO how to store salt and b (secret) ?
+\end{itemize}
+
+
+
+\subsection{Client login}
+\begin{itemize}
+ \item \verb|client_auth_start(uid, pw): RegisterRequest| % similar to client_register_start
+    % compute OPRF initialization 
+    % add OPRF h1 and uid to a struct
+    % return struct
+ \item \emph{Sends uid and h1. Receive e, Y and h2}
+ \item \verb|client_auth_ke(e, Y, h2, r, pw) : (k1, t1, X)|
+    % generate_asymetric_key
+    % compute OPRF output
+    % decrypt (a, B) with rw
+    % compute KeyHidingAKE
+    % compute k1 and t1 % TODO sid, C, S ?
+    % return k1, t1 and X
+ \item \emph{Sends t1 and X. Receive t2}
+ \item \verb|client_auth_finish(t2, k1) : K1|
+    % verify t2
+    % compute K1
+    % return K1
+
+\end{itemize}
+
+
+\subsection{Server login}
+\begin{itemize}
+ \item \emph{Receive uid and h1}
+ \item \verb|server_auth_start(uid, h1, file): (e, Y, h2)|
+    % generate_asymetric_key
+    % retrieve (e, salt) from file
+    % compute OPRF h2 % TODO ensure that client-side attacker cannot retrieve salt (by inputing anoter user uid)
+    % return e, Y, y, h2 % TODO how to store y ?
+ \item \emph{Response e, Y and h2}
+ \item \emph{Receive t1 and X}
+ \item \verb|server_auth_finish(X, Y, A, y, b, t1, file): (K2, t2)|
+    % retrieve (b, A) from file
+    % compute KeyHidingAKE
+    % compute k2 % TODO sid, C, S ?
+    % verify t1
+    % compute t2 and K2
+    % return K2, t2 % TODO what to do with K2 (session key) ? Store in db ? Expiration ?
+ \item \emph{Response t2}
+
+\end{itemize}
+
 \section{Dependencies/Libraries choices}
 \section{Code structure}
 \section{Interesting functions}
