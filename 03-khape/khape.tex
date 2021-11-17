@@ -24,7 +24,7 @@
 \EndIf
 % C on (CltSession; sid; S; pw) ??
 \State $x \gets$ GenerateRandomNumber in $\mathbb{Z}_p$
-\State $X \gets g^x \mod p$
+\State $X \gets g^x$
 
 \If {OPRF}
     \State Wait to receive $e$, $Y$ and $h_2$ from the server
@@ -224,6 +224,8 @@ The group is generic which means we are free to use an integer group or an ellip
 For performances reasons, ECC will be used.
 The curve must be compatible with the curve encoding algorithm selected (Elligator-squared, Elligator2, etc.).
 
+Represented on 256 bits (which curve ?)
+
 
 \subsection{OPRF}
 yes
@@ -246,6 +248,12 @@ HMQV patented but more efficient
 \subsection{Encryption schema}
 non-commiting encryption: elligator2 + ideal cipher
 
+input range between 512 and 1024 bits depending on envelope size
+
+
+In contrary to the OPAQUE Paper, the OPAQUE standard draft doesn't encrypt the client's private key in the envelope.
+Instead, the envelope store a nonce of 32 bytes and an authentication tag. The envelope is not encrypted.
+The nonce is used --- with the randomized password --- to compute a seed, which is then used to derive the client's private and public keys. The authentication tag stored in the envelope is used to verify the derived public key.
 
 
 \subsection{Hash}
