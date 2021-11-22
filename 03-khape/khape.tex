@@ -273,6 +273,13 @@ Voir CAA
 
 
 \section{Security consideration}
+
+\subsection{Difference with OPAQUE} %TODO put this section somewhere (in state-of-the-art ?)
+
+Verification must be initialized by the client, this mean that protocol in completed with 4 message instead of 3 for OPAQUE.
+Still use encryption (ideal cipher) where the OPAQUE standard draft doesn't use encryption anymore.
+Use key-hiding AKE (3DH and HMQV are key-hiding AKE so this doesn't change anything).
+
 % see OPAQUE standard chapter 10
 \subsection{Input validation}
 ``We assume that parties verify public keys and ephemeral DH values, resp.
