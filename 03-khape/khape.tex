@@ -228,7 +228,11 @@ Represented on 256 bits (which curve ?)
 
 
 \subsection{OPRF}
-yes
+yes, but optional
+
+Slow hash optional as well
+
+Can use both, or one of them but avoid to use neither of them because the envelope encryption key would only be an hkdf of the password which is very weak.
 
 \subsection{KeyHidingAKE}
 3DH

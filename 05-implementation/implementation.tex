@@ -19,12 +19,13 @@
     % compute OPRF initialization
     % add OPRF h1 and uid to a struct
     % return struct
- \item \emph{Sends uid and h1. Receive e and h2}
- \item \verb|client_register_finish(B, a, pw, h2) : e|
+ \item \emph{Sends uid and h1. Receive B and h2}
+ \item \verb|client_register_finish(B, pw, h2) : e|
     % generate_asymetric_key
     % compute OPRF output
     % encrypt (a, B) with rw
     % return ciphertext
+ \item \emph{Sends e and A}
 \end{itemize}
 
 
