@@ -5,14 +5,26 @@
 
 \chapter{\writingNotes{KHAPE}}
 
+This chapter explain the details of the KHAPE protocol in term of implementation and explain the design choices.
+
 \section{Choice of implementing KHAPE}
 
+The choice is based on the properties of the PAKE and the existence of implementations and/or standard for this PAKE.
+
+OPAQUE and KHAPE provide the highest level of security amongst aPAKE protocols.
+But while OPAQUE is becoming more mature with a draft standard and multiple high-quality implementations --- including in rust \ref{opaque-ke}, KHAPE is still very recent.
+In fact, KHAPE paper was published only 6 month ago at the time of the writing. To my knowledge, there is currently no public implementation of KHAPE and this is why I will be implementing it.
+
+Since the only ressource for KHAPE is the rather theorical paper, lots of design choice will have to be made. However, since OPAQUE and KHAPE share similarities, some implementation choice will be inspired by the OPAQUE standard draft whenever it's possible.
+
 \section{Generic algorithm}
+This sections details a generic KHAPE protocol.
+Algorithm \ref{alg:login_client} and \ref{alg:login_server} show the pseudocode of a login process from both client-side and server-side. Algorithm \ref{alg:register_client} and \ref{alg:register_server} show the register process.
 
 
-\begin{algorithm}
+\begin{algorithm}[h]
 \caption{KHAPE : Authentication on the client (generic algorithm)}
-\label{login_client}
+\label{alg:login_client}
 \begin{algorithmic}
 \Require Knows username \verb|uid| and password $pw$
 \If {OPRF}
@@ -66,7 +78,7 @@
 
 \begin{algorithm}
 \caption{KHAPE : Authentication on the server (generic algorithm)}
-\label{login_server}
+\label{alg:login_server}
 \begin{algorithmic}
 \Require Store password file $file$ containing <$e$, $b$, $A$[, $salt$]>
 \If {OPRF}
@@ -139,7 +151,7 @@
 
 \begin{algorithm}
 \caption{KHAPE : Registration on the client (generic algorithm)}
-\label{register_login}
+\label{alg:register_client}
 \begin{algorithmic}
 \Require Choose username \verb|uid| and password $pw$
 
@@ -172,7 +184,7 @@
 
 \begin{algorithm}
 \caption{KHAPE : Registration on the server (generic algorithm)}
-\label{register_server}
+\label{alg:register_server}
 \begin{algorithmic}
 \Require 
 
