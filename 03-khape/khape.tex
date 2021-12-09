@@ -15,8 +15,6 @@ OPAQUE and KHAPE provide the highest level of security amongst aPAKE protocols.
 But while OPAQUE is becoming more mature with a draft standard and multiple high-quality implementations --- including in rust \ref{opaque-ke}, KHAPE is still very recent.
 In fact, KHAPE paper was published only 6 month ago at the time of the writing. To my knowledge, there is currently no public implementation of KHAPE and this is why I will be implementing it.
 
-Since the only ressource for KHAPE is the rather theorical paper, lots of design choice will have to be made. However, since OPAQUE and KHAPE share similarities, some implementation choice will be inspired by the OPAQUE standard draft whenever it's possible.
-
 \section{Generic algorithm}
 This sections details a generic KHAPE protocol.
 Algorithm \ref{alg:login_client} and \ref{alg:login_server} show the pseudocode of a login process from both client-side and server-side. Algorithm \ref{alg:register_client} and \ref{alg:register_server} show the register process.
@@ -219,11 +217,16 @@ Algorithm \ref{alg:login_client} and \ref{alg:login_server} show the pseudocode 
 
 
 
-\section{Design choices}
+\section{\writingFormulationBrut{Design choices}}
 
-\subsection{Client-side register}
+This section explain the design choices made to implement KHAPE.
+Since the only resource for KHAPE is the rather theoretical paper, lots of design choice have to be made. However, since OPAQUE and KHAPE share similarities, some implementation choices are inspired by the OPAQUE standard draft whenever it's possible.
 
-\subsection{Session during authentication or registration ?}
+
+\subsection{\writingFormulationBrut{Client-side register}}
+Both client-side and server-side registration are possible but in order to use the aPAKE benefit to the fullest, it is preferable to handle the registration on the client.
+
+This allow to keep the main goal of aPAKEs: the server NEVER see the user's password.
 
 \subsection{Group $\mathbb{G}$}
 
@@ -239,29 +242,36 @@ The curve must be compatible with the curve encoding algorithm selected (Elligat
 Represented on 256 bits (which curve ?)
 
 
-\subsection{OPRF}
-yes, but optional
+\subsection{\writingFormulationBrut{OPRF}}
+In KHAPE, the OPRF is optional --- in contrary to OPAQUE --- but allow to make it a strong aPAKE resistant against pre-computation attacks.
 
-Slow hash optional as well
+This is a major improvement in term of security and therefore an OPRF should be used.
 
-Can use both, or one of them but avoid to use neither of them because the envelope encryption key would only be an hkdf of the password which is very weak.
 
-\subsection{KeyHidingAKE}
-3DH
-HMQV patented but more efficient
+\subsection{\writingFormulationBrut{Key Exchange}}
+KHAPE require that the underlying Authenticated Key Exchange (AKE) is a key-hiding AKE.
+\cite{KHAPE_Paper} shows that HMQV, 3DH and SKEME are key-hiding AKE.
 
+SKEME is a AKE based on key encryption mechanism where HMQV and 3DH are Diffie-Hellman based AKE.
+\cite{OPAQUE_Paper} and \cite{KHAPE_Paper} shows concrete instantiation of their protocol using HMQV. These instantiations are easily adapted to other Diffie-Hellman based AKE like 3DH.
+
+HMQV :
 \begin{algorithmic}
  % HMQV :
 \State $d_c \gets$ Hash'(sid, C, S, 1, $X$)
 \State $e_c \gets$ Hash'(sid, C, S, 2, $Y$)
 \State $o_c \gets (Y \cdot B^{e_c})^{x+d_c \cdot a}$
-\State
+\end{algorithmic}
+
+3DH :
+\begin{algorithmic}
 % 3DH :
 \State $o_c \gets B^x || Y^a || Y^x$
 \end{algorithmic}
 
+Between HMQV and 3DH, HMQV is more efficient but it is patented. This is why 3DH will be used for the implementation.
 
-\subsection{Encryption schema}
+\subsection{\writingNotes{Encryption schema}}
 non-commiting encryption: elligator2 + ideal cipher
 
 input range between 512 and 1024 bits depending on envelope size
@@ -271,15 +281,17 @@ In contrary to the OPAQUE Paper, the OPAQUE standard draft doesn't encrypt the c
 Instead, the envelope store a nonce of 32 bytes and an authentication tag. The envelope is not encrypted.
 The nonce is used --- with the randomized password --- to compute a seed, which is then used to derive the client's private and public keys. The authentication tag stored in the envelope is used to verify the derived public key.
 
+\subsection{Session during authentication or registration ?}
 
 \subsection{Hash}
+Sha3-256
 
 \subsection{HashToGroup}
 Operation of hashing to the group. Since we use elliptic curves, this operation is an hash-to-curve.
 
 
 \subsection{PRF}
-MAC
+HKDF
 
 \subsection{GenerateRandomNumber}
 Voir CAA
