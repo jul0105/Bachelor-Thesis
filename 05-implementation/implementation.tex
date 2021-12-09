@@ -4,6 +4,22 @@
 
 \chapter{\writingNotes{Implementation}}
 \section{API}
+\subsection{Parameters}
+Both client and server has to define their parameters. For a client and a server to authenticate, they need to have the same parameters. 
+Generally parameters are fixed by the application developer and are the same for every clients of the application.
+They can also be negotiated during registration but this require the server to store each client specific parameters as it can be different. This use case is not in the scope of the KHAPE library.
+
+\paragraph{OPRF}
+Strongly encouraged, improve security by a lot, doesn't take much time/resource.
+\paragraph{Slow Hash}
+Encouraged, improve security, take lot of time and resources
+
+Overall, it is strongly discouraged to use neither of them because this mean that the credentials envelope is encrypted by a weak key resulting only of an HKDF of the low-entropy password.
+
+
+\subsection{Client}
+\subsection{Server}
+\subsection{Messages}
 % Parameters, Client, Server and Messages
 
 \subsection{Common}
