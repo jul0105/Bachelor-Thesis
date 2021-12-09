@@ -16,6 +16,17 @@ Encouraged, improve security, take lot of time and resources
 
 Overall, it is strongly discouraged to use neither of them because this mean that the credentials envelope is encrypted by a weak key resulting only of an HKDF of the low-entropy password.
 
+\begin{verbatim}
+(register_request, oprf_client_state) = client.register_start(password);
+----------------register_request----------------->
+(register_response, pre_register_secrets) = server.register_start(register_request);
+<-----------------register_request----------------
+register_finish = client.register_finish(register_response, oprf_client_state);
+----------------register_finish----------------->
+file_entry = server.register_finish(register_finish, pre_register_secrets)
+store file_entry
+\end{verbatim}
+
 
 \subsection{Client}
 \subsection{Server}
