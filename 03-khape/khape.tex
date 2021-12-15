@@ -223,32 +223,21 @@ This section explain the design choices made to implement KHAPE.
 Since the only resource for KHAPE is the rather theoretical paper, lots of design choice have to be made. However, since OPAQUE and KHAPE share similarities, some implementation choices are inspired by the OPAQUE standard draft whenever it's possible.
 
 
+
+
+
 \subsection{\writingFormulationBrut{Client-side register}}
 Both client-side and server-side registration are possible but in order to use the aPAKE benefit to the fullest, it is preferable to handle the registration on the client.
 
 This allow to keep the main goal of aPAKEs: the server NEVER see the user's password.
-
-\subsection{\writingNotes{Group $\mathbb{G}$}}
-
-
-KHAPE constructions are defined on a group $\mathbb{G}$ of prime order $p$ with generator $g$.
-The group is generic which means we are free to use an integer group or an elliptic curves group.
-% p in KHAPE = q in CRY
-% p in CRY is not defined in KHAPE because it's generic (integer or ECC) (no modulo in ECC)
-
-For performances reasons, ECC will be used.
-The curve must be compatible with the curve encoding algorithm selected (Elligator-squared, Elligator2, etc.).
-
-Represented on 256 bits (which curve ?)
+For a detailed explanation, see Section \ref{sec:opaque_register}.
 
 
-\subsection{\writingNotes{OPRF}}
-In KHAPE, the OPRF is optional --- in contrary to OPAQUE --- but allow to make it a strong aPAKE resistant against pre-computation attacks.
-This is a major improvement in term of security and therefore an OPRF should be used.
 
-Needs its own group, hashing function and hashing to group function.
+
 
 \subsection{\writingFormulationBrut{Key Exchange}}
+% TODO each side has 2 asymmetric key pair. one long-term, one short-term (ephemeral, session)
 KHAPE require that the underlying Authenticated Key Exchange (AKE) is a key-hiding AKE.
 \cite{KHAPE_Paper} shows that HMQV, 3DH and SKEME are key-hiding AKE.
 
@@ -271,6 +260,28 @@ HMQV :
 
 Between HMQV and 3DH, HMQV is more efficient but it is patented. This is why 3DH is used for the implementation.
 
+
+
+
+
+\subsection{\writingNotes{Group $\mathbb{G}$}}
+The key exchange is 
+
+
+KHAPE constructions are defined on a group $\mathbb{G}$ of prime order $p$ with generator $g$.
+The group is generic which means we are free to use an integer group or an elliptic curves group.
+% p in KHAPE = q in CRY
+% p in CRY is not defined in KHAPE because it's generic (integer or ECC) (no modulo in ECC)
+
+For performances reasons, ECC will be used.
+The curve must be compatible with the curve encoding algorithm selected (Elligator-squared, Elligator2, etc.).
+
+Represented on 256 bits (which curve ?)
+
+
+
+
+
 \subsection{\writingNotes{Encryption schema}}
 non-commiting encryption: elligator2 + ideal cipher
 
@@ -280,6 +291,19 @@ input range between 512 and 1024 bits depending on envelope size
 In contrary to the OPAQUE Paper, the OPAQUE standard draft doesn't encrypt the client's private key in the envelope.
 Instead, the envelope store a nonce of 32 bytes and an authentication tag. The envelope is not encrypted.
 The nonce is used --- with the randomized password --- to compute a seed, which is then used to derive the client's private and public keys. The authentication tag stored in the envelope is used to verify the derived public key.
+
+
+
+
+
+\subsection{\writingNotes{OPRF}}
+In KHAPE, the OPRF is optional --- in contrary to OPAQUE --- but allow to make it a strong aPAKE resistant against pre-computation attacks.
+This is a major improvement in term of security and therefore an OPRF should be used.
+
+Needs its own group, hashing function and hashing to group function.
+
+
+
 
 
 \subsection{\writingFormulationBrut{Slow Hash}}
