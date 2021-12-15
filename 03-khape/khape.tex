@@ -291,25 +291,28 @@ For the implementation, Argon2 is used because it is a recent memory-hard hashin
 For OPAQUE, \cite{OPAQUE_Standard_Draft} propose to implement this function on the OPRF output $rw$ and use the result to derive the encryption key.
 
 
-\subsection{\writingNotes{Key derivation}}
 
-This section describe the derivation of keys from secrets. It is heavily inspired by OPAQUE's standard draft \cite{OPAQUE_Standard_Draft} since the context is similar.
+
+
+\subsection{\writingFormulationBrut{Key derivation}}
+
+This section describe the derivation of keys from existing secrets. The design is heavily inspired by OPAQUE's standard draft \cite{OPAQUE_Standard_Draft} since the context is similar.
 
 
 The primitive used to derive the encryption key, the export key, the output key and the key verification tag is HKDF. It is well suited for expanding key from existing secret and is already used in OPAQUE rust's implementation \cite{OPAQUE-KE}.
+It is usable with the following API :
 
-It has the following API : \cite{OPAQUE_Standard_Draft}
-- Extract(salt, ikm): ``Extract a pseudorandom key of fixed length Nx
-      bytes from input keying material ikm and an optional byte string
-      salt.''
-- Expand(prk, info, L): ``Expand a pseudorandom key prk using optional
-      string info into L bytes of output keying material.''
+\begin{itemize}
+ \item Extract($salt$, $ikm$): Extract a fixed length pseudorandom key $prk$ with high entropy from the input keying material $ikm$ and the optional $salt$
+ \item Expand($prk$, $info$, $L$): Expand the length of an existing pseudorandom key $prk$ with the optional string $info$ to produce an output keying material $okm$ of $L$ bytes.
+\end{itemize}
 
 
 \subsubsection{Encryption key and export key}
 
-OPRF output --- or password --- is used to derive multiple keys with HKDF. The encryption key and the authentication key for computing authenticated encryption on the credential envelope. And the export key which is exposed to the application at register and login and can be used to encrypt application specific data. In Chapter \ref{cha:use_case}, it is shown how to use this key to encrypt user's passwords for an online password manager.
+OPRF output --- or password --- is used to derive multiple keys with HKDF. The encryption key and the authentication key for computing authenticated encryption on the credential envelope. And the export key which is exposed at register and login and can be used by the application to encrypt application specific data. In Chapter \ref{cha:use_case}, it is shown how to use this key to encrypt user's passwords for an online password manager.
 
+The following pseudo-code shows how these keys are derived.
 \begin{algorithmic}
 \Require $rw$ := OPRF output
 \State $rw_{hardened}$ $\gets$ SlowHash($rw$, params)
@@ -339,9 +342,12 @@ OPRF output --- or password --- is used to derive multiple keys with HKDF. The e
 
 \subsubsection{Output key and key verification}
 
+HKDF is also used to compute the output key $K$ and both key verification tag $t_1$ and $t_2$.
+Instead of exposing the handshake secret $k$ and computing each verification tag and the output key individually, these 3 values are computed at the same time and stored until needed.
 
+The following pseudo-code shows how these keys are derived.
 \begin{algorithmic}
-\Require $o$ := AKE output, $preamble$ := protocol transcript with identities and messages
+\Require $o$ := AKE output, $preamble$ := protocol's identities and messages
 \State $prk \gets$ Extract(salt="", ikm=$o$)
 
 % \State $hss \gets$ Derive-Secret($prk$, "HandshakeSecret", Hash($preamble$))
@@ -378,6 +384,7 @@ OPRF output --- or password --- is used to derive multiple keys with HKDF. The e
 % 6. Output (Km2, Km3, session_key)
 % \end{verbatim}
 
+\subsection{Server-side ephemeral secret storage}
 
 \subsection{Hash}
 Sha3-256
