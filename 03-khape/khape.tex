@@ -286,9 +286,9 @@ The nonce is used --- with the randomized password --- to compute a seed, which 
 It is possible and recommended to use a memory-hard hashing function on the password to make it slow and expensive to compute. 
 This make it more costly for an adversary to compute hashs.
 
-For the implementation, Argon2 is used because it is a recent memory-hard hashing function with a simple construction and it has better security analysis than others resource-heavy hashing function like scrypt, bcrypt and PBKDF2 \cite{CAA}.
+For the implementation, Argon2id \cite{Argon2_Paper} is used because it is a recent memory-hard hashing function with a simple construction and it has better security analysis than others resource-heavy hashing function like scrypt, bcrypt and PBKDF2 \cite{CAA}. The Argon2id variant is used as it provide resistance against both GPU attacks and side-channel attacks --- and is the recommended version.
 
-For OPAQUE, \cite{OPAQUE_Standard_Draft} propose to implement this function on the OPRF output $rw$ and use the result to derive the encryption key.
+For OPAQUE, \cite{OPAQUE_Standard_Draft} propose to implement this function on the OPRF output $rw$ and use the result to derive the encryption key. Section \ref{sec:encryption_key} shows how this hashing function is used in the key derivation process.
 
 
 
@@ -296,30 +296,33 @@ For OPAQUE, \cite{OPAQUE_Standard_Draft} propose to implement this function on t
 
 \subsection{\writingFormulationBrut{Key derivation}}
 
-This section describe the derivation of keys from existing secrets. The design is heavily inspired by OPAQUE's standard draft \cite{OPAQUE_Standard_Draft} since the context is similar.
+This section describe the process of derivating keys from existing secrets. The design is heavily inspired by OPAQUE's standard draft \cite{OPAQUE_Standard_Draft} since the context is similar.
 
 
-The primitive used to derive the encryption key, the export key, the output key and the key verification tag is HKDF. It is well suited for expanding key from existing secret and is already used in OPAQUE rust's implementation \cite{OPAQUE-KE}.
-It is usable with the following API :
+The primitive used to derive the encryption key, the export key, the output key and the key verification tags is HKDF \cite{HKDF_RFC}. It is well suited for expanding key from existing secret and is already used in OPAQUE rust's implementation \cite{OPAQUE-KE}. It follows the ``Extract-then-Expand'' paradigm where these two functions are used with the following API :
 
 \begin{itemize}
  \item Extract($salt$, $ikm$): Extract a fixed length pseudorandom key $prk$ with high entropy from the input keying material $ikm$ and the optional $salt$
  \item Expand($prk$, $info$, $L$): Expand the length of an existing pseudorandom key $prk$ with the optional string $info$ to produce an output keying material $okm$ of $L$ bytes.
 \end{itemize}
 
+HKDF is based on HMAC which in turn is based on an hashing function. The underlying hashing function used should output at least 256 bits to fit the group element size. SHA-3 256 is used for its robust design.
+
+
 
 \subsubsection{Encryption key and export key}
+\label{sec:encryption_key}
 
 OPRF output --- or password --- is used to derive multiple keys with HKDF. The encryption key and the authentication key for computing authenticated encryption on the credential envelope. And the export key which is exposed at register and login and can be used by the application to encrypt application specific data. In Chapter \ref{cha:use_case}, it is shown how to use this key to encrypt user's passwords for an online password manager.
 
 The following pseudo-code shows how these keys are derived.
 \begin{algorithmic}
 \Require $rw$ := OPRF output
-\State $rw_{hardened}$ $\gets$ SlowHash($rw$, params)
+\State $rw_{hardened}$ $\gets$ SlowHash($rw$)
 \State $rw_{randomized}$ $\gets$ Extract(salt="", ikm=concat($rw$, $rw_{hardened}$))
-\State $k_{encryption}$ $\gets$ Expand($rw_{randomized}$, "EncryptionKey", Nh)
-\State $k_{auth}$ $\gets$ Expand($rw_{randomized}$, "AuthKey", Nh)
-\State $k_{export}$ $\gets$ Expand($rw_{randomized}$, "ExportKey", Nh)
+\State $k_{encryption}$ $\gets$ Expand($rw_{randomized}$, "EncryptionKey", HashLength)
+\State $k_{auth}$ $\gets$ Expand($rw_{randomized}$, "AuthKey", HashLength)
+\State $k_{export}$ $\gets$ Expand($rw_{randomized}$, "ExportKey", HashLength)
 
 \State Output $k_{encryption}$, $k_{auth}$ and $k_{export}$
 \end{algorithmic}
@@ -355,10 +358,10 @@ The following pseudo-code shows how these keys are derived.
 % \State $t_1 \gets$ Derive-Secret($hss$, "ClientMAC", "")
 % \State $t_2 \gets$ Derive-Secret($hss$, "ServerMAC", "")
 
-\State $k \gets$ Expand($prk$, concat("HandshakeSecret", Hash($preamble$)), Nx)
-\State $K \gets$ Expand($prk$, concat("SessionKey", Hash($preamble$)), Nx)
-\State $t_1 \gets$ Expand($k$, "ClientMAC", Nx)
-\State $t_2 \gets$ Expand($k$, "ServerMAC", Nx)
+\State $k \gets$ Expand($prk$, concat("HandshakeSecret", Hash($preamble$)), HashLength)
+\State $K \gets$ Expand($prk$, concat("SessionKey", Hash($preamble$)), HashLength)
+\State $t_1 \gets$ Expand($k$, "ClientMAC", HashLength)
+\State $t_2 \gets$ Expand($k$, "ServerMAC", HashLength)
 
 \State Output $K$, $t_1$ and $t_2$
 \end{algorithmic}
@@ -408,7 +411,7 @@ Voir CAA
 
 
 
-\section{\writingNotes{Multiple round-trip limitation}}
+\section{\writingNotes{Limitations}}
 
 In opposition with classical authentication method where the client only send an authentication request and receive a response. With KHAPE, the registration and the authentication processes require multiple messages (round-trip) between the client and the server.
 This add new difficulties for both side that need to be considered.
