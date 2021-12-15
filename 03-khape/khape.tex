@@ -355,8 +355,8 @@ The following pseudo-code shows how these keys are derived.
 % \State $t_1 \gets$ Derive-Secret($hss$, "ClientMAC", "")
 % \State $t_2 \gets$ Derive-Secret($hss$, "ServerMAC", "")
 
-\State $k \gets$ Expand($prk$, concat=("HandshakeSecret", Hash($preamble$)), Nx)
-\State $K \gets$ Expand($prk$, concat=("SessionKey", Hash($preamble$)), Nx)
+\State $k \gets$ Expand($prk$, concat("HandshakeSecret", Hash($preamble$)), Nx)
+\State $K \gets$ Expand($prk$, concat("SessionKey", Hash($preamble$)), Nx)
 \State $t_1 \gets$ Expand($k$, "ClientMAC", Nx)
 \State $t_2 \gets$ Expand($k$, "ServerMAC", Nx)
 
@@ -384,7 +384,10 @@ The following pseudo-code shows how these keys are derived.
 % 6. Output (Km2, Km3, session_key)
 % \end{verbatim}
 
-\subsection{Server-side ephemeral secret storage}
+
+
+\subsection{Session during authentication or registration ?}
+
 
 \subsection{Hash}
 Sha3-256
@@ -396,12 +399,50 @@ Operation of hashing to the group. Since we use elliptic curves, this operation 
 \subsection{PRF}
 HKDF
 
-\subsection{Session during authentication or registration ?}
 
 
 \subsection{GenerateRandomNumber}
 Voir CAA
 
+
+
+
+
+\section{\writingNotes{Multiple round-trip limitation}}
+
+In opposition with classical authentication method where the client only send an authentication request and receive a response. With KHAPE, the registration and the authentication processes require multiple messages (round-trip) between the client and the server.
+This add new difficulties for both side that need to be considered.
+
+\subsection{Client}
+Necessity to send 2 messages. If the client is a web browser, he cannot only send a login form to the server. Behind the scenes request has to be made to compute the 2 round-trip. This means that some javascript has to be implemented but this was known from the beginning that PAKE protocol require a greater implication of the client (code-wise).
+
+\subsection{Server}
+Pre register secret, ephemeral key, session
+The server communicate with multiple client at the same time so when a request come, he needs to know from which client/session it is from to be able to use the correct value. This is even more complicated because during both authentication and registration, the server generate some secret value in the first round trip and needs these values in the second round trip.
+
+
+
+During authentication, the server needs to store his ephemeral private key for the second round-trip. He can store this value in the user's file entry or in a separated session file.
+
+He can :
+- Store this value in the file entry associated to the user
+- Store this value in a session file entry (this require that client generate a session id and sends it with every request) (can be used to store session key later)
+- Encrypt the value and send it to the client which send it back (like JWT)
+In every case, the client has to resend the uid in the 2nd round-trip request
+
+The second solution will be used. Allow multiple session
+ 
+
+
+During register, the server generate his keys (private and public) and the secret salt. He sends the public key but the private key and the secret salt has to remain secret.
+
+He can :
+- Pre register the client in a incomplete file entry.
+   - file[uid] = <secret\_salt, b, INCOMPLET>
+   - file[uid] = <e, b, A, secret\_salt, COMPLET>
+- Solution 2 and 3 from auth
+
+The first solution will be used
 
 
 
