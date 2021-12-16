@@ -383,11 +383,14 @@ On the other hand, if the password is wrong, the OPRF output is totally differen
 
 OPAQUE security relies entirely on the strength of the OPRF. If OPRF gets broken --- for example by cryptanalysis, quantum attacks or security compromise --- an adversary can compute an offline dictionary attack on the user's password. This is especially critical considering that there are currently no known quantum-safe OPRFs.
 
-KHAPE (for Key-Hiding Asymmetric PakE) \cite{KHAPE_Paper} is a variant to the OPAQUE protocol. Instead of using OPRF as a main tool to archive security, it becomes an optional part of the protocol and KHAPE use two other concepts to archive security: non-committing encryption and key-hiding AKE. % TODO non-commiting encryption ??
+KHAPE (for Key-Hiding Asymmetric PakE) \cite{KHAPE_Paper} is a variant to the OPAQUE protocol. Instead of using OPRF as a main tool to archive security, it becomes an optional part of the protocol and KHAPE use two other concepts to archive security: non-committing encryption and key-hiding AKE.
 
-% Like OPAQUE, in KHAPE each party has a private/public key pair that they use to compute the key exchange and the client store it's private key (and server's public key) on the server, encrypted by his password.
-% Since KHAPE doesn't require a OPRF run before decrypting the ciphertext containing the client's private key, an adversary could eavsedrop an exchange between the client and the server. He can save the ciphertext and save the public key used by the client during the AKE. He can then compute an offline dictionary attack using a list of candidat password to decrypt the ciphertext until he find a match with the server's public key that he recorded sooner.
-% To avoid this kind of attacks, KHAPE use 2 mains mechanisms. 1) Non-commiting encryption, 2) Key-hiding AKE. (PAS SUR DU TOUT)
+
+KHAPE is not a Strong aPAKE like OPAQUE. But it can be made a SaPAKE following the aPAKE to SaPAKE compiler from \cite{OPAQUE_Paper} using OPRF.
+
+So OPRF is optional with KHAPE and just allow making it a SaPAKE. In addition, it also allows using OPRF features such as server-side threshold implementation that doesn't require any change from the client. If OPRF fails, KHAPE just loss these functionalities but the rest of the security remain in contrary to OPAQUE.
+
+
 
 
 % ``Two key ideas are: (i) dispense with authentication of the
@@ -400,14 +403,26 @@ KHAPE (for Key-Hiding Asymmetric PakE) \cite{KHAPE_Paper} is a variant to the OP
 % for public key encryption [8]).'' \cite{KHAPE_Paper}
 
 
-KHAPE is not a Strong aPAKE like OPAQUE. But it can be made a SaPAKE following the aPAKE to SaPAKE compiler from \cite{OPAQUE_Paper} using OPRF.
+\paragraph{Security without OPRF.}
+Like OPAQUE, in KHAPE each party has a private/public key pair that is used to compute the key exchange and the client store it's private key and server's public key on the server, encrypted by his password.
 
-So OPRF is optional with KHAPE and just allow making it a SaPAKE. In addition, it also allows using OPRF features such as server-side threshold implementation that doesn't require any change from the client. If OPRF fails, KHAPE just loss these functionalities but the rest of the security remain in contrary to OPAQUE.
+Without using an OPRF, an adversary could try to initiate a authentication request with the server with another user's id to obtain it's credentials ciphertext.
+
+Without using an OPRF, an adversary could try to retrieve the ciphertext and the server's public key from a valid key exchange between an existing client and the server.
+He can then compute an offline dictionary attack using a list of password candidates to decrypt the ciphertext until he find a match with the server's public key that he recorded sooner.
+To avoid this kind of attacks, KHAPE use two mains mechanisms: Non-commiting encryption and key-hiding AKE.
+
+\paragraph{Non-committing encryption.} \label{sec:non_committing_encryption}
+Non-committing encryption make it impossible for an adversary to identify the key used to encrypt the ciphertext event with an list of key candidates. This implies that the decryption of the ciphertext under any possible key provide a valid plaintext (i.e. a valid asymmetrical key pair that can be used in the key exchange).
+
+\paragraph{Key-hiding AKE.} \label{sec:key_hiding_ake}
+The key-hiding feature make it impossible for an adversary to use the key exchange (output) to identify the correct private/public key decrypted from the ciphertext using a list of password candidates.
+
+Even if provided with a full transcript of a key exchange between a client and a server and a list of key pair candidates --- including the correct key pair --- the adversary has no better chance than random to guess the right key pair that was used.
 
 
-% Useful ?
-In terms of implementation, \cite{KHAPE_Paper} prove that 3DH and HMQV are key-hiding AKE and can be used in KHAPE. % TODO see citation in KHAPE_Paper for 3DH and HMQV
-It also shows that some KEM-based AKE like SKEME can be adapted to archive similar result if they are instantiated with a key-hiding KEM. % TODO cites 3DH, HMQV, SKEME papers
+
+
 
 
 % \paragraph{\writingNotes{Mains differences with OPAQUE}}
@@ -546,7 +561,7 @@ COMMENT: EKE only provide informal security analysis \cite{EKE_Informal_Security
 
 SRP provide no valuable security proof \cite{CAA, SRP_Green_blog}. It only prove that it can stands up to passive attacks, which is not enough for an authentication protocol. A proof against active attacks would be welcomed for a such widely-used protocol.
 
-\paragraph{\writingNotes{13. Easily adaptable to elliptic curves.}}
+\paragraph{\writingNotes{13. Easily adaptable to elliptic curves.}} \label{sec:ecc_comparison}
 Elliptic curves cryptography allow to greatly reduce the size of asymmetric key.
 This is crucial in term of performance because keys size recommendation are always growing to ensure security and asymmetrical key are getting giant and difficult to manage --- in particular for key that require long-term protection (up to 50 years). For example, for such a long-term protection, the discrete logarithm group is recommended to be 15'360 bits according to ECRYPT-CSA \cite{ECRYPT_Keylength}.
 In comparison, with elliptic curves, only 512 bits are recommended to archive similar security level.
