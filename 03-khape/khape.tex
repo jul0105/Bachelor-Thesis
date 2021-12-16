@@ -228,17 +228,21 @@ Since the only resource for KHAPE is the rather theoretical paper, lots of desig
 
 \subsection{\writingFormulationBrut{Client-side register}}
 Both client-side and server-side registration are possible but in order to use the aPAKE benefit to the fullest, it is preferable to handle the registration on the client.
-
 This allow to keep the main goal of aPAKEs: the server NEVER see the user's password.
-For a detailed explanation, see Section \ref{sec:opaque_register}.
+For more details, see Section \ref{sec:opaque_register}.
 
 
 
 
 
 \subsection{\writingFormulationBrut{Key Exchange}}
-% TODO each side has 2 asymmetric key pair. one long-term, one short-term (ephemeral, session)
-KHAPE require that the underlying Authenticated Key Exchange (AKE) is a key-hiding AKE.
+PAKE protocol compute a key exchange to perform authentication. The key exchange has to be authenticated to avoid attacks such as Man-in-the-Middle attacks that can be exploited on unauthenticated KE protocol like plain Diffie-Hellman.
+
+In AKE protocols, each party has two asymmetric keys pair.
+One long-term key pair that authenticate the exchange and one short-term (ephemeral) key pair that is used in the actual key exchange and only live for a single session.
+
+
+KHAPE require that the underlying key exchange protocol is a ``key-hiding AKE'' (See Section \ref{sec:key_hiding_ake} for more details about this construction).
 \cite{KHAPE_Paper} shows that HMQV, 3DH and SKEME are key-hiding AKE.
 
 SKEME is a AKE based on key encryption mechanism where HMQV and 3DH are Diffie-Hellman based AKE.
@@ -258,31 +262,14 @@ HMQV :
 \State $o_c \gets B^x || Y^a || Y^x$
 \end{algorithmic}
 
-Between HMQV and 3DH, HMQV is more efficient but it is patented. This is why 3DH is used for the implementation.
-
-
-
-
-
-\subsection{\writingNotes{Group $\mathbb{G}$}}
-The key exchange is 
-
-
-KHAPE constructions are defined on a group $\mathbb{G}$ of prime order $p$ with generator $g$.
-The group is generic which means we are free to use an integer group or an elliptic curves group.
-% p in KHAPE = q in CRY
-% p in CRY is not defined in KHAPE because it's generic (integer or ECC) (no modulo in ECC)
-
-For performances reasons, ECC will be used.
-The curve must be compatible with the curve encoding algorithm selected (Elligator-squared, Elligator2, etc.).
-
-Represented on 256 bits (which curve ?)
+Between 3DH and HMQV, the latter is more efficient but it is patented. This is why 3DH is used for the implementation.
 
 
 
 
 
 \subsection{\writingNotes{Encryption schema}}
+The non-committing encryption is performed with the combination of ideal cipher and curve encoding.
 non-commiting encryption: elligator2 + ideal cipher
 
 input range between 512 and 1024 bits depending on envelope size
@@ -291,6 +278,19 @@ input range between 512 and 1024 bits depending on envelope size
 In contrary to the OPAQUE Paper, the OPAQUE standard draft doesn't encrypt the client's private key in the envelope.
 Instead, the envelope store a nonce of 32 bytes and an authentication tag. The envelope is not encrypted.
 The nonce is used --- with the randomized password --- to compute a seed, which is then used to derive the client's private and public keys. The authentication tag stored in the envelope is used to verify the derived public key.
+
+
+
+
+
+\subsection{\writingNotes{Group $\mathbb{G}$}}
+The key exchange is computed on a group $\mathbb{G}$ of prime order $p$ with generator $g$.
+The group is generic which means that we are free to use an integer group or an elliptic curves group.
+
+For performances reasons, elliptic curves are used for the implementation (See Section \ref{sec:ecc_comparison}).
+The curve must be compatible with the curve encoding algorithm selected (Elligator-squared, Elligator2, etc.).
+
+Represented on 256 bits (which curve ?)
 
 
 
@@ -489,6 +489,8 @@ B; Y for P1 and A; X for P2, as group G elements.''
 
 \subsection{SlowHash}
 Optionaly, use Argon2, scrypt, etc. on the password before inputting it in the algo
+
+\subsection{Session key usage}
 
 
 \section{Precise algorithm}
