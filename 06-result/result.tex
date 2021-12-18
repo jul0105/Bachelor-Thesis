@@ -31,5 +31,135 @@
 
 \section{Message size}
 
+
+
+\newpage
+
+
+\pgfplotsset{width=\textwidth, height=8cm}
+\usepgfplotslibrary{statistics}
+
+\subsection{Registration}
+
+\begin{tikzpicture}
+\begin{axis}[
+    boxplot,
+    boxplot/draw direction=y,
+    xtick={1,2,3,4},
+    xticklabels={client start, server start, client finish, server finish},
+    ylabel={microseconde},
+]
+\addplot table[y=value]{data/khape_standard/client_register_start.dat};
+\addplot table[y=value]{data/khape_standard/server_register_start.dat};
+\addplot table[y=value]{data/khape_standard/client_register_finish.dat};
+\addplot table[y=value]{data/khape_standard/server_register_finish.dat};
+\end{axis}
+\end{tikzpicture}
+
+\subsection{Authentication}
+
+\begin{tikzpicture}
+\begin{axis}[
+    boxplot,
+    boxplot/draw direction=y,
+    xtick={1,2,3,4,5},
+    xticklabels={client start, server start, client ke, server finish, client finish},
+    ylabel={microseconde},
+]
+\addplot table[y=value]{data/khape_standard/client_auth_start.dat};
+\addplot table[y=value]{data/khape_standard/server_auth_start.dat};
+\addplot table[y=value]{data/khape_standard/client_auth_ke.dat};
+\addplot table[y=value]{data/khape_standard/server_auth_finish.dat};
+\addplot table[y=value]{data/khape_standard/client_auth_finish.dat};
+\end{axis}
+\end{tikzpicture}
+
+
+
+
+\subsection{Registration}
+
+\begin{tikzpicture}
+\begin{axis}[
+    boxplot,
+    boxplot/draw direction=x,
+    ytick={1,2,3,4},
+    yticklabels={client start, server start, client finish, server finish},
+    xlabel={microseconde},
+]
+\addplot table[y=value]{data/khape_standard/client_register_start.dat};
+\addplot table[y=value]{data/khape_standard/server_register_start.dat};
+\addplot table[y=value]{data/khape_standard/client_register_finish.dat};
+\addplot table[y=value]{data/khape_standard/server_register_finish.dat};
+\end{axis}
+\end{tikzpicture}
+
+\subsection{Authentication}
+
+\begin{tikzpicture}
+\begin{axis}[
+    boxplot,
+    boxplot/draw direction=x,
+    ytick={1,2,3,4,5},
+    yticklabels={client start, server start, client ke, server finish, client finish},
+    xlabel={microseconde},
+]
+\addplot table[y=value]{data/khape_standard/client_auth_finish.dat};
+\addplot table[y=value]{data/khape_standard/server_auth_finish.dat};
+\addplot table[y=value]{data/khape_standard/client_auth_ke.dat};
+\addplot table[y=value]{data/khape_standard/server_auth_start.dat};
+\addplot table[y=value]{data/khape_standard/client_auth_start.dat};
+\end{axis}
+\end{tikzpicture}
+
+
+\newpage
+
+
+\pgfplotsset{width=4cm, height=8cm}
+\begin{tikzpicture}
+\begin{axis}[
+    boxplot,
+    boxplot/draw direction=y,
+    ylabel={us},
+]
+\addplot table[y=value]{data/khape_standard/client_auth_start.dat};
+\end{axis}
+\end{tikzpicture}
+
+
+\begin{tikzpicture}
+\begin{axis}[
+    boxplot,
+    boxplot/draw direction=y,
+    ylabel={us},
+]
+\addplot table[y=value]{data/khape_standard/server_auth_start.dat};
+\end{axis}
+\end{tikzpicture}
+
+
+\pgfplotsset{width=10cm, height=4cm}
+\begin{tikzpicture}
+\begin{axis}[
+    boxplot,
+    boxplot/draw direction=x,
+    xlabel={us},
+]
+\addplot table[y=value]{data/khape_standard/client_auth_start.dat};
+\end{axis}
+\end{tikzpicture}
+
+
+\begin{tikzpicture}
+\begin{axis}[
+    boxplot,
+    boxplot/draw direction=x,
+    xlabel={us},
+]
+\addplot table[y=value]{data/khape_standard/server_auth_start.dat};
+\end{axis}
+\end{tikzpicture}
+
 \end{document}
 
