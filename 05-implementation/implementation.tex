@@ -3,8 +3,28 @@
 \begin{document}
 
 \chapter{\writingNotes{Implementation}}
-\section{API}
-\subsection{Parameters}
+
+% - Choice of rust
+% - Parameters
+% - Messages exchanges
+%   - Register
+%   - Login
+% - Function definition (API)
+%   - Client
+%   - Server
+% - Messages struct
+% - Choice of libraries
+%   - dalek + PR
+%   - voprf
+%   - hkdf
+%   - argon2
+% - Others
+%   - Rejection method
+%   - Elligator element encoding
+%   - Serialization
+%   - Discharge password from memory directly after use
+
+\section{Parameters}
 Both client and server has to define their parameters. For a client and a server to authenticate, they need to have the same parameters. 
 Generally parameters are fixed by the application developer and are the same for every clients of the application.
 They can also be negotiated during registration but this require the server to store each client specific parameters as it can be different. This use case is not in the scope of the KHAPE library.
@@ -16,6 +36,10 @@ Encouraged, improve security, take lot of time and resources
 
 Overall, it is strongly discouraged to use neither of them because this mean that the credentials envelope is encrypted by a weak key resulting only of an HKDF of the low-entropy password.
 
+
+\section{Exchanges}
+
+\subsection{Register}
 \begin{verbatim}
 (register_request, oprf_client_state) = client.register_start(password);
 ----------------register_request----------------->
@@ -24,8 +48,158 @@ Overall, it is strongly discouraged to use neither of them because this mean tha
 register_finish = client.register_finish(register_response, oprf_client_state);
 ----------------register_finish----------------->
 file_entry = server.register_finish(register_finish, pre_register_secrets)
-store file_entry
+                                                store file_entry
 \end{verbatim}
+\subsection{Login}
+\begin{verbatim}
+(auth_request, oprf_client_state) = client.auth_start(password)
+----------------auth_request----------------->
+(auth_response, server_ephemeral_keys) = server.auth_start(auth_request, &file_entry)
+<-----------------auth_response----------------
+(auth_verify_request, ke_output) = client.auth_ke(auth_response, oprf_client_state)
+----------------auth_verify_request----------------->
+(auth_verify_response, server_output_key) = server.auth_finish(auth_verify_request, server_ephemeral_keys, &file_entry)
+<-----------------auth_verify_response----------------
+client_output_key = client.auth_finish(auth_verify_response, ke_output)
+\end{verbatim}
+
+\section{Function definition}
+\subsection{Client}
+\begin{itemize}
+ \item \verb|register_start(&self, password: &[u8]) -> (RegisterRequest, ClientState)|
+ \item \verb|register_finish(&self, register_response: RegisterResponse, client_state: ClientState) -> RegisterFinish|
+ \item \verb|auth_start(&self, password: &[u8]) -> (AuthRequest, ClientState)|
+ \item \verb|auth_ke(&self, auth_response: AuthResponse, client_state: ClientState) -> (AuthVerifyRequest, KeyExchangeOutput)|
+ \item \verb|auth_finish(&self, auth_verify_response: AuthVerifyResponse, ke_output: KeyExchangeOutput) -> Option<OutputKey>|
+\end{itemize}
+
+\subsection{Server}
+\begin{itemize}
+ \item \verb|register_start(&self, register_request: RegisterRequest) -> (RegisterResponse, PreRegisterSecrets)|
+ \item \verb|register_finish(&self, register_finish: RegisterFinish, pre_register_secrets: PreRegisterSecrets) -> FileEntry|
+ \item \verb|auth_start(&self, auth_request: AuthRequest, file_entry: &FileEntry) -> (AuthResponse, EphemeralKeys)|
+ \item \verb|auth_finish(&self, auth_verify_request: AuthVerifyRequest, ephemeral_keys: EphemeralKeys, file_entry: &FileEntry) -> (AuthVerifyResponse, Option<OutputKey>)|
+\end{itemize}
+
+
+\section{Messages structures}
+
+
+\begin{verbatim}
+pub struct RegisterRequest {
+    pub uid: String,
+    pub(crate) oprf_client_blind_result: Option<Vec<u8>>,
+}
+
+pub struct RegisterResponse {
+    pub(crate) pub_b: PublicKey,
+    pub(crate) oprf_server_evalute_result: Option<Vec<u8>>,
+}
+
+pub struct RegisterFinish {
+    pub uid: String,
+    pub(crate) encrypted_envelope: EncryptedEnvelope,
+    pub(crate) pub_a: PublicKey
+}
+
+
+pub struct AuthRequest {
+    pub uid: String,
+    // pub sid: String, // TODO sid
+    pub(crate) oprf_client_blind_result: Option<Vec<u8>>,
+}
+
+
+pub struct AuthResponse {
+    pub(crate) encrypted_envelope: EncryptedEnvelope,
+    pub(crate) pub_y: PublicKey,
+    pub(crate) oprf_server_evalute_result: Option<Vec<u8>>,
+}
+
+
+pub struct AuthVerifyRequest {
+    pub uid: String,
+    // pub sid: String, // TODO sid
+    pub(crate) client_verify_tag: VerifyTag,
+    pub(crate) pub_x: PublicKey,
+}
+
+
+pub struct AuthVerifyResponse {
+    pub(crate) server_verify_tag: Option<VerifyTag>,
+}
+\end{verbatim}
+
+
+\section{Library choices}
+\begin{itemize}
+ \item \verb|curve25519-dalek v3.2.0| : Pure rust implementation of group operations on Ristretto and Curve25519. Audited in 2019 \cite{https://blog.quarkslab.com/security-audit-of-dalek-libraries.html}. Patched with PR \cite{https://github.com/dalek-cryptography/curve25519-dalek/pull/357} to implement elligator\_decode
+ \item \verb|voprf v0.3| : Implementation of a verifiable OPRF based on the standard draft \cite{}.
+ \item \verb|sha3 v0.9| : Pure rust implementation of the SHA-3 (Keccak) hash function
+ \item \verb|hkdf v0.11| : Pure rust implementation of the HMAC-based Extract-and-Expand Key Derivation Function (HKDF) generic over hash function
+ \item \verb|argon2 v0.3| : Pure rust implementation of the Argon2 password hashing function
+\item \verb|rand v0.8| : Random number generators
+ \item \verb|serde v1| : Framework for serializing and deserializing Rust data structures efficiently and generically
+%  \item \verb|serde_json v1| : JSON serialization file format
+ \item \verb|serde-big-array v0.3| : Big array helper for serde
+\end{itemize}
+
+\begin{verbatim}
+[patch.crates-io]
+curve25519-dalek = { path = "../07-curve25519-dalek-fork" }
+
+[dependencies]
+curve25519-dalek = { version = "3.2.0", features = ["serde"] }
+voprf = "0.3.0"
+rand = "0.8.4"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+#bincode = "1.3.3"
+
+sha3 = "0.9.1"
+hkdf = "0.11"
+argon2 = "0.3.1"
+serde-big-array = { version = "0.3.2", features = ["const-generics"] } # for ciphertext (64 bytes array)
+\end{verbatim}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\newpage
+.
+\newpage
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\section{API}
+
+
 
 
 \subsection{Client}
