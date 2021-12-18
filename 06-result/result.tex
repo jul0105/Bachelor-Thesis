@@ -2,9 +2,34 @@
 
 \begin{document}
 
-\chapter{Results}
+\chapter{Results} % Performance comparison for the KHAPE library (not the password manager use case).
+ 
 
 
+\section{KHAPE endpoints} % What endpoint take the most time during auth and register ? 
+% 2 boite à moustache (en mode histogram), x = each endpoint, y = time
+
+\subsection{Ideal Cipher vs AES} % isolated, endpoints, overall. How does it change the performance of each endpoint and overall ?
+% 2 boite à moustache (en mode histogram), x = each endpoint, y = time. Comparison with the standard time (above)
+
+\subsection{With OPRF vs without OPRF} % endpoints, overall. How does it change the performance of each endpoint and overall ?
+% 2 boite à moustache (en mode histogram), x = each endpoint, y = time. Comparison with the standard time (above)
+
+\subsection{With SlowHash vs without SlowHash} % endpoints, overall. How does it change the performance of each endpoint and overall ?
+% 2 boite à moustache (en mode histogram), x = each endpoint, y = time. Comparison with the standard time (above)
+
+
+\section{(OPAQUE endpoints)} % same as KHAPE endpoints. Shows default parameters and similar parameters as KHAPE
+
+
+\section{OPAQUE vs KHAPE} % endpoints, overall. How does KHAPE performance compare to OPAQUE with ~same~ parameters (OPRF, no SlowHash, same curve ?, same hash ?)
+% 2 histogram, one for auth overall, one for register overall, x = OPAQUE(default) OPAQUE(same params) KHAPE(IC OPRF) KHAPE(IC noOPRF) KHAPE(AES OPRF) KHAPE(AES noOPRF), y = time. Each histogram bar is separated in another color to show each endpoint proportion
+% highlight the 2 bar where OPAQUE and KHAPE have the same params, put the rest aside (just for info)
+
+
+\section{Input size} % Does the uid and password size has any inpact on the performance of auth and register ?
+
+\section{Message size}
 
 \end{document}
 
