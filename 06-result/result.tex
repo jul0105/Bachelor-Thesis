@@ -8,6 +8,65 @@
 
 \section{KHAPE endpoints} % What endpoint take the most time during auth and register ? 
 % 2 boite à moustache (en mode histogram), x = each endpoint, y = time
+% \pgfplotsset{width=\textwidth, height=6cm}
+
+\subsection*{Registration}
+
+\pgfplotsset{width=\textwidth-1.1cm}
+
+\begin{tikzpicture}
+\begin{axis}[
+    xbar,
+    y=0.8cm,
+    xmin=0, xmax=385,
+    enlarge y limits=0.25,
+    enlarge x limits={0.15, upper},
+    legend style={at={(0.5,-0.2)},
+    anchor=north,legend columns=-1},
+    xlabel={microseconde},
+    symbolic y coords={server finish, client finish, server start, client start},
+    ytick=data,
+    nodes near coords,
+    nodes near coords align={horizontal},
+]
+\addplot coordinates {
+    (0.15336,server finish)
+    (201.33,client finish)
+    (191.62,server start)
+    (66.105,client start)
+};
+\end{axis}
+\end{tikzpicture}
+
+
+\subsection*{Authentication}
+
+\begin{tikzpicture}
+\begin{axis}[
+    xbar,
+    y=0.8cm,
+    xmin=0, xmax=385,
+    enlarge y limits=0.25,
+    enlarge x limits={0.15, upper},
+    legend style={at={(0.5,-0.2)},
+    anchor=north,legend columns=-1},
+    xlabel={microseconde},
+    symbolic y coords={client finish, server finish, client ke, server start, client start},
+    ytick=data,
+    nodes near coords,
+    nodes near coords align={horizontal},
+]
+\addplot coordinates {
+    (0.086069,client finish)
+    (185.38,server finish)
+    (387.39,client ke)
+    (189.93,server start)
+    (67.308,client start)
+};
+\end{axis}
+\end{tikzpicture}
+
+
 
 \subsection{Ideal Cipher vs AES} % isolated, endpoints, overall. How does it change the performance of each endpoint and overall ?
 % 2 boite à moustache (en mode histogram), x = each endpoint, y = time. Comparison with the standard time (above)
@@ -31,7 +90,58 @@
 
 \section{Message size}
 
+\newpage
 
+
+\subsection{Registration}
+
+\pgfplotsset{width=10cm, height=8cm}
+
+\begin{tikzpicture}
+\begin{axis}[
+    ybar,
+    enlarge x limits=0.15,
+    enlarge y limits={0.15, upper},
+    legend style={at={(0.5,-0.2)},
+    anchor=north,legend columns=-1},
+    ylabel={microseconde},
+    symbolic x coords={client start, server start, client finish, server finish},
+    xtick=data,
+    nodes near coords,
+    nodes near coords align={vertical},
+    x tick label style={rotate=45,anchor=east},
+]
+\addplot coordinates {
+    (client start,66.105) (server start,191.62) (client finish,201.33)
+    (server finish,0.15336)
+};
+\end{axis}
+\end{tikzpicture}
+
+
+\pgfplotsset{width=\textwidth, height=6cm}
+
+\begin{tikzpicture}
+\begin{axis}[
+    xbar,
+    enlarge y limits=0.2,
+    enlarge x limits={0.15, upper},
+    legend style={at={(0.5,-0.2)},
+    anchor=north,legend columns=-1},
+    xlabel={microseconde},
+    symbolic y coords={server finish, client finish, server start, client start},
+    ytick=data,
+    nodes near coords,
+    nodes near coords align={horizontal},
+]
+\addplot coordinates {
+    (0.15336,server finish)
+    (201.33,client finish)
+    (191.62,server start)
+    (66.105,client start)
+};
+\end{axis}
+\end{tikzpicture}
 
 \newpage
 
