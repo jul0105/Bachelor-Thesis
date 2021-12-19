@@ -1,5 +1,7 @@
 \documentclass[../report.tex]{subfiles}
 
+\usepgfplotslibrary{statistics}
+
 \begin{document}
 
 \chapter{Results} % Performance comparison for the KHAPE library (not the password manager use case).
@@ -218,8 +220,86 @@
 
 \section{Components benchmark}
 \subsection{Encryption (vs AES)}
+
+\subsection*{Ideal cipher}
+
+\pgfplotsset{height=6cm}
+\begin{tikzpicture}
+\begin{axis}[
+    boxplot,
+    boxplot/draw direction=x,
+    xmin=7.4, xmax=8.55,
+    xlabel={microseconde},
+    ytick={1,2},
+    yticklabels={decrypt,encrypt},
+]
+\addplot table[y=value]{data/component/ideal_cipher_decryption.dat};
+\addplot table[y=value]{data/component/ideal_cipher_encryption.dat};
+\end{axis}
+\end{tikzpicture}
+
+\subsection*{AES256-CTR}
+
+\begin{tikzpicture}
+\begin{axis}[
+    boxplot,
+    boxplot/draw direction=x,
+    xmin=0.211, xmax=0.232,
+    xlabel={microseconde},
+    ytick={1,2},
+    yticklabels={decrypt,encrypt},
+]
+\addplot table[y=value]{data/component/aes_decryption.dat};
+\addplot table[y=value]{data/component/aes_encryption.dat};
+\end{axis}
+\end{tikzpicture}
+
 \subsection{TripleDH}
+
+\begin{tikzpicture}
+\begin{axis}[
+    boxplot,
+    boxplot/draw direction=x,
+%     xmin=0.211, xmax=0.232,
+    xlabel={microseconde},
+    ytick={1,2},
+    yticklabels={server,client},
+]
+\addplot table[y=value]{data/component/tripledh_compute_server.dat};
+\addplot table[y=value]{data/component/tripledh_compute_client.dat};
+\end{axis}
+\end{tikzpicture}
+
 \subsection{Key generation}
+\pgfplotsset{height=4cm}
+\begin{tikzpicture}
+\begin{axis}[
+    boxplot,
+    boxplot/draw direction=x,
+%     xmin=0.211, xmax=0.232,
+    xlabel={microseconde},
+    ytick={1},
+    yticklabels={generate},
+]
+\addplot table[y=value]{data/component/group_generate_keys.dat};
+\end{axis}
+\end{tikzpicture}
+
+\begin{tikzpicture}
+\begin{axis}[
+    boxplot,
+    boxplot/draw direction=x,
+%     xmin=0.211, xmax=0.232,
+    xlabel={microseconde},
+    ytick={1},
+    yticklabels={compute},
+]
+\addplot table[y=value]{data/component/group_compute_shared_key.dat};
+\end{axis}
+\end{tikzpicture}
+
+
+
 \subsection{(Key derivation)}
 
 
