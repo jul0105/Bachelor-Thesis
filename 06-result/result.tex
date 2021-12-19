@@ -300,10 +300,70 @@
 
 
 
-\subsection{(Key derivation)}
 
 
-\section{(OPAQUE endpoints)} % same as KHAPE endpoints. Shows default parameters and similar parameters as KHAPE
+\section{OPAQUE endpoints} % same as KHAPE endpoints. Shows default parameters and similar parameters as KHAPE
+
+Note that OPAQUE has only 4 functions for the authentication (where KHAPE needs 5) and for the registration, the server compute a server setup where he generate his key pair (in KHAPE, this is done in server start).
+Benchmark is computed with a ciphersuite that is close to the primitive used for KHAPE : RistrettoPoint for OPRF, MontgomeryPoint for KE, TripleDH, Sha3 for hashing.
+Note that the default ciphersuite for OPAQUE use Sha2 instead of Sha3 and RistrettoPoint for both OPRF and KE. Performance are relatively similar between the two ciphersuites.
+
+\pgfplotsset{width=\textwidth-1.1cm}
+
+
+\subsection*{Registration}
+
+\begin{tikzpicture}
+\begin{axis}[
+    xbar,
+    y=0.8cm,
+    xmin=0, xmax=385,
+    enlarge y limits=0.25,
+    enlarge x limits={0.15, upper},
+    legend style={at={(0.5,-0.2)},
+    anchor=north,legend columns=-1},
+    xlabel={microseconde},
+    symbolic y coords={server finish, client finish, server start, client start, server setup},
+    ytick=data,
+    nodes near coords,
+    nodes near coords align={horizontal},
+]
+\addplot coordinates {
+    (0.13187,server finish)
+    (133.80,client finish)
+    (66.797,server start)
+    (62.885,client start)
+    (114.80,server setup)
+};
+\end{axis}
+\end{tikzpicture}
+
+
+\subsection*{Authentication}
+
+\begin{tikzpicture}
+\begin{axis}[
+    xbar,
+    y=0.8cm,
+    xmin=0, xmax=385,
+    enlarge y limits=0.25,
+    enlarge x limits={0.15, upper},
+    legend style={at={(0.5,-0.2)},
+    anchor=north,legend columns=-1},
+    xlabel={microseconde},
+    symbolic y coords={server finish, client finish, server start, client start},
+    ytick=data,
+    nodes near coords,
+    nodes near coords align={horizontal},
+]
+\addplot coordinates {
+    (2.2455,server finish)
+    (324.08,client finish)
+    (369.59,server start)
+    (125.40,client start)
+};
+\end{axis}
+\end{tikzpicture}
 
 
 \section{OPAQUE vs KHAPE} % endpoints, overall. How does KHAPE performance compare to OPAQUE with ~same~ parameters (OPRF, no SlowHash, same curve ?, same hash ?)
