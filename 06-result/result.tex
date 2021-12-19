@@ -10,9 +10,10 @@
 % 2 boite à moustache (en mode histogram), x = each endpoint, y = time
 % \pgfplotsset{width=\textwidth, height=6cm}
 
-\subsection*{Registration}
-
 \pgfplotsset{width=\textwidth-1.1cm}
+
+
+\subsection*{Registration}
 
 \begin{tikzpicture}
 \begin{axis}[
@@ -74,8 +75,152 @@
 \subsection{With OPRF vs without OPRF} % endpoints, overall. How does it change the performance of each endpoint and overall ?
 % 2 boite à moustache (en mode histogram), x = each endpoint, y = time. Comparison with the standard time (above)
 
+\subsection*{Registration}
+
+\begin{tikzpicture}
+\begin{axis}[
+    xbar=0pt,
+    y=1.1cm,
+    xmin=0, xmax=385,
+    enlarge y limits=0.25,
+    enlarge x limits={0.15, upper},
+    legend pos=north east,
+    xlabel={microseconde},
+    symbolic y coords={server finish, client finish, server start, client start},
+    ytick=data,
+    nodes near coords,
+    nodes near coords align={horizontal},
+]
+\addplot coordinates {
+    (0.15336,server finish)
+    (201.33,client finish)
+    (191.62,server start)
+    (66.105,client start)
+};
+\addplot coordinates {
+    (0.15736,server finish)
+    (132.45,client finish)
+    (119.70,server start)
+    (0.039084,client start)
+};
+\legend{With OPRF,Without OPRF}
+\end{axis}
+\end{tikzpicture}
+
+
+
+\subsection*{Authentication}
+
+\begin{tikzpicture}
+\begin{axis}[
+    xbar=0pt,
+    y=1.1cm,
+    xmin=0, xmax=385,
+    enlarge y limits=0.25,
+    enlarge x limits={0.15, upper},
+    legend pos=north east,
+    xlabel={microseconde},
+    symbolic y coords={client finish, server finish, client ke, server start, client start},
+    ytick=data,
+    nodes near coords,
+    nodes near coords align={horizontal},
+]
+\addplot coordinates {
+    (0.086069,client finish)
+    (185.38,server finish)
+    (387.39,client ke)
+    (189.93,server start)
+    (67.308,client start)
+};
+\addplot coordinates {
+    (0.085906,client finish)
+    (185.49,server finish)
+    (318.02,client ke)
+    (121.29,server start)
+    (0.039352,client start)
+};
+\legend{With OPRF,Without OPRF}
+\end{axis}
+\end{tikzpicture}
+
 \subsection{With SlowHash vs without SlowHash} % endpoints, overall. How does it change the performance of each endpoint and overall ?
 % 2 boite à moustache (en mode histogram), x = each endpoint, y = time. Comparison with the standard time (above)
+
+
+\subsection*{Registration}
+
+\begin{tikzpicture}
+\begin{axis}[
+    xbar=0pt,
+    y=1.1cm,
+    xmin=0, xmax=8300,
+    enlarge y limits=0.25,
+    enlarge x limits={0.15, upper},
+    legend pos=north east,
+    xlabel={microseconde},
+    symbolic y coords={server finish, client finish, server start, client start},
+    ytick=data,
+    nodes near coords,
+    nodes near coords align={horizontal},
+]
+\addplot coordinates {
+    (0.16100,server finish)
+    (8173.6,client finish)
+    (196.37,server start)
+    (66.713,client start)
+};
+\addplot coordinates {
+    (0.15336,server finish)
+    (201.33,client finish)
+    (191.62,server start)
+    (66.105,client start)
+};
+\legend{With SlowHash,Without SlowHash}
+\end{axis}
+\end{tikzpicture}
+
+
+
+\subsection*{Authentication}
+
+\begin{tikzpicture}
+\begin{axis}[
+    xbar=0pt,
+    y=1.1cm,
+    xmin=0, xmax=8300,
+    enlarge y limits=0.25,
+    enlarge x limits={0.15, upper},
+    legend pos=north east,
+    xlabel={microseconde},
+    symbolic y coords={client finish, server finish, client ke, server start, client start},
+    ytick=data,
+    nodes near coords,
+    nodes near coords align={horizontal},
+]
+\addplot coordinates {
+    (0.086840,client finish)
+    (186.55,server finish)
+    (8287.6,client ke)
+    (196.05,server start)
+    (68.013,client start)
+};
+\addplot coordinates {
+    (0.086069,client finish)
+    (185.38,server finish)
+    (387.39,client ke)
+    (189.93,server start)
+    (67.308,client start)
+};
+\legend{With SlowHash,Without SlowHash}
+\end{axis}
+\end{tikzpicture}
+
+
+\section{Components benchmark}
+\subsection{Encryption (vs AES)}
+\subsection{TripleDH}
+\subsection{Key generation}
+\subsection{(Key derivation)}
 
 
 \section{(OPAQUE endpoints)} % same as KHAPE endpoints. Shows default parameters and similar parameters as KHAPE
