@@ -87,6 +87,7 @@
     enlarge y limits=0.25,
     enlarge x limits={0.15, upper},
     legend pos=north east,
+    legend cell align=left,
     xlabel={microseconde},
     symbolic y coords={server finish, client finish, server start, client start},
     ytick=data,
@@ -121,6 +122,7 @@
     enlarge y limits=0.25,
     enlarge x limits={0.15, upper},
     legend pos=north east,
+    legend cell align=left,
     xlabel={microseconde},
     symbolic y coords={client finish, server finish, client ke, server start, client start},
     ytick=data,
@@ -159,6 +161,7 @@
     enlarge y limits=0.25,
     enlarge x limits={0.15, upper},
     legend pos=north east,
+    legend cell align=left,
     xlabel={microseconde},
     symbolic y coords={server finish, client finish, server start, client start},
     ytick=data,
@@ -193,6 +196,7 @@
     enlarge y limits=0.25,
     enlarge x limits={0.15, upper},
     legend pos=north east,
+    legend cell align=left,
     xlabel={microseconde},
     symbolic y coords={client finish, server finish, client ke, server start, client start},
     ytick=data,
@@ -369,6 +373,97 @@ Note that the default ciphersuite for OPAQUE use Sha2 instead of Sha3 and Ristre
 \section{OPAQUE vs KHAPE} % endpoints, overall. How does KHAPE performance compare to OPAQUE with ~same~ parameters (OPRF, no SlowHash, same curve ?, same hash ?)
 % 2 histogram, one for auth overall, one for register overall, x = OPAQUE(default) OPAQUE(same params) KHAPE(IC OPRF) KHAPE(IC noOPRF) KHAPE(AES OPRF) KHAPE(AES noOPRF), y = time. Each histogram bar is separated in another color to show each endpoint proportion
 % highlight the 2 bar where OPAQUE and KHAPE have the same params, put the rest aside (just for info)
+
+\pgfplotsset{width=\textwidth-2.4cm}
+
+
+\subsection*{Registration}
+
+\begin{tikzpicture}
+\begin{axis}[
+    xbar stacked,
+    y=0.8cm,
+%     xmin=0, xmax=600,
+    enlarge y limits=0.45,
+    enlarge x limits={0.15, upper},
+    legend style={
+        at={(0.5,-0.5)},
+        anchor=north
+    },
+    legend columns=3,
+    xlabel={microseconde},
+    symbolic y coords={KHAPE w/o OPRF, KHAPE w/ OPRF, OPAQUE},
+    ytick=data,
+%     nodes near coords,
+%     nodes near coords align={vertical},
+]
+\addplot coordinates { % server setup
+    (114.80,OPAQUE) (0,KHAPE w/ OPRF) (0,KHAPE w/o OPRF)
+};
+\addplot coordinates { % client start
+    (62.885,OPAQUE) (66.105,KHAPE w/ OPRF) (0.039084,KHAPE w/o OPRF)
+};
+\addplot coordinates { % server start
+    (66.797,OPAQUE) (191.62,KHAPE w/ OPRF) (119.70,KHAPE w/o OPRF)
+};
+\addplot coordinates { % client finish
+    (133.80,OPAQUE) (201.33,KHAPE w/ OPRF) (132.45,KHAPE w/o OPRF)
+};
+\addplot coordinates { % server finish
+    (0.13187,OPAQUE) (0.15336,KHAPE w/ OPRF) (0.15736,KHAPE w/o OPRF)
+};
+\legend{Server setup, Client start, Server start, Client finish, Server finish}
+\end{axis}
+\end{tikzpicture}
+
+\subsection*{Authentication}
+
+\begin{tikzpicture}
+\begin{axis}[
+    xbar stacked,
+    y=0.8cm,
+%     xmin=0, xmax=600,
+    enlarge y limits=0.45,
+    enlarge x limits={0.15, upper},
+    legend style={
+        at={(0.5,-0.5)},
+        anchor=north
+    },
+    legend columns=3,
+    xlabel={microseconde},
+    symbolic y coords={KHAPE w/o OPRF, KHAPE w/ OPRF, OPAQUE},
+    ytick=data,
+%     nodes near coords,
+%     nodes near coords align={vertical},
+]
+\addplot coordinates { % client start
+    (125.40,OPAQUE) (67.308,KHAPE w/ OPRF) (0.039352,KHAPE w/o OPRF)
+};
+\addplot coordinates { % server start
+    (369.59,OPAQUE) (189.93,KHAPE w/ OPRF) (121.29,KHAPE w/o OPRF)
+};
+\addplot coordinates { % client ke
+    (0,OPAQUE) (387.39,KHAPE w/ OPRF) (318.02,KHAPE w/o OPRF)
+};
+\addplot coordinates { % server finish
+    (2.2455,OPAQUE) (185.38,KHAPE w/ OPRF) (185.49,KHAPE w/o OPRF)
+};
+\addplot coordinates { % client finish
+    (324.08,OPAQUE) (0.086069,KHAPE w/ OPRF) (0.085906,KHAPE w/o OPRF)
+};
+\legend{Client start, Server start, Client KE, Server finish, Client finish}
+\end{axis}
+\end{tikzpicture}
+
+
+% KHAPE without OPRF
+% \addplot coordinates {
+%     (0.085906,client finish)
+%     (185.49,server finish)
+%     (318.02,client ke)
+%     (121.29,server start)
+%     (0.039352,client start)
+% };
 
 
 \section{Input size} % Does the uid and password size has any inpact on the performance of auth and register ?
