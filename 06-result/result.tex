@@ -466,9 +466,106 @@ Note that the default ciphersuite for OPAQUE use Sha2 instead of Sha3 and Ristre
 % };
 
 
-\section{Input size} % Does the uid and password size has any inpact on the performance of auth and register ?
-
 \section{Message size}
+
+KHAPE not serialized
+OPAQUE value are taken from the tests vector outputs.
+
+To match the value of OPAQUE's tests vector, a uid of 4 bytes and a password of 25 bytes is inputted
+
+
+For OPAQUE, the output size depends on the primitive used (ciphersuite) but the big difference is on the choice of the hashing function output size (and so MAC and KDF). It is either 256 bits or 512 bits.
+P256\_XMD with 256 bits hash, MAC and KDF (!! size of everything is 32 bytes except for the size of public key which is 33 bytes)
+Ristretto255 with 512 bits hash, MAC and KDF
+
+
+%                         registration\_request   registration\_response  registration\_upload    KE1         KE2         KE3         KE4
+% OPAQUE (512 bits)       64/2=32                 128/2=64                384/2=192               192/2=96    658/2=329   128/2=64
+% OPAQUE (256 bits)       66/2=33                 132/2=66                258/2=129               192/2=96    518/2=259   64/2=32
+% KHAPE (with OPRF)       4+32=36                 32+32=64                4+64+32=100             4+32=36     64+32+32=128 4+32+32=68 32
+% KHAPE (without OPRF)    4+0=4                   32+0=32                 4+64+32=100             4+0=4       64+32+0=96  4+32+32=68  32
+% 
+% 
+% For KHAPE:
+% all OPRFs output = 32 bytes
+% all group element (priv, pub, field eleme) = 32 bytes
+
+
+
+\pgfplotsset{width=\textwidth-2.4cm}
+
+
+\subsection*{Registration}
+
+\begin{tikzpicture}
+\begin{axis}[
+    xbar stacked,
+    y=0.8cm,
+%     xmin=0, xmax=600,
+    enlarge y limits=0.45,
+    enlarge x limits={0.15, upper},
+    legend style={
+        at={(0.5,-0.35)},
+        anchor=north
+    },
+    legend columns=3,
+    xlabel={bytes},
+    symbolic y coords={KHAPE w/o OPRF, KHAPE w/ OPRF, OPAQUE 256 bits, OPAQUE 512 bits},
+    ytick=data,
+    nodes near coords,
+%     nodes near coords align={vertical},
+]
+\addplot coordinates { % registration request
+    (32,OPAQUE 512 bits) (33,OPAQUE 256 bits) (36,KHAPE w/ OPRF) (4,KHAPE w/o OPRF)
+};
+\addplot coordinates { % registration response
+    (64,OPAQUE 512 bits) (66,OPAQUE 256 bits) (64,KHAPE w/ OPRF) (32,KHAPE w/o OPRF)
+};
+\addplot coordinates { % registration upload
+    (192,OPAQUE 512 bits) (129,OPAQUE 256 bits) (100,KHAPE w/ OPRF) (100,KHAPE w/o OPRF)
+};
+\legend{Registration request, Registration response, Registration upload}
+\end{axis}
+\end{tikzpicture}
+
+\subsection*{Authentication}
+
+\begin{tikzpicture}
+\begin{axis}[
+    xbar stacked,
+    y=0.8cm,
+%     xmin=0, xmax=600,
+    enlarge y limits=0.45,
+    enlarge x limits={0.15, upper},
+    legend style={
+        at={(0.5,-0.35)},
+        anchor=north
+    },
+    legend columns=4,
+    xlabel={bytes},
+    symbolic y coords={KHAPE w/o OPRF, KHAPE w/ OPRF, OPAQUE 256 bits, OPAQUE 512 bits},
+    ytick=data,
+    nodes near coords,
+%     nodes near coords align={vertical},
+]
+\addplot coordinates { % KE1
+    (96,OPAQUE 512 bits) (96,OPAQUE 256 bits) (36,KHAPE w/ OPRF) (4,KHAPE w/o OPRF)
+};
+\addplot coordinates { % KE2
+    (329,OPAQUE 512 bits) (259,OPAQUE 256 bits) (128,KHAPE w/ OPRF) (96,KHAPE w/o OPRF)
+};
+\addplot coordinates { % KE3
+    (64,OPAQUE 512 bits) (32,OPAQUE 256 bits) (68,KHAPE w/ OPRF) (68,KHAPE w/o OPRF)
+};
+\addplot coordinates { % KE4
+    (0,OPAQUE 512 bits) (0,OPAQUE 256 bits) (32,KHAPE w/ OPRF) (32,KHAPE w/o OPRF)
+};
+\legend{KE1, KE2, KE3, KE4}
+\end{axis}
+\end{tikzpicture}
+
+
+
 
 % \newpage
 % 
