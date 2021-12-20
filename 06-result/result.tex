@@ -17,9 +17,133 @@ The median is used for the charts.
 The benchmark are computed on a HP Elitebook 850 G5 laptop with an intel i7-8550U processor.\footnote{The laptop is plugged to the charging cable during all the benchmarks. This make a performance gain of around 40\% compared to when it runs on battery.} 
 
 
+
+
+
+\section{KHAPE components benchmark}
+
+Before diving into the overall performances of KHAPE and its endpoints, it is important to understand what are some of the components that take the most time to compute.
+
+\subsection{3DH}
+
+The 3DH AKE is unsurprisingly the most time consuming operation to compute. Considering that a curve multiplication take around 58 us to compute and that 3DH --- as its name suggest --- compute 3 of them. Adding the cost of derivating 2 keys using HKDF, the median time of 3DH computation is around 184 us.
+
+Both client and server functions has around the same performances. This is not surprising because they compute the same operations with different party's key.
+
+\pgfplotsset{width=\textwidth +0.2cm}
+\pgfplotsset{height=6cm}
+
+\begin{tikzpicture}
+\begin{axis}[
+    boxplot,
+    boxplot/draw direction=x,
+%     xmin=0.211, xmax=0.232,
+    xlabel={microseconde},
+    ytick={1,2},
+    yticklabels={server,client},
+]
+\addplot table[y=value]{\subfix{data/component/tripledh_compute_server.dat}};
+\addplot table[y=value]{\subfix{data/component/tripledh_compute_client.dat}};
+\end{axis}
+\end{tikzpicture}
+
+Time consumption of a single curve multiplication operation.
+
+\pgfplotsset{width=\textwidth-2.4cm}
+\pgfplotsset{height=4cm}
+
+\begin{tikzpicture}
+\begin{axis}[
+    boxplot,
+    boxplot/draw direction=x,
+    xmin=57.5, xmax=64.5,
+    xlabel={microseconde},
+    ytick={1},
+    yticklabels={curve multiplication},
+]
+\addplot table[y=value]{\subfix{data/component/group_compute_shared_key.dat}};
+\end{axis}
+\end{tikzpicture}
+
+\subsection{Key generation}
+
+Key generation take also a lot of time with a median of 122 us. Key generation consist of: 1) generating a 32 bytes random value, 2) generating a private key from the random bytes, 3) computing its associated public key --- a curve multiplication operation --- and then 4) converting the public key to a field element using the elligator2 map.
+
+For step 2, not all 32 bytes random value can be used to generate a private key and for step 4, not all public key can be mapped to a field element.
+In these case, the rejection method is used which means that the key generation process is restarted from step 1. This is more secure than trying to modify the value to make it fit but in the other hand, it is more costly in term of performance as the key generation process can be made multiple time.
+This is also why the time distribution of this function is more spread out than for other function.
+
+% TODO nombre de fois en moyenne
+
+\pgfplotsset{width=\textwidth-0.3cm}
+\pgfplotsset{height=4cm}
+
+\begin{tikzpicture}
+\begin{axis}[
+    boxplot,
+    boxplot/draw direction=x,
+%     xmin=0.211, xmax=0.232,
+    xlabel={microseconde},
+    ytick={1},
+    yticklabels={generate},
+]
+\addplot table[y=value]{\subfix{data/component/group_generate_keys.dat}};
+\end{axis}
+\end{tikzpicture}
+
+
+
+
+\subsection{Encryption scheme}
+KHAPE require a Ideal Cipher encryption which has been implemented with a 14-rounds feistel cipher.
+
+\pgfplotsset{width=\textwidth-0.1cm}
+\pgfplotsset{height=6cm}
+
+\subsection*{Feistel cipher}
+
+The feistel cipher implemented is not optimal in term of performance but it is surprising not that much time consuming.
+It is still around 36 times slower than AES256-CTR (see below) but it doesn't take much time compared to the group operation above.
+
+% TODO AES256-CTF performances (HW, para, optimized)
+
+\begin{tikzpicture}
+\begin{axis}[
+    boxplot,
+    boxplot/draw direction=x,
+    xmin=7.4, xmax=8.55,
+    xlabel={microseconde},
+    ytick={1,2},
+    yticklabels={decrypt,encrypt},
+]
+\addplot table[y=value]{\subfix{data/component/ideal_cipher_decryption.dat}};
+\addplot table[y=value]{\subfix{data/component/ideal_cipher_encryption.dat}};
+\end{axis}
+\end{tikzpicture}
+
+\subsection*{AES256-CTR}
+Even though AES cannot be used for the encryption in KHAPE, it is still interesting to benchmark it with the same context that the feistel cipher is used for.
+
+\begin{tikzpicture}
+\begin{axis}[
+    boxplot,
+    boxplot/draw direction=x,
+    xmin=0.211, xmax=0.232,
+    xlabel={microseconde},
+    ytick={1,2},
+    yticklabels={decrypt,encrypt},
+]
+\addplot table[y=value]{\subfix{data/component/aes_decryption.dat}};
+\addplot table[y=value]{\subfix{data/component/aes_encryption.dat}};
+\end{axis}
+\end{tikzpicture}
+
+
+
+
+
 \section{KHAPE benchmark} % What endpoint take the most time during auth and register ? 
 
-Firstly, here is the performance for the standard configuration.
 In KHAPE, both registration and authentication process have multiple endpoints --- respectively 4 and 5. These endpoints are shared between the client and the server to constitue the protocol.
 
 For this benchmark, each endpoints are tested to mesure the time they take to complete and to compare them using different parameters.
@@ -236,94 +360,6 @@ For the registration, we can see that both \verb|server start| and \verb|client 
     (67.308,client start)
 };
 \legend{With SlowHash,Without SlowHash}
-\end{axis}
-\end{tikzpicture}
-
-
-\section{Components benchmark}
-\subsection{Encryption (vs AES)}
-
-\pgfplotsset{width=\textwidth-0.1cm}
-\pgfplotsset{height=6cm}
-
-\subsection*{Ideal cipher}
-
-\begin{tikzpicture}
-\begin{axis}[
-    boxplot,
-    boxplot/draw direction=x,
-    xmin=7.4, xmax=8.55,
-    xlabel={microseconde},
-    ytick={1,2},
-    yticklabels={decrypt,encrypt},
-]
-\addplot table[y=value]{\subfix{data/component/ideal_cipher_decryption.dat}};
-\addplot table[y=value]{\subfix{data/component/ideal_cipher_encryption.dat}};
-\end{axis}
-\end{tikzpicture}
-
-\subsection*{AES256-CTR}
-
-\begin{tikzpicture}
-\begin{axis}[
-    boxplot,
-    boxplot/draw direction=x,
-    xmin=0.211, xmax=0.232,
-    xlabel={microseconde},
-    ytick={1,2},
-    yticklabels={decrypt,encrypt},
-]
-\addplot table[y=value]{\subfix{data/component/aes_decryption.dat}};
-\addplot table[y=value]{\subfix{data/component/aes_encryption.dat}};
-\end{axis}
-\end{tikzpicture}
-
-\subsection{TripleDH}
-
-\pgfplotsset{width=\textwidth +0.2cm}
-
-\begin{tikzpicture}
-\begin{axis}[
-    boxplot,
-    boxplot/draw direction=x,
-%     xmin=0.211, xmax=0.232,
-    xlabel={microseconde},
-    ytick={1,2},
-    yticklabels={server,client},
-]
-\addplot table[y=value]{\subfix{data/component/tripledh_compute_server.dat}};
-\addplot table[y=value]{\subfix{data/component/tripledh_compute_client.dat}};
-\end{axis}
-\end{tikzpicture}
-
-\subsection{Key generation}
-
-\pgfplotsset{width=\textwidth-0.3cm}
-\pgfplotsset{height=4cm}
-
-\begin{tikzpicture}
-\begin{axis}[
-    boxplot,
-    boxplot/draw direction=x,
-%     xmin=0.211, xmax=0.232,
-    xlabel={microseconde},
-    ytick={1},
-    yticklabels={generate},
-]
-\addplot table[y=value]{\subfix{data/component/group_generate_keys.dat}};
-\end{axis}
-\end{tikzpicture}
-
-\begin{tikzpicture}
-\begin{axis}[
-    boxplot,
-    boxplot/draw direction=x,
-%     xmin=0.211, xmax=0.232,
-    xlabel={microseconde},
-    ytick={1},
-    yticklabels={compute},
-]
-\addplot table[y=value]{\subfix{data/component/group_compute_shared_key.dat}};
 \end{axis}
 \end{tikzpicture}
 
