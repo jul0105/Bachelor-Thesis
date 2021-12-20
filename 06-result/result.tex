@@ -5,17 +5,35 @@
 \usepgfplotslibrary{statistics}
 
 \chapter{Results} % Performance comparison for the KHAPE library (not the password manager use case).
- 
+
+This chapter presents the performances obtained by the implemented KHAPE library using different parameters and analyzing the performance of some of the component. A performance comparison with OPAQUE rust implementation \cite{opaque-ke} is made. The password manager use case is not in the scope of test.
+
+\section{Testing environment}
+
+For computation benchmark, the rust library Criterion is used. It compute each endpoint 100 times
+Each endpoint is sampled 100 times and each sample linearly increase the number of iteration on the tested function.
+The median is used for the charts.
+
+The benchmark are computed on a HP Elitebook 850 G5 laptop with an intel i7-8550U processor.\footnote{The laptop is plugged to the charging cable during all the benchmarks. This make a performance gain of around 40\% compared to when it runs on battery.} 
 
 
-\section{KHAPE endpoints} % What endpoint take the most time during auth and register ? 
-% 2 boite à moustache (en mode histogram), x = each endpoint, y = time
-% \pgfplotsset{width=\textwidth, height=6cm}
+\section{KHAPE benchmark} % What endpoint take the most time during auth and register ? 
+
+Firstly, here is the performance for the standard configuration.
+In KHAPE, both registration and authentication process have multiple endpoints --- respectively 4 and 5. These endpoints are shared between the client and the server to constitue the protocol.
+
+For this benchmark, each endpoints are tested to mesure the time they take to complete and to compare them using different parameters.
+
+
+\subsection{Standard configuration}
+KHAPE's default and most secure configuration is by using both OPRF and SlowHash. 
+But since SlowHash functions are designed to be slow, it doesn't make sense to add it to the baseline benchmark because it doesn't show the real performances of the protocol.
+So for these benchmarks, the standard baseline configuration is KHAPE with OPRF and without SlowHash.
 
 \pgfplotsset{width=\textwidth-1.1cm}
-
-
 \subsection*{Registration}
+
+For the registration, we can see that both \verb|server start| and \verb|client finish| endpoints take the most time at around 200 us. This is not surprising has it is where the key generation and ke
 
 \begin{tikzpicture}
 \begin{axis}[
@@ -71,7 +89,7 @@
 
 
 
-\subsection{Ideal Cipher vs AES} % isolated, endpoints, overall. How does it change the performance of each endpoint and overall ?
+% \subsection{Ideal Cipher vs AES} % isolated, endpoints, overall. How does it change the performance of each endpoint and overall ?
 % 2 boite à moustache (en mode histogram), x = each endpoint, y = time. Comparison with the standard time (above)
 
 \subsection{With OPRF vs without OPRF} % endpoints, overall. How does it change the performance of each endpoint and overall ?
@@ -225,9 +243,11 @@
 \section{Components benchmark}
 \subsection{Encryption (vs AES)}
 
+\pgfplotsset{width=\textwidth-0.1cm}
+\pgfplotsset{height=6cm}
+
 \subsection*{Ideal cipher}
 
-\pgfplotsset{height=6cm}
 \begin{tikzpicture}
 \begin{axis}[
     boxplot,
@@ -260,6 +280,8 @@
 
 \subsection{TripleDH}
 
+\pgfplotsset{width=\textwidth +0.2cm}
+
 \begin{tikzpicture}
 \begin{axis}[
     boxplot,
@@ -275,7 +297,10 @@
 \end{tikzpicture}
 
 \subsection{Key generation}
+
+\pgfplotsset{width=\textwidth-0.3cm}
 \pgfplotsset{height=4cm}
+
 \begin{tikzpicture}
 \begin{axis}[
     boxplot,
@@ -306,7 +331,7 @@
 
 
 
-\section{OPAQUE endpoints} % same as KHAPE endpoints. Shows default parameters and similar parameters as KHAPE
+\section{OPAQUE benchmark} % same as KHAPE endpoints. Shows default parameters and similar parameters as KHAPE
 
 Note that OPAQUE has only 4 functions for the authentication (where KHAPE needs 5) and for the registration, the server compute a server setup where he generate his key pair (in KHAPE, this is done in server start).
 Benchmark is computed with a ciphersuite that is close to the primitive used for KHAPE : RistrettoPoint for OPRF, MontgomeryPoint for KE, TripleDH, Sha3 for hashing.
