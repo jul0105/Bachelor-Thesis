@@ -67,14 +67,14 @@ client_output_key = client.auth_finish(auth_verify_response, ke_output)
 
 \subsection{Client}
 \begin{itemize}
- \item \verb|register_start(&self, password: &[u8]) -> (RegisterRequest, ClientState)|
+ \item \verb|register_start(Password) -> (RegisterRequest, ClientState)|
   \begin{enumerate}
     \item Compute OPRF initialization (optional)
     \item Build \verb|RegisterRequest| with uid and OPRF blinded result
     \item Build \verb|ClientState| with OPRF state
   \end{enumerate}
   
- \item \verb|register_finish(&self, register_response: RegisterResponse, client_state: ClientState) -> RegisterFinish|
+ \item \verb|register_finish(RegisterResponse, ClientState) -> RegisterFinish|
   \begin{enumerate}
     \item Generate asymmetric key pair
     \item Compute OPRF output (optional)
@@ -86,14 +86,15 @@ client_output_key = client.auth_finish(auth_verify_response, ke_output)
  
  
  
- \item \verb|auth_start(&self, password: &[u8]) -> (AuthRequest, ClientState)|
+ \item \verb|auth_start(Password) -> (AuthRequest, ClientState)|
    \begin{enumerate}
     \item Compute OPRF initialization (optional)
     \item Build \verb|RegisterRequest| with uid and OPRF blinded result
     \item Build \verb|ClientState| with OPRF state
   \end{enumerate}
   
- \item \verb|auth_ke(&self, auth_response: AuthResponse, client_state: ClientState) -> (AuthVerifyRequest, KeyExchangeOutput)|
+ \item \verb|auth_ke(AuthResponse, ClientState) -> (AuthVerifyRequest,|\\
+       \verb| KeyExchangeOutput)|
   \begin{enumerate}
     \item Generate ephemeral asymmetric key pair
     \item Compute OPRF output (optional)
@@ -104,7 +105,8 @@ client_output_key = client.auth_finish(auth_verify_response, ke_output)
     \item Build \verb|AuthVerifyRequest| with uid, verify tag and ephemeral public key
   \end{enumerate}
  
- \item \verb|auth_finish(&self, auth_verify_response: AuthVerifyResponse, ke_output: KeyExchangeOutput) -> Option<OutputKey>|
+ \item \verb|auth_finish(AuthVerifyResponse, KeyExchangeOutput)|\\
+       \verb| -> Option<OutputKey>|
   \begin{enumerate}
     \item Verify server's verification tag
     \item Return output key
@@ -114,7 +116,8 @@ client_output_key = client.auth_finish(auth_verify_response, ke_output)
 
 \subsection{Server}
 \begin{itemize}
- \item \verb|register_start(&self, register_request: RegisterRequest) -> (RegisterResponse, PreRegisterSecrets)|
+ \item \verb|register_start(RegisterRequest) -> (RegisterResponse,|\\
+       \verb| PreRegisterSecrets)|
   \begin{enumerate}
     \item Generate asymmetric key pair
     \item Generate OPRF secret salt (optional)
@@ -123,14 +126,14 @@ client_output_key = client.auth_finish(auth_verify_response, ke_output)
     \item Build \verb|PreRegisterSecret| with private key and OPRF secret salt
   \end{enumerate}
   
- \item \verb|register_finish(&self, register_finish: RegisterFinish, pre_register_secrets: PreRegisterSecrets) -> FileEntry|
+ \item \verb|register_finish(RegisterFinish, PreRegisterSecrets) -> FileEntry|
   \begin{enumerate}
     \item Build storable \verb|FileEntry| structure with encrypted envelope, server's private key, client's public key and OPRF secret salt
   \end{enumerate}
   
   
   
- \item \verb|auth_start(&self, auth_request: AuthRequest, file_entry: &FileEntry) -> (AuthResponse, EphemeralKeys)|
+ \item \verb|auth_start(AuthRequest, FileEntry) -> (AuthResponse, EphemeralKeys)|
   \begin{enumerate}
     \item Generate ephemeral asymmetric key pair
     \item Retrieve encrypted envelope and OPRF secret salt from file entry
@@ -139,7 +142,8 @@ client_output_key = client.auth_finish(auth_verify_response, ke_output)
     \item Build \verb|EphemeralKeys| with ephemeral key pair
   \end{enumerate}
   
- \item \verb|auth_finish(&self, auth_verify_request: AuthVerifyRequest, ephemeral_keys: EphemeralKeys, file_entry: &FileEntry) -> (AuthVerifyResponse, Option<OutputKey>)|
+ \item \verb|auth_finish(AuthVerifyRequest, EphemeralKeys, FileEntry)|\\ 
+       \verb| -> (AuthVerifyResponse, Option<OutputKey>)|
   \begin{enumerate}
     \item Retrieve server's private key and client's public key from file entry
     \item Compute key exchange output
