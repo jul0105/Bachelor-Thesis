@@ -303,6 +303,7 @@ These functions allow for each party, namely the client and the server, to input
 
 Overall, the OPAQUE protocol allows to secure authentication from the simplest applications to the most sensitive ones.
 
+%%% TODO OPRF ?
 
 %%% Implementation ? HMQV ?
 
@@ -507,8 +508,10 @@ The server doesn't receive passwords in cleartext which avoid any miss-handling 
 
 COMMENT: May be required during register depending on the implementation (See Section \ref{sec:opaque_register}).
 
-\paragraph{\writingFormulationClean{3. Secure against pre-computation attacks.}}
-This is the main security property of Strong aPAKE \cite{OPAQUE_Paper}. The server doesn't leak any data that could allow an attacker to perform a pre-computation attack (for example SRP send the salt in cleartext in the first message). This attack allows an attacker to compute a table \emph{before} the server even get compromised. Once the attacker succeeds in compromising the server, he can use the precomputed table to retrieve the passwords \emph{instantaneously}. So this protection force the attacker to perform an offline dictionary attack after successful server compromise. % This vulnerability weaken the initial benefit of using an aPAKE \cite{aPAKE_Formalized} and even make password-over-TLS more secure \cite{OPAQUE_Paper} (than aPAKE vulnerable to pre-computation attacks).
+\paragraph{\writingFormulationClean{3. Secure against pre-computation attacks.}} \label{sec:secure_against_pca}
+This is the main security property of Strong aPAKE \cite{OPAQUE_Paper}. The server doesn't leak any data that could allow an attacker to perform a pre-computation attack (for example SRP send the salt in cleartext in the first message). This attack allows an attacker to compute a table \emph{before} the server even get compromised. Once the attacker succeeds in compromising the server, he can use the precomputed table to retrieve the passwords \emph{instantaneously}. With this protection, an attacker can only perform an offline dictionary attack \emph{after} successfully compromising the server.
+This protection is provided by the OPRF. % TODO ref OPRF in OPAQUE section ?
+% This vulnerability weaken the initial benefit of using an aPAKE \cite{aPAKE_Formalized} and even make password-over-TLS more secure \cite{OPAQUE_Paper} (than aPAKE vulnerable to pre-computation attacks).
 
 
 

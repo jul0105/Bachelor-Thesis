@@ -332,8 +332,8 @@ Group element are represented on 32 bytes.
 
 
 
-\subsection{\writingFormulationBrut{OPRF}}
-In KHAPE, the OPRF is optional --- in contrary to OPAQUE --- but allow to make it a strong aPAKE resistant against pre-computation attacks.
+\subsection{\writingFormulationBrut{OPRF}} \label{sec:design_choice_oprf}
+In KHAPE, the OPRF is optional --- in contrary to OPAQUE --- but allow to make it a strong aPAKE resistant against pre-computation attacks \ref{sec:secure_against_pca}.
 This is a major improvement in term of security and therefore an OPRF should be used.
 
 OPRF operations also need their own group and hashing function.

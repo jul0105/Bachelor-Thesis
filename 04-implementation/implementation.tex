@@ -70,7 +70,7 @@ file_entry = server.register_finish(register_finish, pre_register_secrets)
 client_output_key = client.auth_finish(auth_verify_response, ke_output)
 \end{verbatim}
 
-\section{Function definition}
+\section{Function definition} \label{sec:impl_function_def}
 
 \subsection{Client}
 \begin{itemize}
@@ -216,7 +216,7 @@ pub struct AuthVerifyResponse {
 \section{Library choices}
 \begin{itemize}
  \item \verb|curve25519-dalek v3.2.0| : Pure rust implementation of group operations on Ristretto and Curve25519. Audited in 2019 \cite{https://blog.quarkslab.com/security-audit-of-dalek-libraries.html}. Patched with PR \cite{https://github.com/dalek-cryptography/curve25519-dalek/pull/357} to implement elligator\_decode
- \item \verb|voprf v0.3| : Implementation of a verifiable OPRF based on the standard draft \cite{}.
+ \item \verb|voprf v0.3| : Implementation of a verifiable OPRF based on the standard draft \cite{voprf_draft}.
  \item \verb|sha3 v0.9| : Pure rust implementation of the SHA-3 (Keccak) hash function
  \item \verb|hkdf v0.11| : Pure rust implementation of the HMAC-based Extract-and-Expand Key Derivation Function (HKDF) generic over hash function
  \item \verb|argon2 v0.3| : Pure rust implementation of the Argon2 password hashing function
