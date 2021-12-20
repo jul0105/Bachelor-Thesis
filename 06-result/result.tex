@@ -38,9 +38,10 @@ Both client and server functions has around the same performances. This is not s
     boxplot,
     boxplot/draw direction=x,
 %     xmin=0.211, xmax=0.232,
-    xlabel={microseconde},
+    xlabel={microsecond},
     ytick={1,2},
     yticklabels={server,client},
+    title=Time consumption of 3DH computation,
 ]
 \addplot table[y=value]{\subfix{data/component/tripledh_compute_server.dat}};
 \addplot table[y=value]{\subfix{data/component/tripledh_compute_client.dat}};
@@ -57,9 +58,10 @@ Time consumption of a single curve multiplication operation.
     boxplot,
     boxplot/draw direction=x,
     xmin=57.5, xmax=64.5,
-    xlabel={microseconde},
+    xlabel={microsecond},
     ytick={1},
     yticklabels={curve multiplication},
+    title=Time consumption of one exponentiation,
 ]
 \addplot table[y=value]{\subfix{data/component/group_compute_shared_key.dat}};
 \end{axis}
@@ -83,9 +85,10 @@ This is also why the time distribution of this function is more spread out than 
     boxplot,
     boxplot/draw direction=x,
 %     xmin=0.211, xmax=0.232,
-    xlabel={microseconde},
+    xlabel={microsecond},
     ytick={1},
     yticklabels={generate},
+    title=Time consumption of a key pair generation,
 ]
 \addplot table[y=value]{\subfix{data/component/group_generate_keys.dat}};
 \end{axis}
@@ -105,16 +108,18 @@ KHAPE require a Ideal Cipher encryption which has been implemented with a 14-rou
 The feistel cipher implemented is not optimal in term of performance but it is surprising not that much time consuming.
 It is still around 36 times slower than AES256-CTR (see below) but it doesn't take much time compared to the group operation above.
 
-% TODO AES256-CTF performances (HW, para, optimized)
+% TODO encryption and decryption ?
+% TODO AES256-CTR performances (HW, para, optimized)
 
 \begin{tikzpicture}
 \begin{axis}[
     boxplot,
     boxplot/draw direction=x,
     xmin=7.4, xmax=8.55,
-    xlabel={microseconde},
+    xlabel={microsecond},
     ytick={1,2},
     yticklabels={decrypt,encrypt},
+    title=Time consumption of Feistel cipher operations
 ]
 \addplot table[y=value]{\subfix{data/component/ideal_cipher_decryption.dat}};
 \addplot table[y=value]{\subfix{data/component/ideal_cipher_encryption.dat}};
@@ -124,14 +129,17 @@ It is still around 36 times slower than AES256-CTR (see below) but it doesn't ta
 \subsection*{AES256-CTR}
 Even though AES cannot be used for the encryption in KHAPE, it is still interesting to benchmark it with the same context that the feistel cipher is used for.
 
+Encryption and decryption take almost exactly the same time in median because with AES-CTR, the decryption is performed with the same function as the encryption.
+
 \begin{tikzpicture}
 \begin{axis}[
     boxplot,
     boxplot/draw direction=x,
     xmin=0.211, xmax=0.232,
-    xlabel={microseconde},
+    xlabel={microsecond},
     ytick={1,2},
     yticklabels={decrypt,encrypt},
+    title=Time consumption of AES256-CTR operations
 ]
 \addplot table[y=value]{\subfix{data/component/aes_decryption.dat}};
 \addplot table[y=value]{\subfix{data/component/aes_encryption.dat}};
@@ -146,8 +154,8 @@ Even though AES cannot be used for the encryption in KHAPE, it is still interest
 
 In KHAPE, both registration and authentication process have multiple endpoints --- respectively 4 and 5. These endpoints are shared between the client and the server to constitue the protocol.
 
-For this benchmark, each endpoints are tested to mesure the time they take to complete and to compare them using different parameters.
-
+For this benchmark, each endpoints are tested to mesure the time they take to complete and compare them using different parameters. 
+It is interesting to see Section \ref{sec:impl_function_def} to understand what operations are computed on each endpoints and to compare it with the benchmark result.
 
 \subsection{Standard configuration}
 KHAPE's default and most secure configuration is by using both OPRF and SlowHash. 
@@ -157,7 +165,10 @@ So for these benchmarks, the standard baseline configuration is KHAPE with OPRF 
 \pgfplotsset{width=\textwidth-1.1cm}
 \subsection*{Registration}
 
-For the registration, we can see that both \verb|server start| and \verb|client finish| endpoints take the most time at around 200 us. This is not surprising has it is where the key generation and ke
+For the registration, we can see that both \verb|server start| and \verb|client finish| endpoints take the most time at around 200 us.
+It is not surprising as it is where each party generate his own key pair, which take around 122 us.
+
+The \verb|server finish| endpoint take almost no time since it only build a storable structure with the value received.
 
 \begin{tikzpicture}
 \begin{axis}[
@@ -168,11 +179,12 @@ For the registration, we can see that both \verb|server start| and \verb|client 
     enlarge x limits={0.15, upper},
     legend style={at={(0.5,-0.2)},
     anchor=north,legend columns=-1},
-    xlabel={microseconde},
+    xlabel={microsecond},
     symbolic y coords={server finish, client finish, server start, client start},
     ytick=data,
     nodes near coords,
     nodes near coords align={horizontal},
+    title=Registration with standard configuration,
 ]
 \addplot coordinates {
     (0.15336,server finish)
@@ -186,6 +198,12 @@ For the registration, we can see that both \verb|server start| and \verb|client 
 
 \subsection*{Authentication}
 
+It is important to note that the endpoints for the registration and authentication are obviously different. For readability reason, it is not specified on the label of the charts but in the chart's title, which could make it looks like authentication and registration share the same function.
+
+We can see that \verb|client ke| endpoint take the most time. This is because a lot of things are computed in this endpoint including the generation of an ephemeral key pair (122 us) and the computation of the 3DH (184 us).
+
+We also notice that both \verb|client start| and \verb|server start| take about the same time than their homonym endpoints in registration. This is because these two functions are relatively similar between registration and authentication.
+
 \begin{tikzpicture}
 \begin{axis}[
     xbar,
@@ -195,11 +213,12 @@ For the registration, we can see that both \verb|server start| and \verb|client 
     enlarge x limits={0.15, upper},
     legend style={at={(0.5,-0.2)},
     anchor=north,legend columns=-1},
-    xlabel={microseconde},
+    xlabel={microsecond},
     symbolic y coords={client finish, server finish, client ke, server start, client start},
     ytick=data,
     nodes near coords,
     nodes near coords align={horizontal},
+    title=Authentication with standard configuration,
 ]
 \addplot coordinates {
     (0.086069,client finish)
@@ -219,7 +238,17 @@ For the registration, we can see that both \verb|server start| and \verb|client 
 \subsection{With OPRF vs without OPRF} % endpoints, overall. How does it change the performance of each endpoint and overall ?
 % 2 boite à moustache (en mode histogram), x = each endpoint, y = time. Comparison with the standard time (above)
 
+OPRF largely increase KHAPE security guarantees \ref{sec:design_choice_oprf} but it remains optional.
+
+If used, OPRF is computed for both registration and authentication.
+It requires to compute two hashes and three exponentiations (curve multiplication) for each run. The exponentiation are computed on the three first endpoints of registration and authentication.
+
+In this section, we compare the performance of KHAPE with and without OPRF to see how much it impact the overall performances of the protocol.
+
+
 \subsection*{Registration}
+
+Each OPRF concerned endpoints takes between 66 and 72 us more to compute when using OPRF. In total, the registration will take around 207 us more than without an OPRF.
 
 \begin{tikzpicture}
 \begin{axis}[
@@ -230,11 +259,12 @@ For the registration, we can see that both \verb|server start| and \verb|client 
     enlarge x limits={0.15, upper},
     legend pos=north east,
     legend cell align=left,
-    xlabel={microseconde},
+    xlabel={microsecond},
     symbolic y coords={server finish, client finish, server start, client start},
     ytick=data,
     nodes near coords,
     nodes near coords align={horizontal},
+    title=Registration with and without OPRF,
 ]
 \addplot coordinates {
     (0.15336,server finish)
@@ -255,6 +285,7 @@ For the registration, we can see that both \verb|server start| and \verb|client 
 
 
 \subsection*{Authentication}
+For the authentication, it is similar. The first three endpoints take between 67 and 69 us more to compute and the total time addition for the authentication is around 205 us more than without OPRF.
 
 \begin{tikzpicture}
 \begin{axis}[
@@ -265,11 +296,12 @@ For the registration, we can see that both \verb|server start| and \verb|client 
     enlarge x limits={0.15, upper},
     legend pos=north east,
     legend cell align=left,
-    xlabel={microseconde},
+    xlabel={microsecond},
     symbolic y coords={client finish, server finish, client ke, server start, client start},
     ytick=data,
     nodes near coords,
     nodes near coords align={horizontal},
+    title=Authentication with and without OPRF,
 ]
 \addplot coordinates {
     (0.086069,client finish)
@@ -304,11 +336,12 @@ For the registration, we can see that both \verb|server start| and \verb|client 
     enlarge x limits={0.15, upper},
     legend pos=north east,
     legend cell align=left,
-    xlabel={microseconde},
+    xlabel={microsecond},
     symbolic y coords={server finish, client finish, server start, client start},
     ytick=data,
     nodes near coords,
     nodes near coords align={horizontal},
+    title=Registration with and without SlowHash,
 ]
 \addplot coordinates {
     (0.16100,server finish)
@@ -339,11 +372,12 @@ For the registration, we can see that both \verb|server start| and \verb|client 
     enlarge x limits={0.15, upper},
     legend pos=north east,
     legend cell align=left,
-    xlabel={microseconde},
+    xlabel={microsecond},
     symbolic y coords={client finish, server finish, client ke, server start, client start},
     ytick=data,
     nodes near coords,
     nodes near coords align={horizontal},
+    title=Authentication with and without SlowHash,
 ]
 \addplot coordinates {
     (0.086840,client finish)
@@ -387,11 +421,12 @@ Note that the default ciphersuite for OPAQUE use Sha2 instead of Sha3 and Ristre
     enlarge x limits={0.15, upper},
     legend style={at={(0.5,-0.2)},
     anchor=north,legend columns=-1},
-    xlabel={microseconde},
+    xlabel={microsecond},
     symbolic y coords={server finish, client finish, server start, client start, server setup},
     ytick=data,
     nodes near coords,
     nodes near coords align={horizontal},
+    title=OPAQUE's registration with similar configuration than KHAPE,
 ]
 \addplot coordinates {
     (0.13187,server finish)
@@ -415,11 +450,12 @@ Note that the default ciphersuite for OPAQUE use Sha2 instead of Sha3 and Ristre
     enlarge x limits={0.15, upper},
     legend style={at={(0.5,-0.2)},
     anchor=north,legend columns=-1},
-    xlabel={microseconde},
+    xlabel={microsecond},
     symbolic y coords={server finish, client finish, server start, client start},
     ytick=data,
     nodes near coords,
     nodes near coords align={horizontal},
+    title=OPAQUE's authentication with similar configuration than KHAPE,
 ]
 \addplot coordinates {
     (2.2455,server finish)
@@ -452,11 +488,12 @@ Note that the default ciphersuite for OPAQUE use Sha2 instead of Sha3 and Ristre
         anchor=north
     },
     legend columns=3,
-    xlabel={microseconde},
+    xlabel={microsecond},
     symbolic y coords={KHAPE w/o OPRF, KHAPE w/ OPRF, OPAQUE},
     ytick=data,
 %     nodes near coords,
 %     nodes near coords align={vertical},
+    title=Comparison of registration's time consumption,
 ]
 \addplot coordinates { % server setup
     (114.80,OPAQUE) (0,KHAPE w/ OPRF) (0,KHAPE w/o OPRF)
@@ -491,11 +528,12 @@ Note that the default ciphersuite for OPAQUE use Sha2 instead of Sha3 and Ristre
         anchor=north
     },
     legend columns=3,
-    xlabel={microseconde},
+    xlabel={microsecond},
     symbolic y coords={KHAPE w/o OPRF, KHAPE w/ OPRF, OPAQUE},
     ytick=data,
 %     nodes near coords,
 %     nodes near coords align={vertical},
+    title=Comparison of authentication's time consumption,
 ]
 \addplot coordinates { % client start
     (125.40,OPAQUE) (67.308,KHAPE w/ OPRF) (0.039352,KHAPE w/o OPRF)
@@ -575,6 +613,7 @@ Ristretto255 with 512 bits hash, MAC and KDF
     ytick=data,
     nodes near coords,
 %     nodes near coords align={vertical},
+    title=Comparison of registration's message size,
 ]
 \addplot coordinates { % registration request
     (32,OPAQUE 512 bits) (33,OPAQUE 256 bits) (36,KHAPE w/ OPRF) (4,KHAPE w/o OPRF)
@@ -608,6 +647,7 @@ Ristretto255 with 512 bits hash, MAC and KDF
     ytick=data,
     nodes near coords,
 %     nodes near coords align={vertical},
+    title=Comparison of authentication's message size,
 ]
 \addplot coordinates { % KE1
     (96,OPAQUE 512 bits) (96,OPAQUE 256 bits) (36,KHAPE w/ OPRF) (4,KHAPE w/o OPRF)
