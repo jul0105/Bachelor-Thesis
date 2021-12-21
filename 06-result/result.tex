@@ -10,8 +10,8 @@ This chapter presents the performances obtained by the implemented KHAPE library
 
 \section{Testing environment}
 
-For computation benchmark, the rust library Criterion is used. It compute each endpoint 100 times
-Each endpoint is sampled 100 times and each sample linearly increase the number of iteration on the tested function.
+For computation benchmark, the rust library Criterion is used. It compute each benchmark 100 times.
+Each benchmark is sampled 100 times and each sample linearly increase the number of iteration on the tested function.
 The median is used for the charts.
 
 The benchmark are computed on a HP Elitebook 850 G5 laptop with an intel i7-8550U processor.\footnote{The laptop is plugged to the charging cable during all the benchmarks. This make a performance gain of around 40\% compared to when it runs on battery.} 
@@ -27,6 +27,8 @@ Before diving into the overall performances of KHAPE and its endpoints, it is im
 \subsection{3DH}
 
 The 3DH AKE is unsurprisingly the most time consuming operation to compute. Considering that a curve multiplication take around 58 us to compute and that 3DH --- as its name suggest --- compute 3 of them. Adding the cost of derivating 2 keys using HKDF, the median time of 3DH computation is around 184 us.
+
+% TODO HMQV
 
 Both client and server functions has around the same performances. This is not surprising because they compute the same operations with different party's key.
 
@@ -156,6 +158,8 @@ In KHAPE, both registration and authentication process have multiple endpoints -
 
 For this benchmark, each endpoints are tested to mesure the time they take to complete and compare them using different parameters. 
 It is interesting to see Section \ref{sec:impl_function_def} to understand what operations are computed on each endpoints and to compare it with the benchmark result.
+
+Note that only the time taken for each endpoints to complete is mesured. In a real world scenario, the resulting messages have to be transmitted between the client and the server. The network delay is not very interesting to benchmark as it depends too much on the network infrastructure between the client and the server. Instead, Section \ref{sec:comp_message_size} shows a comparison of message size between multiple configuration of KHAPE and OPAQUE.
 
 \subsection{Standard configuration}
 KHAPE's default and most secure configuration is by using both OPRF and SlowHash. 
@@ -324,6 +328,15 @@ For the authentication, it is similar. The first three endpoints take between 67
 \subsection{With SlowHash vs without SlowHash} % endpoints, overall. How does it change the performance of each endpoint and overall ?
 % 2 boite à moustache (en mode histogram), x = each endpoint, y = time. Comparison with the standard time (above)
 
+Using a memory-hard hashing function also increase the level of security of the protocol \ref{sec:design_choice_slowhash}.
+
+
+This benchmark is not very meaningful since these functions are designed to be slow and the performance only depends on the parameters used. But it is still interesting to see the performance degradation attached to the use of these functions and the scale of it compared to the rest of the protocol.
+
+It also make it easier to understand how these functions slow down attackers that build hashing table. Since we replace a simple and efficient hashing function that would not even take 0.5 us to compute by a slow and expansive hashing function that take around 8,000 us to compute. That make it 16,000 time slower to compute and so the attackers can compute 16,000 time less hashes in the same time frame.
+
+This benchmark is using the rust library Argon2's default parameters. The defaults parameters of the KHAPE library are more resource intensive and time consuming since we believe that final user can wait a little bit more than 8 ms to register/authenticate to a secure system.
+
 
 \subsection*{Registration}
 
@@ -403,14 +416,19 @@ For the authentication, it is similar. The first three endpoints take between 67
 
 \section{OPAQUE benchmark} % same as KHAPE endpoints. Shows default parameters and similar parameters as KHAPE
 
-Note that OPAQUE has only 4 functions for the authentication (where KHAPE needs 5) and for the registration, the server compute a server setup where he generate his key pair (in KHAPE, this is done in server start).
-Benchmark is computed with a ciphersuite that is close to the primitive used for KHAPE : RistrettoPoint for OPRF, MontgomeryPoint for KE, TripleDH, Sha3 for hashing.
-Note that the default ciphersuite for OPAQUE use Sha2 instead of Sha3 and RistrettoPoint for both OPRF and KE. Performance are relatively similar between the two ciphersuites.
+
+KHAPE and OPAQUE designs share lots of similarities. This make OPAQUE a perfect candidate for performances comparison. But before that, we need to understand the difference to be able to compare them fairly.
+
+
+Benchmark is computed with a ciphersuite that is close to the primitive used for KHAPE : ristretto255 curve for the OPRF group, montgomery cruve for the KE group, 3DH for the AKE and SHA3 for hashing.
+Note that the default ciphersuite for OPAQUE use SHA2 instead of SHA3 and ristretto255 curve for both OPRF group and KE group but the performance obtained between the two ciphersuites are relatively similar.
 
 \pgfplotsset{width=\textwidth-1.1cm}
 
 
 \subsection*{Registration}
+
+For the registration, OPAQUE has an additional endpoint \verb|server setup| that generate the server's key pair. In KHAPE, this operation is done in the \verb|server start| endpoint.
 
 \begin{tikzpicture}
 \begin{axis}[
@@ -440,6 +458,8 @@ Note that the default ciphersuite for OPAQUE use Sha2 instead of Sha3 and Ristre
 
 
 \subsection*{Authentication}
+
+For the authentication, OPAQUE has only four endpoints since the server initialize the key verification. The \verb|server start| endpoint is the most time consuming with a median time of around 369 us. It is responsible of generating an ephemeral key pair, compute the OPRF evaluation, computing the key exchange and derivating the output key and key verification tag. In KHAPE, all these operations are spread between \verb|server start| and \verb|server finish| endpoints.
 
 \begin{tikzpicture}
 \begin{axis}[
@@ -565,7 +585,11 @@ Note that the default ciphersuite for OPAQUE use Sha2 instead of Sha3 and Ristre
 % };
 
 
-\section{Message size}
+\section{Message size} \label{sec:comp_message_size}
+
+All the above benchmarks are only comparing the computational performance by mesuring the time consumption. In a real world scenario, network delay during the transmission of messages between the client and the server also has to be considered. Network delay not very meaningful because it depends too much on the network infrastructure between the two parties.
+
+Nevertheless, this section compare the message size and message number for multiple OPAQUE and KHAPE configurations.
 
 KHAPE not serialized
 OPAQUE value are taken from the tests vector outputs.
@@ -595,6 +619,8 @@ Ristretto255 with 512 bits hash, MAC and KDF
 
 
 \subsection*{Registration}
+
+KHAPE: smaller message but one more message (generally more costly with all the overheads)
 
 \begin{tikzpicture}
 \begin{axis}[
