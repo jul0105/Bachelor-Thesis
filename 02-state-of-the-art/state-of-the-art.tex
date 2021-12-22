@@ -374,6 +374,35 @@ He then uses these keys to run an authenticated key exchange with the server.
 On the other hand, if the password is wrong, the OPRF output is totally different and the ciphertext decryption makes the keys incorrect and the server will refuse it during the key exchange. % TODO confirmation
 
 
+\paragraph{\writingFormulationClean{Differences with the internet standard draft}} \label{sec:opaque_paper_vs_draft}
+OPAQUE's paper \cite{OPAQUE_Paper} and OPAQUE's internet standard draft \cite{OPAQUE_Standard_Draft} have some differences. The standard draft has evolved in the last 3 years and is now at version 7 (15th iteration).
+The draft standard is now much more detailed than before.
+
+
+One of the major difference in the core protocol design is the encryption of the client's private key.
+
+In the paper, it is specified that the client use an authenticated encryption scheme to encrypt and decrypt it's credentials --- i.e., client's private and public keys and the server's public key. The encryption key is the OPRF output.
+
+In the draft standard, it is rather different.
+Firstly the envelope does not contains the client's keys anymore. It only contains a nonce and an authentication tag. 
+The nonce is used --- with a derivation of the OPRF output --- to derive an authentication key, and export key and a seed.
+The authentication key is used to verify the envelope,'s authentication tag to ensure that the envelope content has not been modified.
+The export key is exposed to the client for application specific usage.
+The seed is used to derive the client's key pair.
+
+
+The envelope is not encrypted at rest anymore. It is only encrypted during transmission between the client and the server with a one-time pad encryption. The rest of the time, the envelope is stored in cleartext on the server.
+During registration, the client derive a masking key from the OPRF output and sends it to the server with the envelope. The server stores the envelope and the masking key.
+Then, at login, the server generate a masking nonce and derive a one-time pad key using masking key and masking nonce. He encrypt the envelope and his public key with the one-time pad key and sends the ciphertext with the masking nonce to the client.
+The client can compute the masking key with the OPRF output to compute the one-time pad key and decrypt the envelope.
+
+
+
+
+Note that the standard is still in a draft state and is susceptible to be modified.
+
+
+
 
 % ====================================================================================
 
