@@ -630,19 +630,20 @@ Even if it is the fastest in both registration and authentication, we believe th
 
 \section{Message size} \label{sec:comp_message_size}
 
-All the above benchmarks are only comparing the computational performance by mesuring the time consumption. In a real world scenario, network delay during the transmission of messages between the client and the server also has to be considered. Network delay not very meaningful because it depends too much on the network infrastructure between the two parties.
+All the above benchmarks are only comparing computational performances by mesuring the time consumption. In a real world scenario, network delay during transmissions of messages between the client and the server also has to be considered. Network delay benchmark is difficult to evaluate and not very meaningful because it depends too much on the network infrastructure between the two parties.
 
 Nevertheless, this section compare the message size and message number for multiple OPAQUE and KHAPE configurations.
 
-KHAPE not serialized
-OPAQUE value are taken from the tests vector outputs.
-
-To match the value of OPAQUE's tests vector, a uid of 4 bytes and a password of 25 bytes is inputted
 
 
-For OPAQUE, the output size depends on the primitive used (ciphersuite) but the big difference is on the choice of the hashing function output size (and so MAC and KDF). It is either 256 bits or 512 bits.
-P256\_XMD with 256 bits hash, MAC and KDF (!! size of everything is 32 bytes except for the size of public key which is 33 bytes)
-Ristretto255 with 512 bits hash, MAC and KDF
+OPAQUE results are taken from the standard draft tests vector and verified with the OPAQUE-KE library \cite{OPAQUE-KE}. In these tests vector, the user identifier is 4 bytes long. The same length will be used for KHAPE's uid. It is interesting to note that in OPAQUE, the uid is not transmitted with the protocol's messages. It is the responsibility of the application to handle it. In KHAPE, the uid is included with the protocol's messages and accessible to the application.
+
+For OPAQUE, the message size depends on the primitives used (ciphersuite). In particular, the choice of the hashing function, MAC and KDF has a considerable impact since they can produce output of different length depending on the primitive used.
+For the benchmark, we will use a ciphersuite with 256 bit output for hashing function, MAC and KDF because KHAPE also use this output size for these functions. A comparison is also made with a 512 bits output ciphersuite.
+
+
+Note that the 256 bits ciphersuite use a P256 curve where the points are represented on 33 bytes. The 512 bits ciphersuite use Ristretto255 which is represented on 32 bytes
+
 
 
 %                         registration\_request   registration\_response  registration\_upload    KE1         KE2         KE3         KE4
@@ -663,7 +664,31 @@ Ristretto255 with 512 bits hash, MAC and KDF
 
 \subsection*{Registration}
 
-KHAPE: smaller message but one more message (generally more costly with all the overheads)
+Firstly, comparing KHAPE with and without OPRF, we see that the two first message contains 32 more bytes with OPRF. This is simply the size of the representation of a curve point used for OPRF. This difference is exactly the same for the authentication.
+
+Comparing KHAPE and OPAQUE 256 bits ciphersuite, we notice that the last message is larger with OPAQUE.
+This is because OPAQUE encrypt the envelope before transmission with a one-time pad key.
+This key is derived from a static shared secret which is included in this registration upload message (see Section \ref{sec:opaque_paper_vs_draft}). The difference of size is due to this additional key sent with OPAQUE.
+
+
+Comparison between the two OPAQUE's ciphersuite, since there is two hashing function derived result
+Comparing the two OPAQUE's ciphersuites, we see that the first two messages contains curve point since the 256 bits ciphersuite represent curve points on 33 bytes instead of 32.
+The last message contains two hashes derived output. Their size is doubled with the 512 bits ciphersuite.
+
+%%% Registration upload : OK
+% OPAQUE:
+% - user's public key (group element size)
+% - envelope
+%   - inner envelope mode (boolean)
+%   - nonce (32)
+%   - hmac (hash output size)
+% - masking key used to mask the envelope (digest output size)
+% Total : 
+
+% KHAPE:
+% - uid (4)
+% - encrypted_envlope (2x 32)
+% - pub_a (32)
 
 \begin{tikzpicture}
 \begin{axis}[
@@ -676,7 +701,8 @@ KHAPE: smaller message but one more message (generally more costly with all the 
         at={(0.5,-0.35)},
         anchor=north
     },
-    legend columns=3,
+    legend columns=1,
+    legend cell align=left,
     xlabel={bytes},
     symbolic y coords={KHAPE w/o OPRF, KHAPE w/ OPRF, OPAQUE 256 bits, OPAQUE 512 bits},
     ytick=data,
@@ -697,7 +723,98 @@ KHAPE: smaller message but one more message (generally more costly with all the 
 \end{axis}
 \end{tikzpicture}
 
+
+
+
 \subsection*{Authentication}
+
+For the registration, we can see a relatively large difference between KHAPE and OPAQUE 256 bits ciphersuite in particularly in the second message.
+The first message already is about three times longer with OPAQUE. This is because in addition to sending the OPRF blinded element like KHAPE do, OPAQUE also send the client's ephemeral public key and a nonce. KHAPE sends the client's ephemeral public key in the third message.
+% TODO client nonce ?
+In contrary to the server nonce that is used as a context in key derivation, the client nonce has no use in the OPAQUE's internet standard draft.
+
+For the second message, both OPAQUE and KHAPE sends the encrypted envelope, the OPRF evaluation result and the server's ephemeral public key.
+Due to its different envelope encryption (see Section \ref{sec:opaque_paper_vs_draft}), OPAQUE also sends a masking nonce and a the server's public key (which is not included in the envelope in contrary to KHAPE).
+OPAQUE also sends a server nonce used in key derivation and the first verification tag.
+
+For the third message, OPAQUE sends the last verification tag where KHAPE only sends the first verification tag with the server ephemeral key.
+
+Only KHAPE sends a fifth message containing the last verification tag.
+Even though KHAPE's overall messages size is smaller, the fact that it has one more message 
+KHAPE's overall message size is smaller but it has one more message than OPAQUE. Having more message is generally more time consuming than having larger messages with all the overhead of a single message.
+
+Similar to the authentication, KHAPE without OPRF has 32 bytes less for the first two messages than KHAPE with OPRF.
+
+
+%%% KE1: OK
+% OPAQUE: (CredentialRequest)
+% - OPRF blinded_element (OPRF group element size)
+% - ke1_message
+%   - client_nonce (never used, maybe just there to obfusq the ke1 message ?, 32 bytes)
+%   - client ephemeral pk (KE group element size)
+
+% KHAPE:
+% - uid (4)
+% - oprf blind result (32)
+
+
+%%% KE2: OK
+% OPAQUE: (CredentialResponse)
+% - OPRF evaluation element (OPRF group element size)
+% - masking_nonce (32) "A nonce used for the confidentiality of the masked_response field."
+% - masked_response [Npk + Ne] "An encrypted form of the server's public key and the client's Envelope structure."
+%   - server public key (KE group element size)
+%   - envelope
+%     - nonce (32)
+%     - auth_tag (hash size)
+% - ke2_message
+%   - server_nonce (32)
+%   - server epehemeral pk (KE group element size)
+%   - mac (hash size) "authentication tag computed over the handshake"
+
+% KHAPE:
+% - encrypted envelope (2x 32)
+% - pub_y (32)
+% - oprf evaluation (32)
+
+
+%%% KE3: OK
+% OPAQUE:
+% - mac (hash size)
+
+% KHAPE:
+% - uid (4)
+% - client_verify_tag (32)
+% - pub_x (32)
+
+
+%%% KE4:
+% KHAPE:
+% - server_verify_tag (32)
+
+
+
+
+
+%% TODO OPAQUE's envelope
+% at register, client compute a masking_key derived from the randomized password like export_key, auth_key and seed but without the nonce
+% the client send the masking_key to the server that stores it
+
+% at login, masking_nonce is generated
+% record.masking_key is retrieved from storage
+% a ephemeral key is computed by HKDF expanding masking_key with masking_nonce
+% this ephemeral key is used to xor the [server_public_key and record.envelope] (encryption) the result is called masked_response
+% masking_nonce and the masked_response is sent to the client
+
+
+
+
+
+
+% what is record.envelope ? envelope contains a nonce and an auth_tag. The auth_tag protect the envelope and the nonce is used to compute auth_key and, export_key and the seed from which the client's private key is derived.
+
+% how client knows masking_key ? masking key is computed by the client at register (like auth_key, export_key and seed but without the nonce) and sent to the server. the server store the masking key
+
 
 \begin{tikzpicture}
 \begin{axis}[
@@ -710,7 +827,8 @@ KHAPE: smaller message but one more message (generally more costly with all the 
         at={(0.5,-0.35)},
         anchor=north
     },
-    legend columns=4,
+    legend columns=1,
+    legend cell align=left,
     xlabel={bytes},
     symbolic y coords={KHAPE w/o OPRF, KHAPE w/ OPRF, OPAQUE 256 bits, OPAQUE 512 bits},
     ytick=data,
@@ -719,7 +837,7 @@ KHAPE: smaller message but one more message (generally more costly with all the 
     title=Comparison of authentication's message size,
 ]
 \addplot coordinates { % KE1
-    (96,OPAQUE 512 bits) (96,OPAQUE 256 bits) (36,KHAPE w/ OPRF) (4,KHAPE w/o OPRF)
+    (96,OPAQUE 512 bits) (98,OPAQUE 256 bits) (36,KHAPE w/ OPRF) (4,KHAPE w/o OPRF)
 };
 \addplot coordinates { % KE2
     (329,OPAQUE 512 bits) (259,OPAQUE 256 bits) (128,KHAPE w/ OPRF) (96,KHAPE w/o OPRF)
@@ -730,7 +848,7 @@ KHAPE: smaller message but one more message (generally more costly with all the 
 \addplot coordinates { % KE4
     (0,OPAQUE 512 bits) (0,OPAQUE 256 bits) (32,KHAPE w/ OPRF) (32,KHAPE w/o OPRF)
 };
-\legend{KE1, KE2, KE3, KE4}
+\legend{Authentication request / KE1, Authentication response / KE2, Authentication verify request / KE3, Authentication verify response}
 \end{axis}
 \end{tikzpicture}
 
