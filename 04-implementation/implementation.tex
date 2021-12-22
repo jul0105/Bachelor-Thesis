@@ -81,12 +81,12 @@ client_output_key = client.auth_finish(auth_verify_response, ke_output)
     \item Build \verb|ClientState| with OPRF state
   \end{enumerate}
   
- \item \verb|register_finish(RegisterResponse, ClientState) -> RegisterFinish|
+ \item \verb|register_finish(RegisterResponse, ClientState) -> (RegisterFinish, ExportKey)|
   \begin{enumerate}
     \item Generate asymmetric key pair
     \item Compute OPRF output (optional)
     \item Compute slow hash (optional)
-    \item Derive encryption key
+    \item Derive encryption key and export key
     \item Encrypt envelope containing private key and server's public key
     \item Build \verb|RegisterFinish| with envelope ciphertext and own public key
   \end{enumerate}
@@ -101,12 +101,12 @@ client_output_key = client.auth_finish(auth_verify_response, ke_output)
   \end{enumerate}
   
  \item \verb|auth_ke(AuthResponse, ClientState) -> (AuthVerifyRequest,|\\
-       \verb| KeyExchangeOutput)|
+       \verb| KeyExchangeOutput, ExportKey)|
   \begin{enumerate}
     \item Generate ephemeral asymmetric key pair
     \item Compute OPRF output (optional)
     \item Compute slow hash (optional)
-    \item Derive encryption key
+    \item Derive encryption key and export key
     \item Decrypt envelope containing private key and server's public key
     \item Compute key exchange output
     \item Build \verb|AuthVerifyRequest| with uid, verify tag and ephemeral public key
