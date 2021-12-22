@@ -242,7 +242,7 @@ We also notice that both \verb|client start| and \verb|server start| take about 
 \subsection{With OPRF vs without OPRF} % endpoints, overall. How does it change the performance of each endpoint and overall ?
 % 2 boite à moustache (en mode histogram), x = each endpoint, y = time. Comparison with the standard time (above)
 
-OPRF largely increase KHAPE security guarantees \ref{sec:design_choice_oprf} but it remains optional.
+OPRF largely increase KHAPE security guarantees (see Section \ref{sec:design_choice_oprf}) but it remains optional.
 
 If used, OPRF is computed for both registration and authentication.
 It requires to compute two hashes and three exponentiations (curve multiplication) for each run. The exponentiation are computed on the three first endpoints of registration and authentication.
@@ -491,11 +491,38 @@ For the authentication, OPAQUE has only four endpoints since the server initiali
 % 2 histogram, one for auth overall, one for register overall, x = OPAQUE(default) OPAQUE(same params) KHAPE(IC OPRF) KHAPE(IC noOPRF) KHAPE(AES OPRF) KHAPE(AES noOPRF), y = time. Each histogram bar is separated in another color to show each endpoint proportion
 % highlight the 2 bar where OPAQUE and KHAPE have the same params, put the rest aside (just for info)
 
+In this section, we compare the performances of the KHAPE protocol --- with and without OPRF --- with the performances of the OPAQUE protocol.
+
+
 \pgfplotsset{width=\textwidth-2.4cm}
 
 
 \subsection*{Registration}
 
+Firstly, we will compare OPAQUE and KHAPE with OPRF.
+For the registration, KHAPE with OPRF lose around 81 us to OPAQUE in median.
+The \verb|client start| endpoint takes about the same time. KHAPE's \verb|server start| operations are splitted between \verb|server setup| and \verb|server start| for OPAQUE which make it more flexible since it can be called before a request comes. In details, it is the random key pair generation that is computed in the \verb|server setup| endpoint. The two endpoints combined take about the same time as KHAPE's \verb|server start| endpoint.
+
+Majority of khape time lose is on the \verb|client finish| endpoint.
+This is probable due to the fact that KHAPE generate a key pair using the rejection method and then encrypt the private key and server's public key in a encrypted envelope.
+We saw earlier that encryption is not very time consuming (7.7 us) but key generation is (122 us).
+
+OPAQUE neither generate a key pair, nor use the rejection method nor encrypt the envelope.
+Instead of using the OPRF output to derive an encryption key to decrypt the encrypted private key, OPAQUE directly derive the private key (and the resulting public key) from the OPRF output. This solution allow OPAQUE to get rid of encryption altogether and to avoid to compute a random key generation which makes it much faster.
+
+Also note that this method is only for the client-side. The server still need to generate a random key pair which is done in the \verb|server setup| endpoint. This is why we cannot see a similar performance gain in the server-side registration and that the three first endpoints are relatively similar in term of time consumption.
+
+
+Finally, KHAPE without OPRF is around 207 us faster than KHAPE with OPRF --- the equivalent of about three exponentiations --- and 126 us faster than OPAQUE which makes it the fastest protocol.
+
+
+% OPAQUE         : 378.42 us
+% KHAPE w/ OPRF  : 459.21 us
+% KHAPE w/o OPRF : 252.31 us
+
+% KHAPE w/ - OPAQUE    : 80.79
+% OPAQUE - KHAPE w/o   : 126.11
+% KHAPE w/ - KHAPE w/o : 206.9
 \begin{tikzpicture}
 \begin{axis}[
     xbar stacked,
@@ -534,8 +561,24 @@ For the authentication, OPAQUE has only four endpoints since the server initiali
 \end{axis}
 \end{tikzpicture}
 
+
+
 \subsection*{Authentication}
 
+For the authentication, OPAQUE and KHAPE with OPRF have rather different endpoints performances but the overall performance of each protocol is almost equal with a difference of around 7 us.
+This is because a lot of similar operations are computed on both protocol but they are executed in different endpoints.
+
+Similar to the registration, KHAPE without OPRF is the fastest protocol. It is faster by 197 us on OPAQUE and by 205 us on KHAPE with OPRF.
+Even if it is the fastest in both registration and authentication, we believe that the security sacrifice is not worth the performance gain and therefore we recommend using OPAQUE or KHAPE with OPRF which are secure against pre-computation attacks (see Section \ref{sec:design_choice_oprf}).
+
+
+% OPAQUE         : 821.32 us
+% KHAPE w/ OPRF  : 830.01 us
+% KHAPE w/o OPRF : 624.5 us
+
+% KHAPE w/ - OPAQUE    : 8.69
+% OPAQUE - KHAPE w/o   : 196.82
+% KHAPE w/ - KHAPE w/o : 205.51
 \begin{tikzpicture}
 \begin{axis}[
     xbar stacked,
