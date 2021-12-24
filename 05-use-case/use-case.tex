@@ -1,17 +1,26 @@
 ﻿\documentclass[../report.tex]{subfiles}
 \begin{document}
-\chapter{\writingNotes{Use case}} \label{cha:use_case}
-This chapter shows a practical use case of using the newly implemented KHAPE library and the demonstrate the security benefits.
+
+
+\chapter{\writingOK{Use case}} \label{cha:use_case}
+This chapter shows a practical use case of using the newly implemented KHAPE library and demonstrate the security benefits.
+
+
 \section{Context}
+
+This section details use cases where using an aPAKE provide advantages over a classical authentication method.
+
 \subsection{Online password manager}
 Online password managers are among the most sensitive applications out there because the leakage of users’ data cascades into numerous compromised accounts on other services such as email accounts, social media, online banking.
 Using an asymmetric PAKE for an online password manager makes a lot of sense because the client does not have to disclose its master password to the password manager host. In other words, the client does not have to trust the password manager host not to decrypt its personal data or leak the master password (or any other intentional or unintentional miss-handling).
 In fact, multiple well-known online password manager such as iCloud Key Vault or 1Password uses an aPAKE (SRP).
+
+
 \subsection{Other use cases}
-More generally, using an aPAKE makes a lot of sense on applications where the server-side stored user data should not be visible to the server.  This is the case for applications where the server does not process the user's data. For example online backup, secure vault, password managers, etc. This is achieved with encryption and so require an encryption key for the client.
+More generally, using an aPAKE makes a lot of sense on applications where the server-side stored user data should not be visible to the server.  This is the case for applications where the server does not process the user's data. For example, online backup, secure vault, password managers, etc. This is achieved with encryption and so require an encryption key for the client.
 Depending on the client, it is not feasible to store an additional symmetric key because it has to be securely stored --- e.g., with an HSM --- which cause problems of portability and key recovery. For example, for an online encrypted backup of a laptop or a smartphone, if the user loses its device, he cannot retrieve his online backup because the encryption key is stored on its lost device.
-For portability, the encryption key is typically derived from the user's password --- the same password that he uses to authenticate with the server (you could require that the user input two different passwords but this is generally avoided because of bad user experience). Using a classical authentication method, the server store the user's encrypted sensitive data AND also process the password in cleartext which is used to compute the encryption key. This void all the security of encrypting the sensitive data in the first place because the server --- or a malicious party who compromised the server --- could store the cleartext password, compute the encryption key and decrypt the sensitive user's data.
-This is the reason why aPAKEs are very interesting in this case scenario. The server NEVER see the user's password, so he cannot use it to decrypt user’s data.
+For portability, the encryption key is typically derived from the user's password --- the same password that he uses to authenticate with the server (you could require that the user input two different passwords but this is generally avoided because of bad user experience). Using a classical authentication method, the server store the user's encrypted sensitive data and also process the password in cleartext which is used to compute the encryption key. This void all the security of encrypting the sensitive data in the first place because the server --- or a malicious party who compromised the server --- could store the cleartext password, compute the encryption key and decrypt the sensitive user's data.
+This is the reason why aPAKEs are very interesting in this case scenario. The server \textbf{never} see the user's password, so he cannot use it to decrypt user’s data.
 
 
 
@@ -46,22 +55,24 @@ This is the reason why aPAKEs are very interesting in this case scenario. The se
 % server endpoints
 % client action (interaction)
 % limitation / considerations
+
 \section{Design}
 This section describes the design of the use case: a multi-user online password manager.
 The basic concept is that the server stores the encrypted user's data. 
 Each client can only access his personal encrypted data from the server.
+
 KHAPE is used for authentication between the client and the server. OPRF and SlowHash parameters are enabled to provide the highest level of security.
 
 
 % The end user interact with a client which in turn communicate with the server.
 
 \subsection{Encrypted user data}
-Each user stores his encrypted user data on the server. This data include an Encrypted password registry and an Encrypted master key.
+Each user stores his encrypted user data on the server. This data include an Encrypted password registry and an Encrypted master key. Every encryption is computed by the authenticated encryption scheme XChaCha20-Poly1305.
 
 The Encrypted password registry is a structure that contains the user's password. Passwords are double encrypted. The external structure --- the password registry --- is encrypted and then each individual password is also encrypted. Each encryption is performed with a different key, all derived from the master key.
+
 The Encrypted master key is simply a key --- the Master key --- that is encrypted with another key --- the KHAPE's export key. 
 One could derive the Master key from the KHAPE's export key but this means that if the user wants to change his authentication password, it is necessary to decrypt and re-encrypt every single password entry and the password registry with the new export key. This is not conceivable for a scalable password manager. Instead, in case of change in the authentication password, only the Master key is re-encrypted with the new export key. This idea is inspired from Bitwarden's online password manager design \cite{bitwarden}.
-Every encryption is computed by the authenticated encryption scheme XChaCha20-Poly1305.
 
 % ProtectedRegistry:
 % - ciphertext
@@ -121,6 +132,7 @@ The server has only four endpoints:
  \item File upload
 \end{itemize}
 Registration and authentication are handled by KHAPE's protocol (see Section \ref{sec:khape_generic_algo}). Upon successful authentication, the client can use the outputted session key as an authentication token. He sends his session token with every request to prove to the server that he is authenticated. The session token expires after 24 hours.
+
 File download and file upload allow the user to retrieve and commit his protected data from the server. The interactions between the client and the server are defined in the figure \ref{fig:usecase_download} for the file download endpoint and in the figure \ref{fig:usecase_upload} for the file upload endpoint.
 
 
@@ -147,6 +159,7 @@ File download and file upload allow the user to retrieve and commit his protecte
 The end user interacts with the client to access its passwords.
 At client start, the user can either register or login.
 After a successful registration, he still needs to login.
+
 Upon successful authentication, the client automatically download the user's data file and the user can select one of the following actions :
 \begin{itemize}
  \item Read a password
@@ -195,14 +208,19 @@ The interactions between the user and the client are defined in the figure \ref{
  \caption{Interaction between the user and the client for deleting a password entry.}
  \label{fig:usecase_delete}
 \end{figure}
+
+
 \subsection{Advantages of KHAPE}
 Using KHAPE for the authentication has two main advantages.
 Firstly, and most importantly, it allows to authenticate the client to the server with a password without the password being ever visible to the server. As specified in the context section \ref{sec:usecase_context}, it is especially important for an application where the sensitive data is encrypted with a key that is also derived from the password.
+
 Secondly, the utilization of the export key for the password registry decryption, make it more secure and more efficient.
 More secure because computing an OPRF is more secure than just deriving a key in local since it forces the client to interact with the server. Only the server knows the secret salt used to compute the OPRF output. 
 This mean that an attacker would be forced to compute online password guesses making it easier to mitigate by the server.
+
 More efficient because KHAPE already compute an OPRF and a SlowHash for the authentication and derive multiple keys from the output --- including the export key.
 If the export key was not provided to the application, the client would be forced to compute another SlowHash function on the password to derive a master key. This would drastically impact the performances of the application.
+
 
 \subsection{Security considerations}
 It is important to consider that even though each password is double encrypted, it is still possible to an attacker to retrieve all passwords. Since both the Indexable password registry and the Internal encryption key are kept in memory at rest, an attacker could dump the client's memory and derive every Individual password key to decrypt all passwords.
@@ -236,9 +254,11 @@ Mitigation to this would be to add a secret value to the Individual password key
 
 The online password manager has been developed \footnote{Implementation can be found here : https://github.com/jul0105/OnlinePasswordManager} in Rust. It is a functional proof of concept that demonstrates the usefulness of KHAPE for such applications.
 The implementation is based on an existing online password manager project that was developed earlier this year by Gil Balsiger and me.
+
 Currently, the client is a CLI (command line interface). It is planned to be adapted
 The server uses an SQLite database to store user information. Each user's encrypted data structure is stored on the server in a separated file. 
 The network between the client and the server is simulated meaning that the client simply call server’s function instead of sending an actual TCP or HTTP request.
+
 In the future, it is planned to adapt this prototype to be usable in practice. This will be done by implementing the network part. The client will also be adapted to compile the rust code in WebAssembly. The final goal is to build a client for web browsers.
 
 \end{document}
