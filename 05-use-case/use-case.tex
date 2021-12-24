@@ -224,7 +224,7 @@ If the export key was not provided to the application, the client would be force
 
 \subsection{Security considerations}
 It is important to consider that even though each password is double encrypted, it is still possible to an attacker to retrieve all passwords. Since both the Indexable password registry and the Internal encryption key are kept in memory at rest, an attacker could dump the client's memory and derive every Individual password key to decrypt all passwords.
-Mitigation to this would be to add a secret value to the Individual password key derivation. This secret value would be stored outside of the memory in a secure location such as an HSM or an Ubikey. This way, even if an attacker can dump the client's memory, he cannot derive any Individual password key and so he cannot retrieve any cleartext password. 
+Mitigation to this would be to add a secret value to the Individual password key derivation. This secret value would be stored outside of the memory in a secure location such as an HSM or a YubiKey. This way, even if an attacker can dump the client's memory, he cannot derive any Individual password key and so he cannot retrieve any cleartext password. 
 
 % \section{Implementation}
 % At the moment, the implemented client is a CLI (command line interface)
