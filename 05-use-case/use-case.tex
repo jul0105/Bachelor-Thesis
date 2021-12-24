@@ -72,7 +72,7 @@ Each user stores his encrypted user data on the server. This data include an Enc
 The Encrypted password registry is a structure that contains the user's password. Passwords are double encrypted. The external structure --- the password registry --- is encrypted and then each individual password is also encrypted. Each encryption is performed with a different key, all derived from the master key.
 
 The Encrypted master key is simply a key --- the Master key --- that is encrypted with another key --- the KHAPE's export key. 
-One could derive the Master key from the KHAPE's export key but this means that if the user wants to change his authentication password, it is necessary to decrypt and re-encrypt every single password entry and the password registry with the new export key. This is not conceivable for a scalable password manager. Instead, in case of change in the authentication password, only the Master key is re-encrypted with the new export key. This idea is inspired from Bitwarden's online password manager design \cite{bitwarden}.
+One could derive the Master key from the KHAPE's export key but this means that if the user wants to change his authentication password, it is necessary to decrypt and re-encrypt every single password entry and the password registry with the new export key. This is not conceivable for a scalable password manager. Instead, in case of change in the authentication password, only the Master key is re-encrypted with the new export key. This idea is inspired from Bitwarden's online password manager design \cite{Bitwarden_Paper}.
 
 % ProtectedRegistry:
 % - ciphertext

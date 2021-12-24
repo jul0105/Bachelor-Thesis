@@ -280,7 +280,7 @@ As its name may suggest, the ideal cipher model is an idealised model used to pr
 % Implementation (not implementable, but indstinguishable from IC)
 In practice, an ideal cipher is not implementable % Pourquoi ?
 but it's possible to construct an encryption scheme that is indifferentiable from an ideal cipher. Multiple constructions have been investigated in the literature.
-The simplest construction is the one detailed in \cite{https://arxiv.org/pdf/1011.1264.pdf} which is an update from \cite{https://eprint.iacr.org/2008/246.pdf} that got broken.
+The simplest construction is the one detailed in \cite{Ideal_Cipher_2} which is an update from \cite{Ideal_Cipher_1} that got broken.
 The encryption scheme consist of 14 rounds of Feistel where function $F_i = H(key | i | input)$ \footnote{Thanks to Prof. Alexandre Duc for providing this construction}.
 
 The hashing function must be large enough to receive half of the encryption envelope. Since this envelope store two group element, the hashing function must output 256 bits which is the size of a single group element.
@@ -297,7 +297,7 @@ The cleartext group elements that will be encrypted need to be encoded as a bits
 
 % implementation (elligator)
 This is done by implementing a quasi bijection from field elements to bitstrings.
-Elligator-squared and Elligator2 are implementation for such curve point encoding.
+Elligator-squared \cite{Elligator_Squared_Paper} and Elligator2 \cite{Elligator2_Paper} are implementation for such curve point encoding.
 Both these constructions are suitable for the implementation of KHAPE but since the elliptic curve used is Curve25519, it is suitable for Elligator2.
 
 \paragraph{Authentication.}
@@ -337,7 +337,7 @@ In KHAPE, the OPRF is optional --- in contrary to OPAQUE --- but allow to make i
 This is a major improvement in term of security and therefore an OPRF should be used.
 
 OPRF operations also need their own group and hashing function.
-There is also an ongoing standard draft protocol for OPRF \cite{https://datatracker.ietf.org/doc/draft-irtf-cfrg-voprf/} that present multiple ciphersuites for OPRF and different variants.
+There is also an ongoing standard draft protocol for OPRF \cite{VOPRF_Standard_Draft} that present multiple ciphersuites for OPRF and different variants.
 The OPRF used for the KHAPE implementation is based on this standard draft using the ristretto255-SHA-512 ciphersuite and the standard non-verifiable variant. % Why ?
 
 
@@ -361,7 +361,7 @@ For OPAQUE, \cite{OPAQUE_Standard_Draft} propose to implement this function on t
 This section describe the process of derivating keys from existing secrets. The design is heavily inspired by OPAQUE's standard draft \cite{OPAQUE_Standard_Draft} since the context is similar.
 
 
-The primitive used to derive the encryption key, the export key, the output key and the key verification tags is HKDF \cite{HKDF_RFC}. It is well suited for expanding key from existing secret and is already used in OPAQUE rust's implementation \cite{OPAQUE-KE}. It follows the ``Extract-then-Expand'' paradigm where these two functions are used with the following API :
+The primitive used to derive the encryption key, the export key, the output key and the key verification tags is HKDF \cite{HKDF_RFC}. It is well suited for expanding key from existing secret and is already used in OPAQUE rust's implementation \cite{OPAQUE_KE_lib}. It follows the ``Extract-then-Expand'' paradigm where these two functions are used with the following API :
 
 \begin{itemize}
  \item Extract($salt$, $ikm$): Extract a fixed length pseudorandom key $prk$ with high entropy from the input keying material $ikm$ and the optional $salt$

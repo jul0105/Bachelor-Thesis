@@ -2,7 +2,7 @@
 \begin{document}
 \usepgfplotslibrary{statistics}
 \chapter{Results} % Performance comparison for the KHAPE library (not the password manager use case).
-This chapter presents the performances obtained by the implemented KHAPE library using different parameters and analyzing the performance of some of the components. A performance comparison with the OPAQUE rust implementation \cite{opaque-ke} is made. The password manager use case is not in the scope of the test.
+This chapter presents the performances obtained by the implemented KHAPE library using different parameters and analyzing the performance of some of the components. A performance comparison with the OPAQUE rust implementation \cite{OPAQUE_KE_lib} is made. The password manager use case is not in the scope of the test.
 
 
 \section{Testing environment}
@@ -597,7 +597,7 @@ Even if it is the fastest in both registration and authentication, we believe th
 \section{Message size} \label{sec:comp_message_size}
 All the above benchmarks are only comparing computational performances by measuring the time consumption. In a real-world scenario, network delay during transmissions of messages between the client and the server also has to be considered. Network delay benchmark is difficult to evaluate and not very meaningful because it depends too much on the network infrastructure between the two parties.
 Nevertheless, this section compares the message size and message number for multiple OPAQUE and KHAPE configurations.
-OPAQUE results are taken from the standard draft test vector and verified with the OPAQUE rust library \cite{OPAQUE-KE}. In these tests vector, the user identifier is 4 bytes long. The same length will be used for KHAPE's user id. It is interesting to note that in OPAQUE, the user id is not transmitted with the protocol's messages. It is the responsibility of the application to handle it. In KHAPE, the user id is included with the protocol's messages and accessible to the application.
+OPAQUE results are taken from the standard draft test vector and verified with the OPAQUE rust library \cite{OPAQUE_KE_lib}. In these tests vector, the user identifier is 4 bytes long. The same length will be used for KHAPE's user id. It is interesting to note that in OPAQUE, the user id is not transmitted with the protocol's messages. It is the responsibility of the application to handle it. In KHAPE, the user id is included with the protocol's messages and accessible to the application.
 
 For OPAQUE, the message size depends on the primitives used (cipher suite). In particular, the choice of the hashing function, MAC and KDF has a considerable impact since they can produce output of different length depending on the primitive used.
 For the benchmark, we will use a cipher suite with 256-bit output for hashing function, MAC and KDF because KHAPE also use this output size for these functions. A comparison is also made with a 512-bit output cipher suite.

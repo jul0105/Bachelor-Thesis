@@ -73,7 +73,7 @@
 }
 
 @article{SRP_6_Paper,
-  title={Srp-6: Improvements and refinements to the secure remote password protocol},
+  title={{SRP}-6: Improvements and refinements to the secure remote password protocol},
   author={Wu, Thomas},
   journal={http://srp.stanford.edu/srp6.ps},
   year={2002}
@@ -248,14 +248,17 @@
 
 
 
-@book{OPAQUE_Standard_Draft,
-    author      = {Krawczyk, Hugo and Bourdrez, D. and Lewi, K. and Wood, C.A.},
-    year        = {2021},
-    title       = {The OPAQUE Asymmetric PAKE Protocol},
-    address     = {Fremont, California, USA},
-    edition     = {{draft-irtf-cfrg-opaque-07}},
-    publisher   = {Internet Engineering Task Force},
-    url         = {https://datatracker.ietf.org/doc/draft-irtf-cfrg-opaque/07/},
+@techreport{OPAQUE_Standard_Draft,
+	number =	{draft-irtf-cfrg-opaque-07},
+	type =		{Internet-Draft},
+	institution =	{Internet Engineering Task Force},
+	publisher =	{Internet Engineering Task Force},
+	note =		{Work in Progress},
+	url =		{https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-opaque-07},
+        author =	{Daniel Bourdrez and Dr. Hugo Krawczyk and Kevin Lewi and Christopher A. Wood},
+	title =		{{The OPAQUE Asymmetric PAKE Protocol}},
+	pagetotal =	62,
+	year =		2021,
 }
 
 
@@ -265,6 +268,7 @@
   title = {Let’s talk about {PAKE}},
   year = 2018,
   url = {https://blog.cryptographyengineering.com/2018/10/19/lets-talk-about-pake/},
+  howpublished = {\url{https://blog.cryptographyengineering.com/2018/10/19/lets-talk-about-pake/}},
   urldate = {2021-09-25}
 }
 
@@ -273,6 +277,7 @@
   title = {Should you use {SRP} ?},
   year = 2018,
   url = {https://blog.cryptographyengineering.com/should-you-use-srp/},
+  howpublished = {\url{https://blog.cryptographyengineering.com/should-you-use-srp/}},
   urldate = {2021-09-25}
 }
 
@@ -281,6 +286,7 @@
   title = {Developers: How we use SRP, and you can too},
   year = 2018,
   url = {https://blog.1password.com/developers-how-we-use-srp-and-you-can-too/},
+  howpublished = {\url{https://blog.1password.com/developers-how-we-use-srp-and-you-can-too/}},
   urldate = {2021-11-09}
 }
 
@@ -290,6 +296,7 @@
 your Device},
   year = 2020,
   url = {https://blog.cloudflare.com/opaque-oblivious-passwords/},
+  howpublished = {\url{https://blog.cloudflare.com/opaque-oblivious-passwords/}},
   urldate = {2021-09-25},
   organization = {cloudflare}
 }
@@ -305,3 +312,91 @@ your Device},
   Title = {Cryptographie Avancée Appliquée [Advanced Applied Cryptography]},
   Note = {University Lecture at HEIG-VD -- Haute École d'Ingénierie et de Gestion du Canton de Vaud}
 }
+
+
+
+@misc{OPAQUE_KE_lib,
+  author = {Kevin Lewi and François Garillot},
+  title = {{OPAQUE-KE} rust library},
+  year = {2021},
+  publisher = {GitHub},
+  journal = {GitHub repository},
+  howpublished = {\url{https://github.com/novifinancial/opaque-ke}},
+  commit = {d59d0b775b2aa139331318563c33918876e157f5}
+}
+
+@online{Bitwarden_Paper,
+  title = {{Bitwarden} security white paper},
+  year = 2020,
+  url = {https://bitwarden.com/images/resources/security-white-paper-download.pdf},
+  howpublished = {\url{https://bitwarden.com/images/resources/security-white-paper-download.pdf}},
+  urldate = {2021-12-24},
+  organization = {Bitwarden}
+}
+
+
+
+@techreport{VOPRF_Standard_Draft,
+	number =	{draft-irtf-cfrg-voprf-08},
+	type =		{Internet-Draft},
+	institution =	{Internet Engineering Task Force},
+	publisher =	{Internet Engineering Task Force},
+	note =		{Work in Progress},
+	url =		{https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-voprf-08},
+        author =	{Alex Davidson and Armando Faz-Hernández and Nick Sullivan and Christopher A. Wood},
+	title =		{{Oblivious Pseudorandom Functions (OPRFs) using Prime-Order Groups}},
+	pagetotal =	51,
+	year =		2021,
+}
+
+
+@inproceedings{Ideal_Cipher_2,
+  author    = {Thomas Holenstein and
+               Robin K{\"{u}}nzler and
+               Stefano Tessaro},
+  title     = {The equivalence of the random oracle model and the ideal cipher model,
+               revisited},
+  booktitle = {{STOC}},
+  pages     = {89--98},
+  publisher = {{ACM}},
+  year      = {2011}
+}
+
+@inproceedings{Ideal_Cipher_1,
+  author    = {Jean{-}S{\'{e}}bastien Coron and
+               Jacques Patarin and
+               Yannick Seurin},
+  title     = {The Random Oracle Model and the Ideal Cipher Model Are Equivalent},
+  booktitle = {{CRYPTO}},
+  series    = {Lecture Notes in Computer Science},
+  volume    = {5157},
+  pages     = {1--20},
+  publisher = {Springer},
+  year      = {2008}
+}
+
+@inproceedings{Elligator_Squared_Paper,
+  author    = {Mehdi Tibouchi},
+  title     = {Elligator Squared: Uniform Points on Elliptic Curves of Prime Order
+               as Uniform Random Strings},
+  booktitle = {Financial Cryptography},
+  series    = {Lecture Notes in Computer Science},
+  volume    = {8437},
+  pages     = {139--156},
+  publisher = {Springer},
+  year      = {2014}
+}
+
+@inproceedings{Elligator2_Paper,
+  author    = {Daniel J. Bernstein and
+               Mike Hamburg and
+               Anna Krasnova and
+               Tanja Lange},
+  title     = {Elligator: elliptic-curve points indistinguishable from uniform random
+               strings},
+  booktitle = {{CCS}},
+  pages     = {967--980},
+  publisher = {{ACM}},
+  year      = {2013}
+}
+
