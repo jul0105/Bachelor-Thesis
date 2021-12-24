@@ -11,7 +11,7 @@
 
 \chapter{\writingNotes{Introduction}}
 
-This chapter describe the context of this project. We discuss about classical authentication method, their weakness and the necessity to use stronger construction such as PAKE.
+This chapter describe the context of this project. We discuss about classical authentication method, their weakness and the necessity to use stronger construction such as PAKEs.
 
 
 % Order:
@@ -32,31 +32,29 @@ This chapter describe the context of this project. We discuss about classical au
 % 9. OPAQUE
 % 10. KHAPE ?
 
+
 \section{\writingNotes{Problematic}}
 % \subsection{\writingFormulationBrut{Authentication}}
 
 \paragraph{\writingFormulationClean{How to authenticate a user ?}}
 
-When a user want to connect itself to a online service, he send its username or email for identification. Then, he needs a way to prove to the server that he is indeed the person he pretends to be. This is what we call authentication. Without it, anybody can impersonate the account of someone else.
-
+When a user want to connect itself to a online service, he sends its username or email for identification. Then, he needs a way to prove to the server that he is indeed the person he pretends to be. This is what we call authentication. Without it, anybody can impersonate the account of someone else.
 Authentication can be based on multiple factors. Something that the user \emph{knows} (e.g. passwords, PINs, ...), something that the user \emph{has} (e.g. digital certificates, OTP token devices, smartphones, ...) or something that the user \emph{is} (e.g. fingerprints, iris, ...). Multiple factors can be combined to obtain a strong authentication.
 
-Traditionally, the user send the authentication value to the server through a secure channel --- generally TLS --- to avoid eavesdropping and then the server compare the value that he received to the value that he stored for the specific user.
+Traditionally, the user send the authentication value to the server through a secure channel --- generally TLS --- to avoid eavesdropping and then the server compare the value that he received to the value that he stored for this specific user.
 This means that the server has to knows and store this sensible value before authentication --- generally during register.
-
-Currently on the vast majority of websites and softwares, passwords are used as the authentication value. They are the easier to implement and the most familiar to the users.
+Currently, the vast majority of websites and softwares use passwords as the authentication value. They are the easier to implement and the most familiar to the users.
 
 
 
 \paragraph{\writingFormulationClean{Attacks and mitigations.}}
 This setup is not ideal and can lead to multiple attacks.
-In case where the server get compromised, the attacker immediately obtain access to all passwords since the server store the passwords. This means that the adversary can impersonate every user.
-
+In case where the server get compromised, the attacker immediately obtain access to all accounts since the server store the passwords. This means that the adversary can impersonate every user.
 To avoid this scenario, numerous techniques have been developed.
-Mainly, adding salt, adding pepper --- a secret salt --- and using memory-hard password hashing function such as Scrypt \cite{Scrypt_Paper} or Argon2 \cite{Argon2_Paper}.
+Mainly, hashing the password and storing the result, adding hashing salt, adding hashing pepper --- a secret salt --- and using memory-hard password hashing function such as Scrypt \cite{Scrypt_Paper} or Argon2 \cite{Argon2_Paper}.
 
 
-These techniques improve the security of storing password but they doesn't address the deeper problem;
+These techniques improve the security of storing password but they do not address the deeper problem;
 When the user wants to login, he has to send its \emph{cleartext} password to the server in order for the server to authenticate the user. This necessity void any password storing improvement if the server is ever persistently compromised or if passwords are accidentally logged or cached.
 
 
@@ -65,28 +63,26 @@ Passwords are a problem. They are hard to remember and to manage for the user. T
 The problem is that ``a password that leaves your possession is guaranteed to sacrifice security, no matter its complexity or how hard it may be to guess. Passwords are insecure by their very existence'' \cite{PAKE_Cloudflare_blog}. % cite
 Now-a-day, a majority of passwords use require that the password is sent in cleartext.
 
-Even if the channel between the client and the server is appropriately secured, generally with TLS (PKI attack, cert miss-configuration, etc.), % TODO
-and even if on the server-side every secure password storing techniques are implemented, the password still has to be processed in cleartext.
-As stated before, there can be some software issue like accidental logging or caching of the password. But hardware vulnerabilities are not to forgot. While the password is processed in clear, it reside on the memory. It use a shared bus between the CPU and the memory. Hardware attacks are less likely to occur but are no less severe (remember Spectre and Meltdown). % TODO cite
+Even if the channel between the client and the server is appropriately secured
+--- generally with TLS which can be vulnerable to PKI attack, cert miss-configuration, etc. ---
+and even if on the server-side every password storing techniques are carefully implemented, the password still has to be processed in cleartext.
+As stated before, there can be some software issue like accidental logging or caching of the password. But hardware vulnerabilities are not to forgot. While the password is processed in clear, it reside on the memory. It use a shared bus between the CPU and the memory. Hardware attacks are less likely to occur but are no less severe (remember Spectre \cite{Spectre_Paper} and Meltdown \cite{Meltdown_Paper} attacks).
 
 In a ideal world, the server should never see the user's password in cleartext at all.
-
+One could think that hashing the password on the client side would solve the problem but if the server ever gets compromised, every account is immediately accessible to the attacker. The client hash should be be hashed again on the server but this does not solve the initial problem. The password is just replaced by a longer password --- the hash.
 
 \paragraph{\writingFormulationBrut{Get rid of password.}}
 
 In summary, password are not ideal. They are difficult to remember, annoying to type and insecure.
 So why don't we try to get rid of them altogether ?
 
-Promising initiatives to reduce or remove passwords are emerging and improving. % (TODO examples: WebAuthn).
-
-% TODO utiliser what we have and what we are. pas simple pour l'utilisateur final
-% TODO Expliquer que utiliser des clé publique pour s'auth, c'est pas très pratique. Par exemple si on change d'ordi, ou en déplacement.
-These solutions are a good replacement to passwords but they require a deep change. It will take time for them to grow mature and impose themself as industry standard.
-This is also because password are so ubiquitous due in part to the ease of implementation and the familiarity for the users.
-If we cannot get rid of passwords for now, we need a way to make it ``as secure as possible while they persist''. % TODO cite
-
-
-This is where PAKE become interesting. It allow password-based authentication without the password leaving the client.
+Promising initiatives to reduce or remove passwords are emerging and improving --- e.g. WebAuthn ---
+but they generally require a deep change for the developers and a sacrifice in convenience for the end user.
+For example, it can be difficult for an end user to manager private keys if he needs to transfer them securely between multiple devices or if he lose the device that store them.
+Overall, it will take time for these new solutions to grow mature and impose themself as industry standard.
+Password are so ubiquitous due in part to the ease of implementation and the familiarity for the users.
+So if we cannot get rid of passwords for now, we need a way to make them ``as secure as possible while they persist'' \cite{PAKE_Cloudflare_blog}.
+and this is where PAKE become interesting. It allow password-based authentication without the password ever leaving the client.
 
 
 
@@ -126,15 +122,14 @@ Password-Authenticated Key Exchange (PAKE) is a cryptographic primitive. There a
 \end{itemize}
 
 For the moment, we will focus on asymmetric PAKE (aPAKE) because it is the one that can solve our authentication problem.
+aPAKEs guarantee that the client's password is protected because it \textbf{never} leave the client's machine in cleartext.
+It is done by computing a key exchange between the two parties and then mutually verifying that they share the same output key. The password is used to compute or retrieve values inputted in the key exchange protocol.
+This allow a client and a server to mutually authenticate without requiring a secure channel (except for the initial registration)
 
-aPAKE guarantee that the client's password is protected because it never leave the client's machine in cleartext.
-It is done by doing a key exchange between the client and the server.
-%In majority of case, the server doesn't want to setup a key exchange with the client, he just want to authenticate the client.
-It allow mutual authentication in a client-server scenarios without requiring a PKI (except for the initial registration).
+% TODO Intro: manque problématique active vs passive attacks. (PAKE: forcer les attacks active)
 
-``A secure aPAKE should provide the best possible security for a password protocol'' \cite{OPAQUE_Standard_Draft}.
 
-And should only be vulnerable to inevitable attacks such as online guess or offline dictionary attacks if server's data get leaked.
+Overall, ``a secure aPAKE should provide the best possible security for a password protocol'' \cite{OPAQUE_Standard_Draft} and it should only be vulnerable to inevitable attacks such as online guess or offline dictionary attacks upon server compromise.
 
 \paragraph{\writingFormulationBrut{Why PAKEs have almost no adoption ?}}
 
@@ -156,18 +151,16 @@ And should only be vulnerable to inevitable attacks such as online guess or offl
 Despite existing for nearly 3 decades and providing better security guanrantees than traditional authentication method, PAKEs have almost no adoption. So why are they so rare in the industry now-a-day ?
 
 Firstly, for web site, it's easier to setup a password form and handle all the processing on the server than to implement complex cryptography in the browser. But even in native app PAKEs are rarely used to authenticate.
-
 This could be caused by the fact that many old PAKEs was either patented, got broken or both. % TODO need example
 It probably hurted the reputation and adoption of PAKEs.
+
 Another factor is the insufficiency of well-implemented PAKE library in some programming language % TODO example ?
 which make them difficult to use.
+One exception to that is SRP, the most used PAKE protocol in the world \cite{PAKE_Green_blog}.
+It is a TLS ciphersuite, is implemented in OpenSSL and used in Apple's iCloud Key Vault. Even though it has far more adoption than other PAKEs, is not the ideal PAKE.
 
-One exception to that is SRP, the most used PAKE protocol in the world. % TODO cite Green ? "most widely-deployed PAKE in the world"
- It is a TLS ciphersuite, is implemented in OpenSSL and used in Apple's iCloud Key Vault. Even though it has far more adoption than other PAKEs, is not the ideal PAKE.
 
-
-Today, new generation of PAKE are better and provide more security guarantees. Efforts are made to make PAKE a standard for password authentication. % TODO cite OPAQUE standard ?
-
+In the last few years, a new generation of strong aPAKE \cite{OPAQUE_Paper, KHAPE_Paper} has appeared. These new construction are better and provide more security guarantees than ever.
 
 
 % - "most wiidely-deployed PAKE protocol in the world"
@@ -177,5 +170,6 @@ Today, new generation of PAKE are better and provide more security guarantees. E
 
 
 \section{My contribution}
+\section{Organization}
 \end{document}
 
