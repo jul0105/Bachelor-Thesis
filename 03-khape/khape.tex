@@ -20,199 +20,7 @@ This sections details a generic KHAPE protocol.
 Algorithm \ref{alg:login_client} and \ref{alg:login_server} show the pseudocode of a login process from both client-side and server-side. Algorithm \ref{alg:register_client} and \ref{alg:register_server} show the register process.
 
 
-\begin{algorithm}[h]
-\caption{KHAPE : Authentication on the client (generic algorithm)}
-\label{alg:login_client}
-\begin{algorithmic}
-\Require Knows username \verb|uid| and password $pw$
-\If {OPRF}
-    \State $r \gets$ GenerateRandomNumber in $\mathbb{Z}_p$
-    \State $h_1 \gets$ HashToGroup($pw$)$^r$
-    \State Sends authentication request to the server with \verb|uid| and $h_1$
-\Else
-    \State Sends authentication request to the server with \verb|uid|
-\EndIf
-% C on (CltSession; sid; S; pw) ??
-\State $x \gets$ GenerateRandomNumber in $\mathbb{Z}_p$
-\State $X \gets g^x$
 
-\If {OPRF}
-    \State Wait to receive $e$, $Y$ and $h_2$ from the server
-    \State $salt_2 \gets$ $h_2^{\frac{1}{r}}$
-    \State $rw \gets$ Hash($salt_2$, $pw$)
-    \State $(a, B) \gets$ Decrypt($rw$, $e$)
-\Else
-    \State Wait to receive $e$ and $Y$ from the server
-    \State $(a, B) \gets$ Decrypt($pw$, $e$)
-\EndIf
-
-% HMQV :
-% \State $d_c \gets$ Hash'(sid, C, S, 1, $X$)
-% \State $e_c \gets$ Hash'(sid, C, S, 2, $Y$)
-% \State $o_c \gets (Y \cdot B^{e_c})^{x+d_c \cdot a}$
-
-% 3DH :
-% \State $o_c \gets B^x || Y^a || Y^x$
-
-% Generic
-\State $o_c \gets$ KeyHidingAKE($X$, $Y$, $B$, $x$, $a$)
-
-\State $k_1 \gets$ Hash(sid, C, S, $X$, $Y$, $o_c$)
-\State $t_1 \gets$ PRF($k_1$, 1)
-\State Sends $t_1$ and $X$ to the server
-
-
-\State Wait to receive $t_2$ from the server
-\If {$t_2 \neq$ PRF($k_1$, 2)}
-    \State $K_1 \gets$ False
-\Else
-    \State $K_1 \gets$ PRF($k_1$, 0)
-\EndIf
-
-\State output $K_1$
-\end{algorithmic}
-\end{algorithm}
-
-
-\begin{algorithm}
-\caption{KHAPE : Authentication on the server (generic algorithm)}
-\label{alg:login_server}
-\begin{algorithmic}
-\Require Store password file $file$ containing <$e$, $b$, $A$[, $salt$]>
-\If {OPRF}
-    \State Wait to receive authentication request from the client with \verb|uid| and $h_1$
-\Else
-    \State Wait to receive authentication request from the client with \verb|uid|
-\EndIf
-
-% S on (SvrSession; sid; C; uid)
-\State $y \gets$ GenerateRandomNumber in $\mathbb{Z}_p$
-\State $Y \gets g^y$
-
-\If {OPRF}
-    \State ($e$, $b$, $A$, $salt$) $\gets$ file[\verb|uid|, S] % TODO S ?
-    \State $h_2 \gets h_1^{salt}$
-    \State Sends $e$, $Y$ and $h_2$ to the client
-\Else
-    \State ($e$, $b$, $A$) $\gets$ file[\verb|uid|, S] % TODO S ?
-    \State Sends $e$ and $Y$ to the client
-\EndIf
-
-
-\State Wait to receive $t_1$ and $X$ from the client
-
-% 3DH :
-% \State $o_s \gets X^b || A^y || X^y$
-
-% Generic
-\State $o_s \gets$ KeyHidingAKE($X$, $Y$, $A$, $y$, $b$)
-
-\State $k_2 \gets$ Hash(sid, C, S, $X$, $Y$, $o_s$)
-
-
-\If {$t_1 \neq$ PRF($k_2$, 1)}
-    \State $t_2 \gets$ False
-\Else
-    \State $t_2 \gets$ PRF($k_2$, 2)
-\EndIf
-
-
-\State Sends $t_2$ to the client
-
-
-\If {$t_1 \neq$ PRF($k_2$, 1)}
-    \State $K_2 \gets$ False
-\Else
-    \State $K_2 \gets$ PRF($k_2$, 0)
-\EndIf
-
-\State output $K_2$
-\end{algorithmic}
-\end{algorithm}
-
-% Notes:
-% - x, y : ephemeral sessions secrets
-% - a, b : long-term keys
-% - d, e :  hashes of (session state identifiers and) resp. X = g^x and Y = g^y.
-
-% To understand :
-% - sid = Session identifiers (generated randomly for a new session)
-% - uid = user id ?
-% - C, S = each party identity ?? ("These identities could be e.g. domain names, user names, or any other identifiers. They have no other semantics except that the two parties can establish the same session key only if they assume matching identifiers, i.e. (P1; CP1) = (CP2; P2)")
-% - CltSession
-% - SvrSession
-
-
-% TODO generate sid
-% TODO C and S ?
-
-
-\begin{algorithm}
-\caption{KHAPE : Registration on the client (generic algorithm)}
-\label{alg:register_client}
-\begin{algorithmic}
-\Require Choose username \verb|uid| and password $pw$
-
-\If {OPRF}
-    \State $r \gets$ GenerateRandomNumber in $\mathbb{Z}_p$
-    \State $h_1 \gets$ HashToGroup($pw$)$^r$
-    \State Sends registration request to the server with \verb|uid| and $h_1$
-\Else
-    \State Sends registration request to the server with \verb|uid|
-\EndIf
-
-\State $a \gets$ GenerateRandomNumber in $\mathbb{Z}_p$
-\State $A \gets g^a$
-
-\If {OPRF}
-    \State Wait to receive $B$ and $h_2$ from the server
-    \State $salt_2 \gets$ $h_2^{\frac{1}{r}}$
-    \State $rw \gets$ Hash($salt_2$, $pw$)
-    \State $e \gets$ Encrypt($rw$, $(a, B)$)
-\Else
-    \State Wait to receive $B$ from the server
-    \State $e \gets$ Encrypt($pw$, $(a, B)$)
-\EndIf
-
-\State Sends $e$ and $A$ to the server
-
-
-\end{algorithmic}
-\end{algorithm}
-
-\begin{algorithm}
-\caption{KHAPE : Registration on the server (generic algorithm)}
-\label{alg:register_server}
-\begin{algorithmic}
-\Require 
-
-\If {OPRF}
-    \State Waits to receive registration request from a client with \verb|uid| and $h_1$
-\Else
-    \State Waits to receive registration request from a client with \verb|uid|
-\EndIf
-
-\State $b \gets$ GenerateRandomNumber in $\mathbb{Z}_p$
-\State $B \gets g^b$
-
-\If {OPRF}
-    \State $salt \gets$ GenerateRandomNumber in $\mathbb{Z}_p$
-    \State $h_2 \gets h_1^{salt}$    
-    \State Sends $B$ and $h_2$ to the client
-\Else
-    \State Sends $B$ to the client
-\EndIf
-
-\State Waits to receive $e$ and $A$ from the client
-
-\If {OPRF}
-    \State Store file[\verb|uid|, S] $\gets$ ($e$, $b$, $A$, $salt$) % TODO S ?
-\Else
-    \State Store file[\verb|uid|, S] $\gets$ ($e$, $b$, $A$) % TODO S ?
-\EndIf
-
-\end{algorithmic}
-\end{algorithm}
 
 
 
@@ -557,7 +365,199 @@ The first solution will be used
 % 
 % \section{(Threat model)}
 
+\begin{algorithm}[h]
+\caption{KHAPE : Authentication on the client (generic algorithm)}
+\label{alg:login_client}
+\begin{algorithmic}
+\Require Knows username \verb|uid| and password $pw$
+\If {OPRF}
+    \State $r \gets$ GenerateRandomNumber in $\mathbb{Z}_p$
+    \State $h_1 \gets$ HashToGroup($pw$)$^r$
+    \State Sends authentication request to the server with \verb|uid| and $h_1$
+\Else
+    \State Sends authentication request to the server with \verb|uid|
+\EndIf
+% C on (CltSession; sid; S; pw) ??
+\State $x \gets$ GenerateRandomNumber in $\mathbb{Z}_p$
+\State $X \gets g^x$
 
+\If {OPRF}
+    \State Wait to receive $e$, $Y$ and $h_2$ from the server
+    \State $salt_2 \gets$ $h_2^{\frac{1}{r}}$
+    \State $rw \gets$ Hash($salt_2$, $pw$)
+    \State $(a, B) \gets$ Decrypt($rw$, $e$)
+\Else
+    \State Wait to receive $e$ and $Y$ from the server
+    \State $(a, B) \gets$ Decrypt($pw$, $e$)
+\EndIf
+
+% HMQV :
+% \State $d_c \gets$ Hash'(sid, C, S, 1, $X$)
+% \State $e_c \gets$ Hash'(sid, C, S, 2, $Y$)
+% \State $o_c \gets (Y \cdot B^{e_c})^{x+d_c \cdot a}$
+
+% 3DH :
+% \State $o_c \gets B^x || Y^a || Y^x$
+
+% Generic
+\State $o_c \gets$ KeyHidingAKE($X$, $Y$, $B$, $x$, $a$)
+
+\State $k_1 \gets$ Hash(sid, C, S, $X$, $Y$, $o_c$)
+\State $t_1 \gets$ PRF($k_1$, 1)
+\State Sends $t_1$ and $X$ to the server
+
+
+\State Wait to receive $t_2$ from the server
+\If {$t_2 \neq$ PRF($k_1$, 2)}
+    \State $K_1 \gets$ False
+\Else
+    \State $K_1 \gets$ PRF($k_1$, 0)
+\EndIf
+
+\State output $K_1$
+\end{algorithmic}
+\end{algorithm}
+
+
+\begin{algorithm}
+\caption{KHAPE : Authentication on the server (generic algorithm)}
+\label{alg:login_server}
+\begin{algorithmic}
+\Require Store password file $file$ containing <$e$, $b$, $A$[, $salt$]>
+\If {OPRF}
+    \State Wait to receive authentication request from the client with \verb|uid| and $h_1$
+\Else
+    \State Wait to receive authentication request from the client with \verb|uid|
+\EndIf
+
+% S on (SvrSession; sid; C; uid)
+\State $y \gets$ GenerateRandomNumber in $\mathbb{Z}_p$
+\State $Y \gets g^y$
+
+\If {OPRF}
+    \State ($e$, $b$, $A$, $salt$) $\gets$ file[\verb|uid|, S] % TODO S ?
+    \State $h_2 \gets h_1^{salt}$
+    \State Sends $e$, $Y$ and $h_2$ to the client
+\Else
+    \State ($e$, $b$, $A$) $\gets$ file[\verb|uid|, S] % TODO S ?
+    \State Sends $e$ and $Y$ to the client
+\EndIf
+
+
+\State Wait to receive $t_1$ and $X$ from the client
+
+% 3DH :
+% \State $o_s \gets X^b || A^y || X^y$
+
+% Generic
+\State $o_s \gets$ KeyHidingAKE($X$, $Y$, $A$, $y$, $b$)
+
+\State $k_2 \gets$ Hash(sid, C, S, $X$, $Y$, $o_s$)
+
+
+\If {$t_1 \neq$ PRF($k_2$, 1)}
+    \State $t_2 \gets$ False
+\Else
+    \State $t_2 \gets$ PRF($k_2$, 2)
+\EndIf
+
+
+\State Sends $t_2$ to the client
+
+
+\If {$t_1 \neq$ PRF($k_2$, 1)}
+    \State $K_2 \gets$ False
+\Else
+    \State $K_2 \gets$ PRF($k_2$, 0)
+\EndIf
+
+\State output $K_2$
+\end{algorithmic}
+\end{algorithm}
+
+% Notes:
+% - x, y : ephemeral sessions secrets
+% - a, b : long-term keys
+% - d, e :  hashes of (session state identifiers and) resp. X = g^x and Y = g^y.
+
+% To understand :
+% - sid = Session identifiers (generated randomly for a new session)
+% - uid = user id ?
+% - C, S = each party identity ?? ("These identities could be e.g. domain names, user names, or any other identifiers. They have no other semantics except that the two parties can establish the same session key only if they assume matching identifiers, i.e. (P1; CP1) = (CP2; P2)")
+% - CltSession
+% - SvrSession
+
+
+% TODO generate sid
+% TODO C and S ?
+
+
+\begin{algorithm}
+\caption{KHAPE : Registration on the client (generic algorithm)}
+\label{alg:register_client}
+\begin{algorithmic}
+\Require Choose username \verb|uid| and password $pw$
+
+\If {OPRF}
+    \State $r \gets$ GenerateRandomNumber in $\mathbb{Z}_p$
+    \State $h_1 \gets$ HashToGroup($pw$)$^r$
+    \State Sends registration request to the server with \verb|uid| and $h_1$
+\Else
+    \State Sends registration request to the server with \verb|uid|
+\EndIf
+
+\State $a \gets$ GenerateRandomNumber in $\mathbb{Z}_p$
+\State $A \gets g^a$
+
+\If {OPRF}
+    \State Wait to receive $B$ and $h_2$ from the server
+    \State $salt_2 \gets$ $h_2^{\frac{1}{r}}$
+    \State $rw \gets$ Hash($salt_2$, $pw$)
+    \State $e \gets$ Encrypt($rw$, $(a, B)$)
+\Else
+    \State Wait to receive $B$ from the server
+    \State $e \gets$ Encrypt($pw$, $(a, B)$)
+\EndIf
+
+\State Sends $e$ and $A$ to the server
+
+
+\end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}
+\caption{KHAPE : Registration on the server (generic algorithm)}
+\label{alg:register_server}
+\begin{algorithmic}
+\Require 
+
+\If {OPRF}
+    \State Waits to receive registration request from a client with \verb|uid| and $h_1$
+\Else
+    \State Waits to receive registration request from a client with \verb|uid|
+\EndIf
+
+\State $b \gets$ GenerateRandomNumber in $\mathbb{Z}_p$
+\State $B \gets g^b$
+
+\If {OPRF}
+    \State $salt \gets$ GenerateRandomNumber in $\mathbb{Z}_p$
+    \State $h_2 \gets h_1^{salt}$    
+    \State Sends $B$ and $h_2$ to the client
+\Else
+    \State Sends $B$ to the client
+\EndIf
+
+\State Waits to receive $e$ and $A$ from the client
+
+\If {OPRF}
+    \State Store file[\verb|uid|, S] $\gets$ ($e$, $b$, $A$, $salt$) % TODO S ?
+\Else
+    \State Store file[\verb|uid|, S] $\gets$ ($e$, $b$, $A$) % TODO S ?
+\EndIf
+
+\end{algorithmic}
+\end{algorithm}
 
 \end{document}
 
