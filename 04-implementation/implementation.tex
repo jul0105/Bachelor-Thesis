@@ -24,36 +24,51 @@
 %   - Serialization
 %   - Discharge password from memory directly after use
 
+This chapter define specific implementation details for the KHAPE library \footnote{KHAPE's library implementation is available here : https://github.com/jul0105/KHAPE}.
+
 \section{Parameters}
-Both client and server has to define their parameters. For a client and a server to authenticate, they need to have the same parameters. 
+Both the client and the server has to define their parameters. For a client and a server to authenticate, they need to have the same parameters. 
 Generally parameters are fixed by the application developer and are the same for every clients of the application.
 They can also be negotiated during registration but this require the server to store each client specific parameters as it can be different. This use case is not in the scope of the KHAPE library.
 
 \paragraph{OPRF}
-Strongly encouraged, improve security by a lot, doesn't take much time/resource.
+It is strongly encouraged to use the OPRF.
+It provide an higher security level (see Section \ref{sec:opaque_oprf}) without impacting too much on the performances (see Section \ref{sec:oprf_performances}).
+
+
 \paragraph{Slow Hash}
-Encouraged, improve security, take lot of time and resources
+It is also encouraged to use a Slow Hash function. It allows to be more resistant against attacker (see Section \ref{sec:password_hardening_comparison} but it has a high impact on the performances (see Section \ref{sec:slowhash_performances}).
 
 Overall, it is strongly discouraged to use neither of them because this mean that the credentials envelope is encrypted by a weak key resulting only of an HKDF of the low-entropy password.
 
 
 \section{Exchanges}
 
-\subsection{Register}
+This section shows which function is called to produce each messages during the exchange between the client and the server for both registration and authentication
+
+\subsection{Registration}
 \begin{verbatim}
+Client                                                           Server
+-----------------------------------------------------------------------
 (register_request, oprf_client_state) = client.register_start(password);
+
 ----------------register_request----------------->
+
 (register_response, pre_register_secrets) 
     = server.register_start(register_request);
+
 <-----------------register_request----------------
+
 register_finish
     = client.register_finish(register_response, oprf_client_state);
+
 ----------------register_finish----------------->
+
 file_entry = server.register_finish(register_finish, pre_register_secrets)
 
                                                 store file_entry
 \end{verbatim}
-\subsection{Login}
+\subsection{Authentication}
 \begin{verbatim}
 (auth_request, oprf_client_state) = client.auth_start(password)
 ----------------auth_request----------------->
@@ -70,7 +85,12 @@ file_entry = server.register_finish(register_finish, pre_register_secrets)
 client_output_key = client.auth_finish(auth_verify_response, ke_output)
 \end{verbatim}
 
+
 \section{Function definition} \label{sec:impl_function_def}
+
+This section shows the client and the server API.
+For each function, the operations executed are listed.
+
 
 \subsection{Client}
 \begin{itemize}
@@ -162,58 +182,61 @@ client_output_key = client.auth_finish(auth_verify_response, ke_output)
 \end{itemize}
 
 
-\section{Messages structures}
-
-
-\begin{verbatim}
-pub struct RegisterRequest {
-    pub uid: String,
-    pub(crate) oprf_client_blind_result: Option<Vec<u8>>,
-}
-
-pub struct RegisterResponse {
-    pub(crate) pub_b: PublicKey,
-    pub(crate) oprf_server_evalute_result: Option<Vec<u8>>,
-}
-
-pub struct RegisterFinish {
-    pub uid: String,
-    pub(crate) encrypted_envelope: EncryptedEnvelope,
-    pub(crate) pub_a: PublicKey
-}
-
-
-pub struct AuthRequest {
-    pub uid: String,
-    // pub sid: String, // TODO sid
-    pub(crate) oprf_client_blind_result: Option<Vec<u8>>,
-}
-
-
-pub struct AuthResponse {
-    pub(crate) encrypted_envelope: EncryptedEnvelope,
-    pub(crate) pub_y: PublicKey,
-    pub(crate) oprf_server_evalute_result: Option<Vec<u8>>,
-}
-
-
-pub struct AuthVerifyRequest {
-    pub uid: String,
-    // pub sid: String, // TODO sid
-    pub(crate) client_verify_tag: VerifyTag,
-    pub(crate) pub_x: PublicKey,
-}
-
-
-pub struct AuthVerifyResponse {
-    pub(crate) server_verify_tag: Option<VerifyTag>,
-}
-\end{verbatim}
+% \section{Messages structures}
+% 
+% 
+% \begin{verbatim}
+% pub struct RegisterRequest {
+%     pub uid: String,
+%     pub(crate) oprf_client_blind_result: Option<Vec<u8>>,
+% }
+% 
+% pub struct RegisterResponse {
+%     pub(crate) pub_b: PublicKey,
+%     pub(crate) oprf_server_evalute_result: Option<Vec<u8>>,
+% }
+% 
+% pub struct RegisterFinish {
+%     pub uid: String,
+%     pub(crate) encrypted_envelope: EncryptedEnvelope,
+%     pub(crate) pub_a: PublicKey
+% }
+% 
+% 
+% pub struct AuthRequest {
+%     pub uid: String,
+%     // pub sid: String, // TODO sid
+%     pub(crate) oprf_client_blind_result: Option<Vec<u8>>,
+% }
+% 
+% 
+% pub struct AuthResponse {
+%     pub(crate) encrypted_envelope: EncryptedEnvelope,
+%     pub(crate) pub_y: PublicKey,
+%     pub(crate) oprf_server_evalute_result: Option<Vec<u8>>,
+% }
+% 
+% 
+% pub struct AuthVerifyRequest {
+%     pub uid: String,
+%     // pub sid: String, // TODO sid
+%     pub(crate) client_verify_tag: VerifyTag,
+%     pub(crate) pub_x: PublicKey,
+% }
+% 
+% 
+% pub struct AuthVerifyResponse {
+%     pub(crate) server_verify_tag: Option<VerifyTag>,
+% }
+% \end{verbatim}
 
 % TODO server storage struct, client state, envelope ?
 
 
 \section{Library choices}
+
+This section shows the dependencies to implement the KHAPE library and the choice of using them.
+
 \begin{itemize}
  \item \verb|curve25519-dalek v3.2.0| : Pure rust implementation of group operations on Ristretto and Curve25519. Audited in 2019 \cite{https://blog.quarkslab.com/security-audit-of-dalek-libraries.html}. Patched with PR \cite{https://github.com/dalek-cryptography/curve25519-dalek/pull/357} to implement elligator\_decode
  \item \verb|voprf v0.3| : Implementation of a verifiable OPRF based on the standard draft \cite{VOPRF_Standard_Draft}.
@@ -226,167 +249,13 @@ pub struct AuthVerifyResponse {
  \item \verb|serde-big-array v0.3| : Big array helper for serde
 \end{itemize}
 
-\begin{verbatim}
-[patch.crates-io]
-curve25519-dalek = { path = "../07-curve25519-dalek-fork" }
-
-[dependencies]
-curve25519-dalek = { version = "3.2.0", features = ["serde"] }
-voprf = "0.3.0"
-rand = "0.8.4"
-serde = { version = "1.0", features = ["derive"] }
-serde_json = "1.0"
-#bincode = "1.3.3"
-
-sha3 = "0.9.1"
-hkdf = "0.11"
-argon2 = "0.3.1"
-serde-big-array = { version = "0.3.2", features = ["const-generics"] } # for ciphertext (64 bytes array)
-\end{verbatim}
 
 
 
+% \section{Interesting functions}
+% \subsection{Rejection method}
+% \subsection{Elligator element encoding}
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-\newpage
-.
-\newpage
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-\section{API}
-
-
-
-
-\subsection{Client}
-\subsection{Server}
-\subsection{Messages}
-% Parameters, Client, Server and Messages
-
-\subsection{Common}
-\begin{itemize}
- \item \verb|generate_asymetric_key|
-    % generate a in Zp
-    % compute A
-    % return (a, A)
-\end{itemize}
-
-
-\subsection{Client register}
-\begin{itemize}
- \item \verb|client_register_start(uid, pw): RegisterRequest|
-    % compute OPRF initialization
-    % add OPRF h1 and uid to a struct
-    % return struct
- \item \emph{Sends uid and h1. Receive B and h2}
- \item \verb|client_register_finish(B, pw, h2) : e|
-    % generate_asymetric_key
-    % compute OPRF output
-    % encrypt (a, B) with rw
-    % return ciphertext
- \item \emph{Sends e and A}
-\end{itemize}
-
-
-\subsection{Server register}
-\begin{itemize}
- \item \emph{Receive uid and h1}
- \item \verb|server_register_start(uid, h1): (b, B, salt, h2)|
-    % generate_asymetric_key
-    % generate OPRF salt
-    % compute OPRF h2
-    % return B and h2 % TODO how to store salt and b (secret) ? Pre-store b and salt in file[uid] (remove it on server_register_finish) OR use a session_file[sid] <- (b, salt)
- \item \emph{Response B and h2}
- \item \emph{Receive e and A}
- \item \verb|server_register_finish(e, A, b, salt): file_entry|
-    % store (e, b, A, salt) 
-\end{itemize}
-
-
-
-\subsection{Client login}
-\begin{itemize}
- \item \verb|client_auth_start(uid, pw): RegisterRequest| % similar to client_register_start
-    % compute OPRF initialization 
-    % add OPRF h1 and uid to a struct
-    % return struct
- \item \emph{Sends uid and h1. Receive e, Y and h2}
- \item \verb|client_auth_ke(e, Y, h2, r, pw) : (k1, t1, X)|
-    % generate_asymetric_key
-    % compute OPRF output
-    % decrypt (a, B) with rw
-    % compute KeyHidingAKE
-    % compute k1 and t1 % TODO sid, C, S ?
-    % return k1, t1 and X
- \item \emph{Sends t1 and X. Receive t2}
- \item \verb|client_auth_finish(t2, k1) : K1|
-    % verify t2
-    % compute K1
-    % return K1
-
-\end{itemize}
-
-
-\subsection{Server login}
-\begin{itemize}
- \item \emph{Receive uid and h1}
- \item \verb|server_auth_start(uid, h1, file): (e, Y, h2)|
-    % generate_asymetric_key
-    % retrieve (e, salt) from file
-    % compute OPRF h2 % TODO ensure that client-side attacker cannot retrieve salt (by inputing anoter user uid)
-    % return e, Y, y, h2 % TODO how to store y ? Store in file[uid] (remove it on server_auth_finish) OR use a session_file[sid] <- (y)
- \item \emph{Response e, Y and h2}
- \item \emph{Receive t1 and X}
- \item \verb|server_auth_finish(X, Y, A, y, b, t1, file): (K2, t2)|
-    % retrieve (b, A) from file
-    % compute KeyHidingAKE
-    % compute k2 % TODO sid, C, S ?
-    % verify t1
-    % compute t2 and K2
-    % return K2, t2 % TODO what to do with K2 (session key) ? Store in db ? Expiration ? use a session_file[sid] <- K
- \item \emph{Response t2}
-
-\end{itemize}
-
-\subsection{Structure}
-Ciphersuite
-file
-
-\section{Dependencies/Libraries choices}
-\begin{itemize}
- \item OPRF : https://crates.io/crates/voprf
- \item Curve : https://crates.io/crates/curve25519-dalek (Support Elligator2)
-\end{itemize}
-
-\section{Code structure}
-\section{Interesting functions}
-\subsection{Discharge password from RAM directly after use}
-\subsection{(Timing attack mitigation)}
 \end{document}
 

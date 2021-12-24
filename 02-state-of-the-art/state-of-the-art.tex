@@ -302,6 +302,7 @@ The OPAQUE protocol allows to secure authentication from the simplest applicatio
 
 \paragraph{OPRF.} \label{sec:opaque_oprf}
 OPRF \cite{VOPRF_Standard_Draft} is a two-party protocol that allow to compute an output from two secret input. In other words, each party, namely the client and the server, input a secret value --- a password for the client, a secret salt for the server --- and the client can use the output as a key. What is interesting is that the client cannot learn the server's secret salt and the server cannot learn user's password or the OPRF output.
+This feature allow OPRF to provide security against pre-computation attacks to OPAQUE and KHAPE.
 
 In addition to providing a Strong aPAKE protocol, OPRF provides other interesting security features that can be used with OPAQUE.
 Mainly, it supports the use of password hardening function, it allow an easy implementation of server threshold --- instead of a single server providing its secret salt, multiple server would do it --- and overall computing an OPRF provide a far more secure key than deriving directly from a password \cite{OPAQUE_Paper}.
@@ -543,7 +544,7 @@ Mutual authentication explicit that users must be authenticated to the server bu
 \paragraph{\writingFormulationBrut{6. PKI-free.}} % TODO rename to: Doesn't require transmission over a secure channel
 The transmissions between client and server doesn't require to be secured with Public Key Infrastructure (PKI). This is a big improvement over classical authentication method (password-over-TLS) considering the occurrence of PKI failures nowadays. % "PKI failures include stealing of server private keys, software that does not verify certificates correctly, users that accept invalid or suspicious certificates, certificates issued by rogue CAs, servers that share their TLS keys with others e.g., CDN providers or security monitoring software, information (including passwords) that traverses networks in plaintext form after TLS termination; and more."
 
-\paragraph{\writingFormulationClean{7. User-side password hardening.}}
+\paragraph{\writingFormulationClean{7. User-side password hardening.}} \label{sec:password_hardening_comparison}
 Users can use password hardening technique to increase the cost of an offline attack if the server gets compromised. This is done by using resource-heavy functions such as Scrypt \cite{Scrypt_Paper} or Argon2 \cite{Argon2_Paper} instead of computing a simple and efficient hash. These functions allow to drastically slows down hashing process and so making offline attacks and online guessing attack much slower.
 
 COMMENT: For EKE, it could be possible to compute a KDF function on the password before using it as a symmetrical key but this is closer to Augmented EKE \cite{AEKE_Paper} where the password is hashed client side and the server store the hash results.
