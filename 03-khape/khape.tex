@@ -248,21 +248,34 @@ KHAPE require that the underlying key exchange protocol is a ``key-hiding AKE'' 
 SKEME is a AKE based on key encryption mechanism where HMQV and 3DH are Diffie-Hellman based AKE.
 \cite{OPAQUE_Paper} and \cite{KHAPE_Paper} shows concrete instantiation of their protocol using HMQV. These instantiations are easily adapted to other Diffie-Hellman based AKE like 3DH.
 
-HMQV :
+Algorithm \ref{alg:hmqv} and \ref{alg:3dh} show both key computation for HMQV and 3DH protocol. We can see that the 3DH protocol require to compute more exponentiation.
+In fact, between the two protocols, HMQV is more efficient but it is patented so 3DH is used for the KHAPE implementation.
+
+\begin{algorithm}
+\caption{HMQV protocol key computation for the client}
+\label{alg:hmqv}
+
 \begin{algorithmic}
- % HMQV :
+\Require C := Client identity, S := Server identity
 \State $d_c \gets$ Hash'(sid, C, S, 1, $X$)
 \State $e_c \gets$ Hash'(sid, C, S, 2, $Y$)
 \State $o_c \gets (Y \cdot B^{e_c})^{x+d_c \cdot a}$
+\State $k \gets$ H(sid, C, S, $X$, $Y$, $o_c$)
 \end{algorithmic}
+\end{algorithm}
 
-3DH :
+\begin{algorithm}
+\caption{3DH protocol key computation for the client}
+\label{alg:3dh}
+
 \begin{algorithmic}
-% 3DH :
+\Require C := Client identity, S := Server identity
 \State $o_c \gets B^x || Y^a || Y^x$
+\State $k \gets$ H(sid, C, S, $X$, $Y$, $o_c$)
 \end{algorithmic}
+\end{algorithm}
 
-Between 3DH and HMQV, the latter is more efficient but it is patented. This is why 3DH is used for the implementation.
+
 
 
 
@@ -281,7 +294,7 @@ As its name may suggest, the ideal cipher model is an idealised model used to pr
 In practice, an ideal cipher is not implementable % Pourquoi ?
 but it's possible to construct an encryption scheme that is indifferentiable from an ideal cipher. Multiple constructions have been investigated in the literature.
 The simplest construction is the one detailed in \cite{Ideal_Cipher_2} which is an update from \cite{Ideal_Cipher_1} that got broken.
-The encryption scheme consist of 14 rounds of Feistel where function $F_i = H(key | i | input)$ \footnote{Thanks to Prof. Alexandre Duc for providing this construction}.
+The encryption scheme consist of 14 rounds of Feistel where function $F_i = H(key | i | input)$.
 
 The hashing function must be large enough to receive half of the encryption envelope. Since this envelope store two group element, the hashing function must output 256 bits which is the size of a single group element.
 
@@ -376,8 +389,12 @@ HKDF is based on HMAC which in turn is based on an hashing function. The underly
 \label{sec:encryption_key}
 
 OPRF output --- or password --- is used to derive multiple keys with HKDF. The encryption key and the authentication key for computing authenticated encryption on the credential envelope. And the export key which is exposed at register and login and can be used by the application to encrypt application specific data. In Chapter \ref{cha:use_case}, it is shown how to use this key to encrypt user's passwords for an online password manager.
+Algorithm \ref{alg:key_derivation_1} shows how these keys are derived.
 
-The following pseudo-code shows how these keys are derived.
+\begin{algorithm}
+\caption{KHAPE's encryption key and export key computation}
+\label{alg:key_derivation_1}
+
 \begin{algorithmic}
 \Require $rw$ := OPRF output
 \State $rw_{hardened}$ $\gets$ SlowHash($rw$)
@@ -388,6 +405,7 @@ The following pseudo-code shows how these keys are derived.
 
 \State Output $k_{encryption}$, $k_{auth}$ and $k_{export}$
 \end{algorithmic}
+\end{algorithm}
 
 
 
@@ -409,8 +427,11 @@ The following pseudo-code shows how these keys are derived.
 
 HKDF is also used to compute the output key $K$ and both key verification tag $t_1$ and $t_2$.
 Instead of exposing the handshake secret $k$ and computing each verification tag and the output key individually, these 3 values are computed at the same time and stored until needed.
+Algorithm \ref{alg:key_derivation_2} shows how these keys are derived.
 
-The following pseudo-code shows how these keys are derived.
+\begin{algorithm}
+\caption{KHAPE's output key and key verification computation}
+\label{alg:key_derivation_2}
 \begin{algorithmic}
 \Require $o$ := AKE output, $preamble$ := protocol's identities and messages
 \State $prk \gets$ Extract(salt="", ikm=$o$)
@@ -427,6 +448,7 @@ The following pseudo-code shows how these keys are derived.
 
 \State Output $K$, $t_1$ and $t_2$
 \end{algorithmic}
+\end{algorithm}
 
 % \begin{verbatim}
 % DeriveKeys(ikm, preamble)
@@ -451,23 +473,23 @@ The following pseudo-code shows how these keys are derived.
 
 
 
-\subsection{Session during authentication or registration ?}
-
-
-\subsection{Hash}
-Sha3-256
-
-\subsection{HashToGroup}
-Operation of hashing to the group. Since we use elliptic curves, this operation is an hash-to-curve.
-
-
-\subsection{PRF}
-HKDF
-
-
-
-\subsection{GenerateRandomNumber}
-Voir CAA
+% \subsection{Session during authentication or registration ?}
+% 
+% 
+% \subsection{Hash}
+% Sha3-256
+% 
+% \subsection{HashToGroup}
+% Operation of hashing to the group. Since we use elliptic curves, this operation is an hash-to-curve.
+% 
+% 
+% \subsection{PRF}
+% HKDF
+% 
+% 
+% 
+% \subsection{GenerateRandomNumber}
+% Voir CAA
 
 
 
@@ -512,28 +534,28 @@ The first solution will be used
 
 
 
-\section{Security consideration}
-
-\subsection{Difference with OPAQUE} %TODO put this section somewhere (in state-of-the-art ?)
-
-Verification must be initialized by the client, this mean that protocol in completed with 4 message instead of 3 for OPAQUE.
-Still use encryption (ideal cipher) where the OPAQUE standard draft doesn't use encryption anymore.
-Use key-hiding AKE (3DH and HMQV are key-hiding AKE so this doesn't change anything).
-
+% \section{Security consideration}
+% 
+% \subsection{Difference with OPAQUE} %TODO put this section somewhere (in state-of-the-art ?)
+% 
+% Verification must be initialized by the client, this mean that protocol in completed with 4 message instead of 3 for OPAQUE.
+% Still use encryption (ideal cipher) where the OPAQUE standard draft doesn't use encryption anymore.
+% Use key-hiding AKE (3DH and HMQV are key-hiding AKE so this doesn't change anything).
+% 
 % see OPAQUE standard chapter 10
-\subsection{Input validation}
-``We assume that parties verify public keys and ephemeral DH values, resp.
-B; Y for P1 and A; X for P2, as group G elements.''
-
-\subsection{SlowHash}
-Optionaly, use Argon2, scrypt, etc. on the password before inputting it in the algo
-
-\subsection{Session key usage}
-
-
-\section{Precise algorithm}
-
-\section{(Threat model)}
+% \subsection{Input validation}
+% ``We assume that parties verify public keys and ephemeral DH values, resp.
+% B; Y for P1 and A; X for P2, as group G elements.''
+% 
+% \subsection{SlowHash}
+% Optionaly, use Argon2, scrypt, etc. on the password before inputting it in the algo
+% 
+% \subsection{Session key usage}
+% 
+% 
+% \section{Precise algorithm}
+% 
+% \section{(Threat model)}
 
 
 
