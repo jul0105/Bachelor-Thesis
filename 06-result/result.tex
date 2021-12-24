@@ -93,7 +93,7 @@ KHAPE require a Ideal Cipher encryption which has been implemented with a 14-rou
 
 \subsection*{Feistel cipher}
 The Feistel cipher implemented is not optimal in terms of performance but it is surprising not that much time consuming.
-It is still around 36 times slower than AES256-CTR (see below) but it doesn't take much time compared to the group operation above.
+It is still around 36 times slower than AES256-CTR (see below) but it does not take much time compared to the group operation above.
 % TODO encryption and decryption ?
 % TODO AES256-CTR performances (HW, para, optimized)
 
@@ -145,7 +145,7 @@ Note that only the time taken for each endpoint to complete is measured. In a re
 
 \subsection{Standard configuration}
 KHAPE's default and most secure configuration is by using both OPRF and SlowHash. 
-But since SlowHash functions are designed to be slow, it doesn't make sense to add it to the baseline benchmark because it doesn't show the real performances of the protocol.
+But since SlowHash functions are designed to be slow, it does not make sense to add it to the baseline benchmark because it does not show the real performances of the protocol.
 So for these benchmarks, the standard baseline configuration is KHAPE with OPRF and without SlowHash.
 
 
