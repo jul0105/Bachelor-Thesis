@@ -45,8 +45,20 @@
 % \isconfidentialtrue
 
 \newcommand{\TBresumePubliable}{
-Dans ce travail... Ceci est le résumé publiable...
-} % TODO résumé publiable
+Password-based authentication process are generally require that the user sends his password to the server to prove that he is indeed the person he pretend to be.
+This design become fundamentally unsecured at the moment the user's secret, namely the password, leaves his possession. It become vulnerable to TLS channel attack, server compromise, password miss-handling on the server, etc.
+
+PAKE protocols makes password-based authentication more secure by provide a way for a user to authenticate with a server without the password ever leave the user's possession.
+
+The goal of this project is to make an comparison between the mains PAKE protocols and to present the first ever implementation of KHAPE, a strong asymmetric PAKE protocol.
+% This implementation is developed with the Rust programming language.
+In addition, a practical use case using the developed KHAPE
+library is also implemented.
+% and a performance test of the library is also
+
+% PAKE increase the security of passwords but they are still insecure. future: use other auth method
+}
+
 
 % +---------------------------------------------------------------+
 
