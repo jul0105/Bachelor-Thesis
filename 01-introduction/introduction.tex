@@ -124,9 +124,10 @@ Password-Authenticated Key Exchange (PAKE) is a cryptographic primitive. There a
 For the moment, we will focus on asymmetric PAKE (aPAKE) because it is the one that can solve our authentication problem.
 aPAKEs guarantee that the client's password is protected because it \textbf{never} leave the client's machine in cleartext.
 It is done by computing a key exchange between the two parties and then mutually verifying that they share the same output key. The password is used to compute or retrieve values inputted in the key exchange protocol.
-This allow a client and a server to mutually authenticate without requiring a secure channel (except for the initial registration)
+This allow a client and a server to mutually authenticate without requiring a secure channel --- except for the initial registration.
 
-% TODO Intro: manque problématique active vs passive attacks. (PAKE: forcer les attacks active)
+
+The goal of PAKEs protocol is to provide a shared key between two parties and that the only way for an attacker do a dictionary attack --- test a list of password candidates --- is to perform online guesses. The attacker is forced to become active and to interact with the server, which is easier to mitigate than passive attacks.
 
 
 Overall, ``a secure aPAKE should provide the best possible security for a password protocol'' \cite{OPAQUE_Standard_Draft} and it should only be vulnerable to inevitable attacks such as online guess or offline dictionary attacks upon server compromise.
@@ -170,6 +171,11 @@ In the last few years, a new generation of strong aPAKE \cite{OPAQUE_Paper, KHAP
 
 
 \section{My contribution}
-\section{Organization}
+
+
+\section{Generalities}
+
+This bachelor thesis conclude a three year bachelor degree in information security at HEIG-VD.
+It started the 21st September 2021 and ended the 24th December 2021 with an intermediate evaluation the 26th October 2021. The expected workload is 450 hours.
 \end{document}
 
