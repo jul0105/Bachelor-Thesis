@@ -1,68 +1,44 @@
-\documentclass[../report.tex]{subfiles}
-
+﻿\documentclass[../report.tex]{subfiles}
 
 \begin{document}
-
 \chapter{\writingNotes{KHAPE}} \label{cha:khape}
-
-This chapter explain the details of the KHAPE protocol in term of implementation and explain the design choices.
-
+This chapter explain the details of the KHAPE protocol in terms of implementation and explain the design choices.
 \section{Choice of implementing KHAPE}
-
-The choice is based on the properties of the PAKE and the existence of implementations and/or standard for this PAKE.
-
+The choice is based on the properties of the PAKE and the existence of implementations or standards for this PAKE.
 OPAQUE and KHAPE provide the highest level of security amongst aPAKE protocols.
 But while OPAQUE is becoming more mature with a draft standard and multiple high-quality implementations --- including in rust \ref{opaque-ke}, KHAPE is still very recent.
-In fact, KHAPE paper was published only 6 month ago at the time of the writing. To my knowledge, there is currently no public implementation of KHAPE and this is why I will be implementing it.
-
+In fact, the KHAPE paper was published only six months ago at the time of the writing. To our knowledge, there is currently no public implementation of KHAPE and this is why we will be implementing it.
 \section{Generic algorithm} \label{sec:khape_generic_algo}
-This sections details a generic KHAPE protocol.
-Algorithm \ref{alg:login_client} and \ref{alg:login_server} show the pseudocode of a login process from both client-side and server-side. Algorithm \ref{alg:register_client} and \ref{alg:register_server} show the register process.
-
-
-
-
+This section details a generic KHAPE protocol.
+Algorithms \ref{alg:login_client} and \ref{alg:login_server} show the pseudocode of a login process from both client side and server side. Algorithms \ref{alg:register_client} and \ref{alg:register_server} show the register process.
 
 
 
 \section{\writingFormulationBrut{Design choices}}
-
-This section explain the design choices made to implement KHAPE.
-Since the only resource for KHAPE is the rather theoretical paper, lots of design choice have to be made. However, since OPAQUE and KHAPE share similarities, some implementation choices are inspired by the OPAQUE standard draft whenever it's possible.
-
-
-
+This section explains the design choices made to implement KHAPE.
+Since the only resource for KHAPE is a rather theoretical paper, a large number of  design choices have to be made. However, since OPAQUE and KHAPE share similarities, some implementation choices are inspired by the OPAQUE's standard draft whenever it is possible.
 
 
 \subsection{\writingFormulationBrut{Client-side register}}
-Both client-side and server-side registration are possible but in order to use the aPAKE benefit to the fullest, it is preferable to handle the registration on the client.
-This allow to keep the main goal of aPAKEs: the server NEVER see the user's password.
+Both client-side and server-side registrations are possible but in order to use the aPAKE benefit to the fullest, it is preferable to handle the registration on the client.
+This allows to keep the main goal of aPAKEs: the server NEVER see the user's password.
 For more details, see Section \ref{sec:opaque_register}.
 
 
-
-
-
 \subsection{\writingFormulationBrut{Key Exchange}}
-PAKE protocol compute a key exchange to perform authentication. The key exchange has to be authenticated to avoid attacks such as Man-in-the-Middle attacks that can be exploited on unauthenticated KE protocol like plain Diffie-Hellman.
-
-In AKE protocols, each party has two asymmetric keys pair.
+The PAKE protocol computes a key exchange to perform authentication. The key exchange has to be authenticated to avoid attacks such as Man-in-the-middle attacks that can be exploited on un-authenticated KE protocol like plain Diffie-Hellman.
+In AKE protocols, each party has two asymmetric key pairs.
 One long-term key pair that authenticate the exchange and one short-term (ephemeral) key pair that is used in the actual key exchange and only live for a single session.
 
-
-KHAPE require that the underlying key exchange protocol is a ``key-hiding AKE'' (See Section \ref{sec:key_hiding_ake} for more details about this construction).
+KHAPE requires that the underlying key exchange protocol is a ``key-hiding AKE'' (See Section \ref{sec:key_hiding_ake} for more details about this construction).
 \cite{KHAPE_Paper} shows that HMQV, 3DH and SKEME are key-hiding AKE.
-
-SKEME is a AKE based on key encryption mechanism where HMQV and 3DH are Diffie-Hellman based AKE.
+SKEME is an AKE based on key encryption mechanism where HMQV and 3DH are Diffie-Hellman based AKE.
 \cite{OPAQUE_Paper} and \cite{KHAPE_Paper} shows concrete instantiation of their protocol using HMQV. These instantiations are easily adapted to other Diffie-Hellman based AKE like 3DH.
-
-Algorithm \ref{alg:hmqv} and \ref{alg:3dh} show both key computation for HMQV and 3DH protocol. We can see that the 3DH protocol require to compute more exponentiation.
+Algorithms \ref{alg:hmqv} and \ref{alg:3dh} show both key computation for HMQV and 3DH protocol. We can see that the 3DH protocol requires to compute more exponentiation.
 In fact, between the two protocols, HMQV is more efficient but it is patented so 3DH is used for the KHAPE implementation.
-
 \begin{algorithm}
 \caption{HMQV protocol key computation for the client}
 \label{alg:hmqv}
-
 \begin{algorithmic}
 \Require C := Client identity, S := Server identity
 \State $d_c \gets$ Hash'(sid, C, S, 1, $X$)
@@ -71,11 +47,9 @@ In fact, between the two protocols, HMQV is more efficient but it is patented so
 \State $k \gets$ H(sid, C, S, $X$, $Y$, $o_c$)
 \end{algorithmic}
 \end{algorithm}
-
 \begin{algorithm}
 \caption{3DH protocol key computation for the client}
 \label{alg:3dh}
-
 \begin{algorithmic}
 \Require C := Client identity, S := Server identity
 \State $o_c \gets B^x || Y^a || Y^x$
@@ -85,124 +59,82 @@ In fact, between the two protocols, HMQV is more efficient but it is patented so
 
 
 
-
-
-
-
 \subsection{\writingFormulationBrut{Encryption scheme}}
-KHAPE require that the encryption scheme is non-committing (See Section \ref{sec:non_committing_encryption}).
-
-Non-committing encryption is archived by combining ideal cipher and curve encoding.
-
+KHAPE requires that the encryption scheme is non-committing (See Section \ref{sec:non_committing_encryption}).
+Non-committing encryption is achieved by combining an ideal cipher and a curve encoding.
 \paragraph{Ideal cipher.}
 % What is IC
-As its name may suggest, the ideal cipher model is an idealised model used to prove the security of cryptographical systems.
-
+As its name may suggest, the ideal cipher model is an idealized model used to prove the security of cryptographic systems.
 % Implementation (not implementable, but indstinguishable from IC)
 In practice, an ideal cipher is not implementable % Pourquoi ?
-but it's possible to construct an encryption scheme that is indifferentiable from an ideal cipher. Multiple constructions have been investigated in the literature.
+but it is possible to construct an encryption scheme that is indifferentiable from an ideal cipher. Multiple constructions have been investigated in the literature.
 The simplest construction is the one detailed in \cite{Ideal_Cipher_2} which is an update from \cite{Ideal_Cipher_1} that got broken.
-The encryption scheme consist of 14 rounds of Feistel where function $F_i = H(key | i | input)$.
-
-The hashing function must be large enough to receive half of the encryption envelope. Since this envelope store two group element, the hashing function must output 256 bits which is the size of a single group element.
-
-In term of performance, this construction is not very efficient but its one of the only found that is easily instantiatiable.
-
-
+The encryption scheme consists of 14 rounds of Feistel where function $F_i = H(key | i | input)$.
+The hashing function must be large enough to receive half of the encryption envelope. Since this envelope store two group element, the hashing function must output a 256-bit value which is the size of a single group element.
+In terms of performance, this construction is not very efficient but it is one of the only found that is easily instantiable.
 
 \paragraph{Curve encoding.}
 % What is it
-The cleartext group elements that will be encrypted need to be encoded as a bitstring that is indistiguishable from random. This has the consequence that if plaintext is encrypted with password $pw$ and then decrypted with a different password $pw'$, the result is a random valid element.
-
-
+The cleartext group elements that will be encrypted need to be encoded as a bit string that is indistinguishable from random. This has the consequence that if plaintext is encrypted with password $pw$ and then decrypted with a different password $pw'$, the result is a valid random element.
 
 % implementation (elligator)
-This is done by implementing a quasi bijection from field elements to bitstrings.
-Elligator-squared \cite{Elligator_Squared_Paper} and Elligator2 \cite{Elligator2_Paper} are implementation for such curve point encoding.
+This is done by implementing a quasi bijection from field elements to bit string.
+Elligator-squared \cite{Elligator_Squared_Paper} and Elligator2 \cite{Elligator2_Paper} are implementations for such curve point encoding.
 Both these constructions are suitable for the implementation of KHAPE but since the elliptic curve used is Curve25519, it is suitable for Elligator2.
-
 \paragraph{Authentication.}
 % no authentication
 Authenticated encryption is generally recommended for encryption.
 It is interesting to note that this encryption scheme must not be authenticated. 
-
-
 
 In contrary to the OPAQUE Paper, the OPAQUE standard draft doesn't encrypt the client's private key in the envelope.
 Instead, the envelope store a nonce of 32 bytes and an authentication tag. The envelope is not encrypted.
 The nonce is used --- with the randomized password --- to compute a seed, which is then used to derive the client's private and public keys. The authentication tag stored in the envelope is used to verify the derived public key.
 
 
-
-
-
 \subsection{\writingFormulationBrut{Group $\mathbb{G}$}}
 The key exchange is computed on a group $\mathbb{G}$ of prime order $p$ with generator $g$.
-The group is generic which means that we are free to use an integer group or an elliptic curves group.
-
+The group is generic which means that we are free to use an integer group or an elliptic curve group.
 For performances reasons, elliptic curves are used for the implementation (See Section \ref{sec:ecc_comparison}).
 The curve must be compatible with the curve encoding algorithm selected (Elligator-squared, Elligator2, etc.).
 
-
 For current usage, it is recommended to use 256 bits elliptic curve \cite{ECRYPT_Keylength}. For a more long-term usage (up to 50 years), it is recommended to use 512 bits elliptic curve.
 
-
-For KHAPE implementation, curve25519 is used. It is a safe elliptic curve that provide the sufficient security level and is well suited for implementing Elligator2 on it.
-Group element are represented on 32 bytes.
-
-
+For KHAPE implementation, curve25519 is used. It is a safe elliptic curve that provides sufficient security level and is well suited for implementing Elligator2 on it.
+Group elements are represented on 32 bytes.
 
 
 \subsection{\writingFormulationBrut{OPRF}} \label{sec:design_choice_oprf}
-In KHAPE, the OPRF is optional --- in contrary to OPAQUE --- but allow to make it a strong aPAKE resistant against pre-computation attacks \ref{sec:secure_against_pca}.
-This is a major improvement in term of security and therefore an OPRF should be used.
-
+In KHAPE, the OPRF is optional --- in contrary to OPAQUE --- but allow making it a strong aPAKE resistant against pre-computation attacks \ref{sec:secure_against_pca}.
+This is a major improvement in terms of security, and therefore an OPRF should be used.
 OPRF operations also need their own group and hashing function.
-There is also an ongoing standard draft protocol for OPRF \cite{VOPRF_Standard_Draft} that present multiple ciphersuites for OPRF and different variants.
-The OPRF used for the KHAPE implementation is based on this standard draft using the ristretto255-SHA-512 ciphersuite and the standard non-verifiable variant. % Why ?
-
-
-
+There is also an ongoing standard draft protocol for OPRF \cite{VOPRF_Standard_Draft} that presents multiple cipher suites for OPRF and different variants.
+The OPRF used for the KHAPE implementation is based on this standard draft using the ristretto255-SHA-512 cipher suite and the standard non-verifiable variant. % Why ?
 
 
 \subsection{\writingFormulationBrut{Slow Hash}} \label{sec:design_choice_slowhash}
 It is possible and recommended to use a memory-hard hashing function (also called Slow Hash in this report) on the password to make it slow and expensive to compute. 
-This make it more costly for an adversary to compute hashs.
-
-For the implementation, Argon2id \cite{Argon2_Paper} is used because it is a recent memory-hard hashing function with a simple construction and it has better security analysis than others resource-heavy hashing function like scrypt, bcrypt and PBKDF2 \cite{CAA}. The Argon2id variant is used as it provide resistance against both GPU attacks and side-channel attacks --- and is the recommended version.
-
+This makes it more costly for an adversary to compute hashes.
+For the implementation, Argon2id \cite{Argon2_Paper} is used because it is a recent memory-hard hashing function with a simple construction and it has better security analysis than other resource-heavy hashing functions like scrypt, bcrypt and PBKDF2 \cite{CAA}. The Argon2id variant is used as it provides resistance against both GPU attacks and side-channel attacks --- and is the recommended version.
 For OPAQUE, \cite{OPAQUE_Standard_Draft} propose to implement this function on the OPRF output $rw$ and use the result to derive the encryption key. Section \ref{sec:encryption_key} shows how this hashing function is used in the key derivation process.
 
 
-
-
-
 \subsection{\writingFormulationBrut{Key derivation}}
+This section describes the process of deriving keys from existing secrets. The design is heavily inspired by OPAQUE's standard draft \cite{OPAQUE_Standard_Draft} since the context is similar.
 
-This section describe the process of derivating keys from existing secrets. The design is heavily inspired by OPAQUE's standard draft \cite{OPAQUE_Standard_Draft} since the context is similar.
-
-
-The primitive used to derive the encryption key, the export key, the output key and the key verification tags is HKDF \cite{HKDF_RFC}. It is well suited for expanding key from existing secret and is already used in OPAQUE rust's implementation \cite{OPAQUE_KE_lib}. It follows the ``Extract-then-Expand'' paradigm where these two functions are used with the following API :
-
+The primitive used to derive the encryption key, the export key, the output key and the key verification tags is HKDF \cite{HKDF_RFC}. It is well suited for expanding keys from existing secret and is already used in OPAQUE rust's implementation \cite{OPAQUE_KE_lib}. It follows the ``Extract-then-Expand'' paradigm where these two functions are used with the following API :
 \begin{itemize}
- \item Extract($salt$, $ikm$): Extract a fixed length pseudorandom key $prk$ with high entropy from the input keying material $ikm$ and the optional $salt$
- \item Expand($prk$, $info$, $L$): Expand the length of an existing pseudorandom key $prk$ with the optional string $info$ to produce an output keying material $okm$ of $L$ bytes.
+ \item Extract($salt$, $ikm$): Extract a fixed length pseudo-random key $prk$ with high entropy from the input keying material $ikm$ and the optional $salt$
+ \item Expand($prk$, $info$, $L$): Expand the length of an existing pseudo-random key $prk$ with the optional string $info$ to produce an output keying material $okm$ of $L$ bytes.
 \end{itemize}
-
-HKDF is based on HMAC which in turn is based on an hashing function. The underlying hashing function used should output at least 256 bits to fit the group element size. SHA-3 256 is used for its robust design.
-
-
+HKDF is based on HMAC which in turn is based on a hashing function. The underlying hashing function should output at least 256 bits to fit the group element size. SHA-3 256 is used for its robust design.
 
 \subsubsection{Encryption key and export key}
 \label{sec:encryption_key}
-
-OPRF output --- or password --- is used to derive multiple keys with HKDF. The encryption key and the authentication key for computing authenticated encryption on the credential envelope. And the export key which is exposed at register and login and can be used by the application to encrypt application specific data. In Chapter \ref{cha:use_case}, it is shown how to use this key to encrypt user's passwords for an online password manager.
+OPRF output --- or the password --- is used to derive multiple keys with HKDF. The encryption key and the authentication key for computing authenticated encryption on the credential envelope. And the export key which is exposed at register and login and can be used by the application to encrypt application-specific data. In Chapter \ref{cha:use_case}, it is shown how to use this key to encrypt user passwords for an online password manager.
 Algorithm \ref{alg:key_derivation_1} shows how these keys are derived.
-
 \begin{algorithm}
 \caption{KHAPE's encryption key and export key computation}
 \label{alg:key_derivation_1}
-
 \begin{algorithmic}
 \Require $rw$ := OPRF output
 \State $rw_{hardened}$ $\gets$ SlowHash($rw$)
@@ -210,12 +142,9 @@ Algorithm \ref{alg:key_derivation_1} shows how these keys are derived.
 \State $k_{encryption}$ $\gets$ Expand($rw_{randomized}$, "EncryptionKey", HashLength)
 \State $k_{auth}$ $\gets$ Expand($rw_{randomized}$, "AuthKey", HashLength)
 \State $k_{export}$ $\gets$ Expand($rw_{randomized}$, "ExportKey", HashLength)
-
 \State Output $k_{encryption}$, $k_{auth}$ and $k_{export}$
 \end{algorithmic}
 \end{algorithm}
-
-
 
 % \begin{verbatim}
 % 1. y = Finalize(password, blind, response.data, nil)
@@ -230,34 +159,27 @@ Algorithm \ref{alg:key_derivation_1} shows how these keys are derived.
 % 5. seed = Expand(randomized_pwd, concat(envelope_nonce, "PrivateKey"), Nseed)
 % \end{verbatim}
 
-
 \subsubsection{Output key and key verification}
-
 HKDF is also used to compute the output key $K$ and both key verification tag $t_1$ and $t_2$.
-Instead of exposing the handshake secret $k$ and computing each verification tag and the output key individually, these 3 values are computed at the same time and stored until needed.
+Instead of exposing the handshake secret $k$ and computing each verification tag and the output key individually, these three values are computed at the same time and stored until needed.
 Algorithm \ref{alg:key_derivation_2} shows how these keys are derived.
-
 \begin{algorithm}
 \caption{KHAPE's output key and key verification computation}
 \label{alg:key_derivation_2}
 \begin{algorithmic}
 \Require $o$ := AKE output, $preamble$ := protocol's identities and messages
 \State $prk \gets$ Extract(salt="", ikm=$o$)
-
 % \State $hss \gets$ Derive-Secret($prk$, "HandshakeSecret", Hash($preamble$))
 % \State $k_{session} \gets$ Derive-Secret($prk$, "SessionKey", Hash($preamble$))
 % \State $t_1 \gets$ Derive-Secret($hss$, "ClientMAC", "")
 % \State $t_2 \gets$ Derive-Secret($hss$, "ServerMAC", "")
-
 \State $k \gets$ Expand($prk$, concat("HandshakeSecret", Hash($preamble$)), HashLength)
 \State $K \gets$ Expand($prk$, concat("SessionKey", Hash($preamble$)), HashLength)
 \State $t_1 \gets$ Expand($k$, "ClientMAC", HashLength)
 \State $t_2 \gets$ Expand($k$, "ServerMAC", HashLength)
-
 \State Output $K$, $t_1$ and $t_2$
 \end{algorithmic}
 \end{algorithm}
-
 % \begin{verbatim}
 % DeriveKeys(ikm, preamble)
 % 
@@ -279,8 +201,6 @@ Algorithm \ref{alg:key_derivation_2} shows how these keys are derived.
 % 6. Output (Km2, Km3, session_key)
 % \end{verbatim}
 
-
-
 % \subsection{Session during authentication or registration ?}
 % 
 % 
@@ -300,46 +220,31 @@ Algorithm \ref{alg:key_derivation_2} shows how these keys are derived.
 % Voir CAA
 
 
-
-
-
 \section{\writingNotes{Limitations}}
-
 In opposition with classical authentication method where the client only send an authentication request and receive a response. With KHAPE, the registration and the authentication processes require multiple messages (round-trip) between the client and the server.
-This add new difficulties for both side that need to be considered.
-
+This adds new difficulties for both sides that need to be considered.
 \subsection{Client}
-Necessity to send 2 messages. If the client is a web browser, he cannot only send a login form to the server. Behind the scenes request has to be made to compute the 2 round-trip. This means that some javascript has to be implemented but this was known from the beginning that PAKE protocol require a greater implication of the client (code-wise).
-
+Necessity to send two messages. If the client is a web browser, he cannot only send a login form to the server. Behind-the-scene request has to be made to compute the two round-trip. This means that some JavaScript has to be implemented but this was known from the beginning that PAKE protocol requires a greater implication of the client (code-wise).
 \subsection{Server}
 Pre register secret, ephemeral key, session
-The server communicate with multiple client at the same time so when a request come, he needs to know from which client/session it is from to be able to use the correct value. This is even more complicated because during both authentication and registration, the server generate some secret value in the first round trip and needs these values in the second round trip.
-
-
+The server communicate with multiple clients at the same time so when a request comes, he needs to know from which client/session it is from to be able to use the correct value. This is even more complicated because during both authentication and registration, the server generate some secret value in the first round trip and needs these values in the second round trip.
 
 During authentication, the server needs to store his ephemeral private key for the second round-trip. He can store this value in the user's file entry or in a separated session file.
-
 He can :
 - Store this value in the file entry associated to the user
 - Store this value in a session file entry (this require that client generate a session id and sends it with every request) (can be used to store session key later)
 - Encrypt the value and send it to the client which send it back (like JWT)
 In every case, the client has to resend the uid in the 2nd round-trip request
-
 The second solution will be used. Allow multiple session
  
 
-
 During register, the server generate his keys (private and public) and the secret salt. He sends the public key but the private key and the secret salt has to remain secret.
-
 He can :
 - Pre register the client in a incomplete file entry.
    - file[uid] = <secret\_salt, b, INCOMPLET>
    - file[uid] = <e, b, A, secret\_salt, COMPLET>
 - Solution 2 and 3 from auth
-
 The first solution will be used
-
-
 
 
 % \section{Security consideration}
@@ -364,7 +269,6 @@ The first solution will be used
 % \section{Precise algorithm}
 % 
 % \section{(Threat model)}
-
 \begin{algorithm}[h]
 \caption{KHAPE : Authentication on the client (generic algorithm)}
 \label{alg:login_client}
@@ -380,7 +284,6 @@ The first solution will be used
 % C on (CltSession; sid; S; pw) ??
 \State $x \gets$ GenerateRandomNumber in $\mathbb{Z}_p$
 \State $X \gets g^x$
-
 \If {OPRF}
     \State Wait to receive $e$, $Y$ and $h_2$ from the server
     \State $salt_2 \gets$ $h_2^{\frac{1}{r}}$
@@ -390,22 +293,17 @@ The first solution will be used
     \State Wait to receive $e$ and $Y$ from the server
     \State $(a, B) \gets$ Decrypt($pw$, $e$)
 \EndIf
-
 % HMQV :
 % \State $d_c \gets$ Hash'(sid, C, S, 1, $X$)
 % \State $e_c \gets$ Hash'(sid, C, S, 2, $Y$)
 % \State $o_c \gets (Y \cdot B^{e_c})^{x+d_c \cdot a}$
-
 % 3DH :
 % \State $o_c \gets B^x || Y^a || Y^x$
-
 % Generic
 \State $o_c \gets$ KeyHidingAKE($X$, $Y$, $B$, $x$, $a$)
-
 \State $k_1 \gets$ Hash(sid, C, S, $X$, $Y$, $o_c$)
 \State $t_1 \gets$ PRF($k_1$, 1)
 \State Sends $t_1$ and $X$ to the server
-
 
 \State Wait to receive $t_2$ from the server
 \If {$t_2 \neq$ PRF($k_1$, 2)}
@@ -413,11 +311,9 @@ The first solution will be used
 \Else
     \State $K_1 \gets$ PRF($k_1$, 0)
 \EndIf
-
 \State output $K_1$
 \end{algorithmic}
 \end{algorithm}
-
 
 \begin{algorithm}
 \caption{KHAPE : Authentication on the server (generic algorithm)}
@@ -429,11 +325,9 @@ The first solution will be used
 \Else
     \State Wait to receive authentication request from the client with \verb|uid|
 \EndIf
-
 % S on (SvrSession; sid; C; uid)
 \State $y \gets$ GenerateRandomNumber in $\mathbb{Z}_p$
 \State $Y \gets g^y$
-
 \If {OPRF}
     \State ($e$, $b$, $A$, $salt$) $\gets$ file[\verb|uid|, S] % TODO S ?
     \State $h_2 \gets h_1^{salt}$
@@ -443,17 +337,12 @@ The first solution will be used
     \State Sends $e$ and $Y$ to the client
 \EndIf
 
-
 \State Wait to receive $t_1$ and $X$ from the client
-
 % 3DH :
 % \State $o_s \gets X^b || A^y || X^y$
-
 % Generic
 \State $o_s \gets$ KeyHidingAKE($X$, $Y$, $A$, $y$, $b$)
-
 \State $k_2 \gets$ Hash(sid, C, S, $X$, $Y$, $o_s$)
-
 
 \If {$t_1 \neq$ PRF($k_2$, 1)}
     \State $t_2 \gets$ False
@@ -461,25 +350,20 @@ The first solution will be used
     \State $t_2 \gets$ PRF($k_2$, 2)
 \EndIf
 
-
 \State Sends $t_2$ to the client
-
 
 \If {$t_1 \neq$ PRF($k_2$, 1)}
     \State $K_2 \gets$ False
 \Else
     \State $K_2 \gets$ PRF($k_2$, 0)
 \EndIf
-
 \State output $K_2$
 \end{algorithmic}
 \end{algorithm}
-
 % Notes:
 % - x, y : ephemeral sessions secrets
 % - a, b : long-term keys
 % - d, e :  hashes of (session state identifiers and) resp. X = g^x and Y = g^y.
-
 % To understand :
 % - sid = Session identifiers (generated randomly for a new session)
 % - uid = user id ?
@@ -487,17 +371,14 @@ The first solution will be used
 % - CltSession
 % - SvrSession
 
-
 % TODO generate sid
 % TODO C and S ?
-
 
 \begin{algorithm}
 \caption{KHAPE : Registration on the client (generic algorithm)}
 \label{alg:register_client}
 \begin{algorithmic}
 \Require Choose username \verb|uid| and password $pw$
-
 \If {OPRF}
     \State $r \gets$ GenerateRandomNumber in $\mathbb{Z}_p$
     \State $h_1 \gets$ HashToGroup($pw$)$^r$
@@ -505,10 +386,8 @@ The first solution will be used
 \Else
     \State Sends registration request to the server with \verb|uid|
 \EndIf
-
 \State $a \gets$ GenerateRandomNumber in $\mathbb{Z}_p$
 \State $A \gets g^a$
-
 \If {OPRF}
     \State Wait to receive $B$ and $h_2$ from the server
     \State $salt_2 \gets$ $h_2^{\frac{1}{r}}$
@@ -518,28 +397,22 @@ The first solution will be used
     \State Wait to receive $B$ from the server
     \State $e \gets$ Encrypt($pw$, $(a, B)$)
 \EndIf
-
 \State Sends $e$ and $A$ to the server
-
 
 \end{algorithmic}
 \end{algorithm}
-
 \begin{algorithm}
 \caption{KHAPE : Registration on the server (generic algorithm)}
 \label{alg:register_server}
 \begin{algorithmic}
 \Require 
-
 \If {OPRF}
     \State Waits to receive registration request from a client with \verb|uid| and $h_1$
 \Else
     \State Waits to receive registration request from a client with \verb|uid|
 \EndIf
-
 \State $b \gets$ GenerateRandomNumber in $\mathbb{Z}_p$
 \State $B \gets g^b$
-
 \If {OPRF}
     \State $salt \gets$ GenerateRandomNumber in $\mathbb{Z}_p$
     \State $h_2 \gets h_1^{salt}$    
@@ -547,17 +420,12 @@ The first solution will be used
 \Else
     \State Sends $B$ to the client
 \EndIf
-
 \State Waits to receive $e$ and $A$ from the client
-
 \If {OPRF}
     \State Store file[\verb|uid|, S] $\gets$ ($e$, $b$, $A$, $salt$) % TODO S ?
 \Else
     \State Store file[\verb|uid|, S] $\gets$ ($e$, $b$, $A$) % TODO S ?
 \EndIf
-
 \end{algorithmic}
 \end{algorithm}
-
 \end{document}
-
