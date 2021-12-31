@@ -3,12 +3,23 @@
 \begin{document}
 
 \chapter{Conclusion}
-\section{Final result}
-Almost all the goal defined in the specification has been achieved.
-The comparison between the main PAKEs was extensive. The implementation of the KHAPE library was successful, as well as the implementation of the use case.
-A performance test has been added to evaluate the developed library.
 
-The only thing that has not be done, due to lack of time, is the PAKE history.
+This chapter conclude this report with a summary of the work done, and what can still be done.
+
+\section{Password security}
+PAKE protocol provide the highest level of security for password-based authentication, and KHAPE provide the largest amount of security guarantees among PAKE protocol. This make KHAPE the most secure way to perform authentication with passwords.
+However, passwords are still insecure by they very nature of being low-entropy secrets. Password-based authentication should ideally be replaced by more secure protocol such as WebAuthn.
+
+
+\section{Final result}
+Looking back at the goals defined in the specification, almost all of them has been achieved.
+The comparison between the main PAKEs was extensive.
+KHAPE has been chosen to be implemented, providing the first ever implementation of this protocol. %The implementation of the KHAPE library was successful, as well as the implementation of the use case.
+A working prototype of an online password manager has been implemented for the use case.
+And a performance test has been added to evaluate the efficiency of the developed library. In this regard, the developed library achieve almost similar performances than the OPAQUE's library with a slightly higher security level which is a great success.
+
+The only thing that has not be done --- due to lack of time --- is the PAKE history. This section was supposed to provide an overview on the state of PAKE protocols --- from the most commons to the less knowns --- in a chronological order. In consequence, this report rarely mention any other PAKE protocols that is not one of the main protocols (EKE, SRP, OPAQUE and KHAPE). However, the explanations and comparison of the main PAKE protocols is much more significant that initialy planned and provide --- in part --- the overview the the history should have provided, at least for the main protocol.
+
 
 
 % - Résultat final (ce qui a été fait, ce qui n'a pas été fait, cahier du charge)
@@ -25,18 +36,20 @@ The only thing that has not be done, due to lack of time, is the PAKE history.
 % - Historique
 
 
-% \section{Difficulties}
-% Ideal cipher
-% Not much
-
 \section{Future work}
-The KHAPE library has been implemented and is functional but multiple thing could still be done.
+The KHAPE library has been implemented and is functional but multiple interesting concept has not been considered or implemented by lack of time.
+
 \begin{itemize}
  \item Protection against timing attacks,
  \item Discharge password, and other sensitive value from memory directly after use,
- \item Performance comparison of 3DH with HMQV,
+ \item Password reset feature,
+ \item Support for WebAssembly build (to be used directly in web browser),
+ \item Refactor the library to be generic and give the choice of the cryptographic primitives to the library's users,
+ \item Performance comparison between 3DH and HMQV,
  \item Adapt the online password manager client for web browsers
 \end{itemize}
+
+
 
 % - Future work (ideas non implemented)
 %   - continue to work and improve the KHAPE library
@@ -50,6 +63,15 @@ The KHAPE library has been implemented and is functional but multiple thing coul
 % PAKE increase the security of passwords but they are still insecure. future: use other auth method
 
 % \section{Personal conclusion}
+
+\section{Personal conclusion}
+I had much pleasure to do this work and to implement KHAPE and I will continue to improve it in order to propose a public library. Reading a large number of cryptographic paper was new to me but it was very interesting to see how the cryptographic literature evolved with time.
+
+In term of difficulties, KHAPE's non-committing encryption was hard to understand and implement for me. It took me quite some time to understand the concept and how it work and even more time to find a way to implement it in the library.
+Other than that, I didn't face any big difficulties.
+
+% Ideal cipher
+% Not much
 
 
 
