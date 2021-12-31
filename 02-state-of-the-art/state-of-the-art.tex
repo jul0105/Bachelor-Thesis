@@ -42,7 +42,7 @@ Schemas will use the notation described in Fig \ref{fig:notation}.
 \section{Main PAKEs}
 This section describe in more details four fundamental PAKE construction. 
 EKE as it is the first ever PAKE. 
-SRP because it's the most used. 
+SRP because it is the most used. 
 OPAQUE because it is very promising, in the process of standardization and the first construction of this new generation of Strong aPAKE.
 OPAQUE because it is the first construction of Strong aPAKE
 KHAPE because it is most recent one and provide slightly better security guarantees than OPAQUE in certain conditions.
@@ -82,26 +82,26 @@ The steps are the following :
  \item Client computes $A$, encrypt it using the password and send the result to the server in addition to it identifies (e.g., username).
  \item Server decrypts ciphertext using the password to obtain $A$. He computes $B$ and $K$. He encrypts $B$ using the password and encrypt a randomly generated challenge $c1$ using $K$. He sends the resulting ciphertext to the client.
  \item The client decrypts $B$ using the password and compute $K$. He decrypts $c1$ with $K$ and also generate a random challenge $c2$. He concatenate the two challenges, encrypt them using $K$ and send the result to the server.
- \item Server decrypt the ciphertext and check that both sent and received $c1$ match. If it's the case, the server is assured that the client possesses the same password. The server has authenticated the client. He finishes by encrypting $c2$ and sending the result.
- \item Client decrypts the ciphertext and check that both sent and received $c2$ match. If it's the case, the client is assured that the server possesses the same password and therefore is authenticated. The client has authenticated the server.
+ \item Server decrypt the ciphertext and check that both sent and received $c1$ match. If it is the case, the server is assured that the client possesses the same password. The server has authenticated the client. He finishes by encrypting $c2$ and sending the result.
+ \item Client decrypts the ciphertext and check that both sent and received $c2$ match. If it is the case, the client is assured that the server possesses the same password and therefore is authenticated. The client has authenticated the server.
 \end{enumerate}
 
 %%% Login ?
 \paragraph{\writingFormulationClean{Register.}}
-The protocol doesn't mention registration. It is assumed that both parties already share a common secret, the password. A secure channel is therefore necessary to share the password in the first place.
+The protocol does not mention registration. It is assumed that both parties already share a common secret, the password. A secure channel is therefore necessary to share the password in the first place.
 
 % ====================================================================================
 
 \subsection{\writingNotes{SRP}}
 \paragraph{\writingNotes{Introduction.}}
 SRP \cite{SRP_Paper, SRP_6_Paper} (for Secure Remote Password) was proposed in 1998 and is the most widely implemented PAKE protocol in the world \cite{PAKE_Green_blog}.
-It's largely used in iCloud Key Vault --- which could make it one of the most widely used cryptographic protocols \cite{PAKE_Green_blog} considering the number of active Apple devices worldwide --- and in 1Password's password manager.
+It is largely used in iCloud Key Vault --- which could make it one of the most widely used cryptographic protocols \cite{PAKE_Green_blog} considering the number of active Apple devices worldwide --- and in 1Password's password manager.
 It is well standardized and has numerous implementation in different programming languages. %\cite{http://srp.stanford.edu/links.html}.
 It is in fact a TLS cipher suite \cite{SRP_RFC_3}, implemented in OpenSSL.
 This success is partly due to the SRP's creators will to avoid patents --- unlike most of the PAKE of its time --- but also to avoid export restriction imposed by US law by not using any encryption schema \cite{SRP_Formal_Analysis}.
-Their goal was to provide a technology that improve the security of existing password protocols while keeping the ease-of-use of passwords. In other words, provide a drop-in replacement to the classical authentication methods where the implementation doesn't require a deep change in contrary to EKE where the shared secret --- the password --- need to be stored in cleartext on the server making it difficult to manage correctly.
+Their goal was to provide a technology that improve the security of existing password protocols while keeping the ease-of-use of passwords. In other words, provide a drop-in replacement to the classical authentication methods where the implementation does not require a deep change in contrary to EKE where the shared secret --- the password --- need to be stored in cleartext on the server making it difficult to manage correctly.
 This makes SRP easy to implement for developers and transparent for the user.
-One of the main strengths of SRP is that the server doesn't store the cleartext password or the hashed password. Instead it stores a password verifier that is a discrete logarithm one-way function of the password.
+One of the main strengths of SRP is that the server does not store the cleartext password or the hashed password. Instead it stores a password verifier that is a discrete logarithm one-way function of the password.
 
 Even though SRP is in interesting construction and does some things right, it is not ideal.
 It got broken and patched multiple time --- current version is SRP v6a, which is not broken.
@@ -132,7 +132,7 @@ The steps are the following :
  \item The server sends $s$ and $B$ to the client.
  \item The client and server both compute $u$, $S$ and $K$ with their own values.
  \item They finish with a mutual key-confirmation process where the client sends his proof of $K$ first.
- \item If the server finds that the user's proof is incorrect, he stops the exchange and doesn't send its own proof of $K$.
+ \item If the server finds that the user's proof is incorrect, he stops the exchange and does not send its own proof of $K$.
 \end{enumerate}
 If the password is correct, the client and the server end up with having the same $S$ --- and so the same key. The derivation of $S$ is less straightforward than other constructions so it is detailed below.
 \begin{align*}
@@ -275,7 +275,7 @@ OPAQUE's paper \cite{OPAQUE_Paper} and OPAQUE's internet standard draft \cite{OP
 The draft standard is now much more detailed than before.
 
 One of the major differences in the core protocol design is the encryption of the client's private key.
-In the paper, it is specified that the client uses an authenticated encryption scheme to encrypt and decrypt it's credentials --- i.e., client's private and public keys and the server's public key. The encryption key is the OPRF output.
+In the paper, it is specified that the client uses an authenticated encryption scheme to encrypt and decrypt its credentials --- i.e., client's private and public keys and the server's public key. The encryption key is the OPRF output.
 In the draft standard, it is rather different.
 Firstly, the envelope does not contain the client's keys anymore. It only contains a nonce and an authentication tag. 
 The nonce is used --- with a derivation of the OPRF output --- to derive an authentication key, and export key and a seed.
@@ -300,7 +300,7 @@ OPAQUE security relies entirely on the strength of the OPRF. If OPRF gets broken
 KHAPE (for Key-Hiding Asymmetric PakE) \cite{KHAPE_Paper} is a variant to the OPAQUE protocol. Instead of using OPRF as a main tool to archive security, it becomes an optional part of the protocol and KHAPE use two other concepts to archive security: non-committing encryption and key-hiding AKE.
 
 KHAPE is not a Strong aPAKE like OPAQUE. But it can be made a SaPAKE following the aPAKE to SaPAKE compiler from \cite{OPAQUE_Paper} using OPRF.
-So OPRF is optional with KHAPE and just allow making it a SaPAKE. In addition, it also allows using OPRF features such as a server-side threshold implementation that doesn't require any change from the client (see all feature in section \ref{sec:opaque_oprf}). If OPRF fails, KHAPE just loss these functionalities but the rest of the security remain in contrary to OPAQUE.
+So OPRF is optional with KHAPE and just allow making it a SaPAKE. In addition, it also allows using OPRF features such as a server-side threshold implementation that does not require any change from the client (see all feature in section \ref{sec:opaque_oprf}). If OPRF fails, KHAPE just loss these functionalities but the rest of the security remain in contrary to OPAQUE.
 
 
 % ``Two key ideas are: (i) dispense with authentication of the
@@ -313,7 +313,7 @@ So OPRF is optional with KHAPE and just allow making it a SaPAKE. In addition, i
 % for public key encryption [8]).'' \cite{KHAPE_Paper}
 
 \paragraph{Security without OPRF.}
-Like OPAQUE, in KHAPE each party has a private/public key pair that is used to compute the key exchange and the client store it's private key and server's public key on the server, encrypted by his password.
+Like OPAQUE, in KHAPE each party has a private/public key pair that is used to compute the key exchange and the client store its private key and server's public key on the server, encrypted by his password.
 Without using an OPRF, an adversary could try to retrieve the ciphertext and the server's public key from a valid key exchange between an existing client and the server.
 He can then compute an offline dictionary attack using a list of password candidates to decrypt the ciphertext until he finds a match with the server's public key that he recorded sooner.
 To avoid these kinds of attacks, KHAPE use two main mechanisms: Non-committing encryption and key-hiding AKE.
@@ -378,25 +378,25 @@ This section compares the main PAKEs on their security guarantees and performanc
  
 \subsection{Details} \label{sec:comparison_details}
 
-\paragraph{\writingFormulationClean{1. Server doesn't process passwords in cleartext.}}
-This is the main security property of asymmetric PAKE \cite{aPAKE_Formalized}. Server doesn't have to store passwords in cleartext which should make it more resilient in case of server compromise. Adversary has to compute an offline attack to retrieve passwords from the compromised server.
+\paragraph{\writingFormulationClean{1. Server does not process passwords in cleartext.}}
+This is the main security property of asymmetric PAKE \cite{aPAKE_Formalized}. Server does not have to store passwords in cleartext which should make it more resilient in case of server compromise. Adversary has to compute an offline attack to retrieve passwords from the compromised server.
 \paragraph{\writingFormulationClean{2. Avoid sending cleartext password to the server.}}
-Even though it seems similar to criteria 1, it's not. Criterion 1 is about password processing, but this criterion is about password transmission. Transmission and processing of passwords are vulnerable to different attacks vectors.
-The server doesn't receive passwords in cleartext which avoid any miss-handling vulnerabilities such as logging or caching cleartext passwords on the server.
+Even though it seems similar to criteria 1, it is not. Criterion 1 is about password processing, but this criterion is about password transmission. Transmission and processing of passwords are vulnerable to different attacks vectors.
+The server does not receive passwords in cleartext which avoid any miss-handling vulnerabilities such as logging or caching cleartext passwords on the server.
 COMMENT: May be required during register depending on the implementation (See Section \ref{sec:opaque_register}).
 \paragraph{\writingFormulationClean{3. Secure against pre-computation attacks.}} \label{sec:secure_against_pca}
-This is the main security property of Strong aPAKE \cite{OPAQUE_Paper}. The server doesn't leak any data that could allow an attacker to perform a pre-computation attack (for example SRP send the salt in cleartext in the first message). This attack allows an attacker to compute a table \emph{before} the server even get compromised. Once the attacker succeeds in compromising the server, he can use the precomputed table to retrieve the passwords \emph{instantaneously}. With this protection, an attacker can only perform an offline dictionary attack \emph{after} successfully compromising the server.
+This is the main security property of Strong aPAKE \cite{OPAQUE_Paper}. The server does not leak any data that could allow an attacker to perform a pre-computation attack (for example SRP send the salt in cleartext in the first message). This attack allows an attacker to compute a table \emph{before} the server even get compromised. Once the attacker succeeds in compromising the server, he can use the precomputed table to retrieve the passwords \emph{instantaneously}. With this protection, an attacker can only perform an offline dictionary attack \emph{after} successfully compromising the server.
 This protection is provided by the OPRF (see Section \ref{sec:opaque_oprf}).
 % This vulnerability weaken the initial benefit of using an aPAKE \cite{aPAKE_Formalized} and even make password-over-TLS more secure \cite{OPAQUE_Paper} (than aPAKE vulnerable to pre-computation attacks).
 
 \paragraph{\writingFormulationClean{4. Forward secrecy.}}
 In key-exchange protocol, Forward Secrecy (also called Full Forward Secrecy or Perfect Forward Secrecy) ensures that upon compromise of any long-term key used to negotiate sessions key, an attacker cannot compromise previous session keys.
 In detail key-exchange protocol use long-lived keys to authenticate the user and short-lived keys to encrypt sessions. With Forward Secrecy, an attacker that successfully compromised a long-lived key cannot retrieve any previous session data even if he recorded the previous encrypted transmissions. % TODO cite Duc CAA 05-password ?
-COMMENT: For EKE, only DH-EKE provide forward secrecy. ElGamal-EKE and RSA-EKE doesn't.
+COMMENT: For EKE, only DH-EKE provide forward secrecy. ElGamal-EKE and RSA-EKE does not.
 \paragraph{\writingFormulationClean{5. Mutual authentication.}}
 Mutual authentication explicit that users must be authenticated to the server but also that the server must authenticate itself to the user to avoid that an adversary impersonates the server to maliciously communicate with the client.
 \paragraph{\writingFormulationBrut{6. PKI-free.}} % TODO rename to: Doesn't require transmission over a secure channel
-The transmissions between client and server doesn't require to be secured with Public Key Infrastructure (PKI). This is a big improvement over classical authentication method (password-over-TLS) considering the occurrence of PKI failures nowadays. % "PKI failures include stealing of server private keys, software that does not verify certificates correctly, users that accept invalid or suspicious certificates, certificates issued by rogue CAs, servers that share their TLS keys with others e.g., CDN providers or security monitoring software, information (including passwords) that traverses networks in plaintext form after TLS termination; and more."
+The transmissions between client and server does not require to be secured with Public Key Infrastructure (PKI). This is a big improvement over classical authentication method (password-over-TLS) considering the occurrence of PKI failures nowadays. % "PKI failures include stealing of server private keys, software that does not verify certificates correctly, users that accept invalid or suspicious certificates, certificates issued by rogue CAs, servers that share their TLS keys with others e.g., CDN providers or security monitoring software, information (including passwords) that traverses networks in plaintext form after TLS termination; and more."
 \paragraph{\writingFormulationClean{7. User-side password hardening.}} \label{sec:password_hardening_comparison}
 Users can use password hardening technique to increase the cost of an offline attack if the server gets compromised. This is done by using resource-heavy functions such as Scrypt \cite{Scrypt_Paper} or Argon2 \cite{Argon2_Paper} instead of computing a simple and efficient hash. These functions allow to drastically slows down hashing process and so making offline attacks and online guessing attack much slower.
 COMMENT: For EKE, it could be possible to compute a KDF function on the password before using it as a symmetrical key but this is closer to Augmented EKE \cite{AEKE_Paper} where the password is hashed client side and the server store the hash results.
@@ -484,7 +484,7 @@ For value where there is a ``*'', please refer to the appropriate comment in Sec
      
      % Qualities (security guarantees)
      
-     1 & Server doesn't process passwords in cleartext & No & Yes & Yes & Yes \\ \hline
+     1 & Server does not process passwords in cleartext & No & Yes & Yes & Yes \\ \hline
      2 & Avoid sending cleartext password to the server & No & Yes & Yes* & Yes* \\ \hline
      
      3 & Secure against pre-computation attacks & - (no hash) & No & Yes & Yes, if using OPRF \\ \hline
