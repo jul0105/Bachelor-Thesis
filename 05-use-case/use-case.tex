@@ -1,4 +1,4 @@
-﻿\documentclass[../report.tex]{subfiles}
+\documentclass[../report.tex]{subfiles}
 \begin{document}
 
 
@@ -20,7 +20,7 @@ In fact, multiple well-known online password manager such as iCloud Key Vault or
 More generally, using an aPAKE makes a lot of sense on applications where the server-side stored user data should not be visible to the server.  This is the case for applications where the server does not process the user's data. For example, online backup, secure vault, password managers, etc. This is achieved with encryption and so require an encryption key for the client.
 Depending on the client, it is not feasible to store an additional symmetric key because it has to be securely stored --- e.g., with an HSM --- which cause problems of portability and key recovery. For example, for an online encrypted backup of a laptop or a smartphone, if the user loses its device, he cannot retrieve his online backup because the encryption key is stored on its lost device.
 For portability, the encryption key is typically derived from the user's password --- the same password that he uses to authenticate with the server (you could require that the user input two different passwords but this is generally avoided because of bad user experience). Using a classical authentication method, the server store the user's encrypted sensitive data and also process the password in cleartext which is used to compute the encryption key. This void all the security of encrypting the sensitive data in the first place because the server --- or a malicious party who compromised the server --- could store the cleartext password, compute the encryption key and decrypt the sensitive user's data.
-This is the reason why aPAKEs are very interesting in this case scenario. The server \textbf{never} see the user's password, so he cannot use it to decrypt user’s data.
+This is the reason why aPAKEs are very interesting in this case scenario. The server \textbf{never} sees the user's password, so he cannot use it to decrypt user’s data.
 
 
 
@@ -69,7 +69,7 @@ KHAPE is used for authentication between the client and the server. OPRF and Slo
 \subsection{Encrypted user data}
 Each user stores his encrypted user data on the server. This data include an Encrypted password registry and an Encrypted master key. Every encryption is computed by the authenticated encryption scheme XChaCha20-Poly1305.
 
-The Encrypted password registry is a structure that contains the user's password. Passwords are double encrypted. The external structure --- the password registry --- is encrypted and then each individual password is also encrypted. Each encryption is performed with a different key, all derived from the master key.
+The Encrypted password registry is a structure that contains the user's password. Passwords are double encrypted. The external structure --- the password registry --- is encrypted, and then each individual password is also encrypted. Each encryption is performed with a different key, all derived from the master key.
 
 The Encrypted master key is simply a key --- the Master key --- that is encrypted with another key --- the KHAPE's export key. 
 One could derive the Master key from the KHAPE's export key but this means that if the user wants to change his authentication password, it is necessary to decrypt and re-encrypt every single password entry and the password registry with the new export key. This is not conceivable for a scalable password manager. Instead, in case of change in the authentication password, only the Master key is re-encrypted with the new export key. This idea is inspired from Bitwarden's online password manager design \cite{Bitwarden_Paper}.
@@ -105,7 +105,7 @@ The figure \ref{fig:Online_password_manager} shows the entire process of reading
  \item He decrypts the Encrypted master key with the KHAPE's export key to obtain his private key
  \item He computes two HKDF Expand with the Master key as an input and constant labels to obtain an External encryption key and an Internal encryption key
  \item He decrypts the Encrypted password registry with the External encryption key to obtain the Indexable password registry
- \item Now that the client has decrypted the external layer of the password registry, he remove the following value from memory: Export key, Master key, Encrypted master keys and Encrypted password registry. He still has to keep the Session key to communicate with the server and the external encryption key to re-encrypt the password registry upon modification.
+ \item Now that the client has decrypted the external layer of the password registry, he remove the following value from memory: Export key, Master key, Encrypted master keys and Encrypted password registry. He still has to keep the Session key to communicate with the server, and the external encryption key to re-encrypt the password registry upon modification.
  \item In the Indexable password registry each entry's label and username are in cleartext but the password is still unreadable. 
  \item When the user chooses to read a password entry, the client uses Internal encryption keys to compute an HKDF Expand with the entry's label and username as context. The result is a key that is unique for this password.
  \item The client finish by decrypting the encrypted password with the computed key. He obtains the readable password.
