@@ -221,30 +221,42 @@ Algorithm \ref{alg:key_derivation_2} shows how these keys are derived.
 
 
 \section{\writingNotes{Limitations}}
-In opposition with classical authentication method where the client only send an authentication request and receive a response. With KHAPE, the registration and the authentication processes require multiple messages (round-trip) between the client and the server.
-This adds new difficulties for both sides that need to be considered.
+In opposition with classical authentication method where the client only sends an authentication request and receives a response, KHAPE's registration and authentication processes require multiple messages (round-trip) between the client and the server.
+This adds new difficulties for both sides.
+
 \subsection{Client}
-Necessity to send two messages. If the client is a web browser, he cannot only send a login form to the server. Behind-the-scene request has to be made to compute the two round-trip. This means that some JavaScript has to be implemented but this was known from the beginning that PAKE protocol requires a greater implication of the client (code-wise).
+For both registration and authentication, the client is required to send two messages. If the client is a web browser, he cannot only send a login form to the server. Behind-the-scene request has to be made to compute the two round-trip. This means that some JavaScript has to be implemented but this was known from the beginning that PAKE protocol requires a greater implication of the client code-wise.
+
+
 \subsection{Server}
-Pre register secret, ephemeral key, session
-The server communicate with multiple clients at the same time so when a request comes, he needs to know from which client/session it is from to be able to use the correct value. This is even more complicated because during both authentication and registration, the server generate some secret value in the first round trip and needs these values in the second round trip.
+The server communicate with multiple clients at the same time so when a request comes, he needs to know from which client it is from to be able to use the correct value. This is even more complicated because during both authentication and registration, the server generate some secret value in the first round trip and needs these values in the second round trip.
 
-During authentication, the server needs to store his ephemeral private key for the second round-trip. He can store this value in the user's file entry or in a separated session file.
-He can :
-- Store this value in the file entry associated to the user
-- Store this value in a session file entry (this require that client generate a session id and sends it with every request) (can be used to store session key later)
-- Encrypt the value and send it to the client which send it back (like JWT)
-In every case, the client has to resend the uid in the 2nd round-trip request
-The second solution will be used. Allow multiple session
+The way to store these value is outside the scope of the KHAPE library. It is up to the applications using the KHAPE's library to decide how to store these value in their system. However, we still provide possible solutions and the recommended one to store these values.
+
+\paragraph{Authentication.}
+During authentication, the server needs to store his ephemeral private key for the second round-trip. Applications using the KHAPE library can store this value in the following locations :
+
+\begin{itemize}
+ \item Store this value on the server in the user datastore.
+ \item Store this value on the server in a session datastore. This require that client generate a session id and sends it with every request.
+ \item Encrypt the value with a server secret and send it to the client which send it back (comparable to JWT).
+\end{itemize}
+
+The KHAPE library is implemented to use the first solution since it is the easiest of the three --- it doesn't require an additional session datastore. With this solution, a unique user cannot authentication multiple time at the same moment. It is not a common requirement but if the application need it, one should use solution 2.
+The third solution can be used but application developers should be extra careful that the ephemeral keys never leaks.
+
  
+\paragraph{Registration.}
+During registration, the server generate his key pair and the secret salt. He sends the public key but the private key and the secret salt has to remain secret. Applications using the KHAPE library can store these values in the following locations :
 
-During register, the server generate his keys (private and public) and the secret salt. He sends the public key but the private key and the secret salt has to remain secret.
-He can :
-- Pre register the client in a incomplete file entry.
-   - file[uid] = <secret\_salt, b, INCOMPLET>
-   - file[uid] = <e, b, A, secret\_salt, COMPLET>
-- Solution 2 and 3 from auth
-The first solution will be used
+\begin{itemize}
+ \item Pre-register the client a incomplete file entry.
+ \item Pre-register the client. Store the available values on the server in the user datastore and specify that the registration is not completed. When the second registration round-trip arrive, the server store the rest of the value and mark the user registration as completed.
+ \item Solution 2 and 3 from authentication
+\end{itemize}
+
+This time again, the first solution is recommended since it is the easier to implement.
+A user registration that is not completed should be overridable if another registration request comes with the same username.
 
 
 % \section{Security consideration}
