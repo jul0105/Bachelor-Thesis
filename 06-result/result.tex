@@ -1,4 +1,4 @@
-﻿\documentclass[../report.tex]{subfiles}
+\documentclass[../report.tex]{subfiles}
 \begin{document}
 \usepgfplotslibrary{statistics}
 
@@ -394,7 +394,7 @@ This benchmark is using the rust library Argon2's default parameters. The defaul
 \section{OPAQUE benchmark} % same as KHAPE endpoints. Shows default parameters and similar parameters as KHAPE
 
 
-KHAPE and OPAQUE designs share lots of similarities. This makes OPAQUE a perfect candidate for performance comparison. But before that, we need to understand the difference to be able to compare them fairly.
+KHAPE and OPAQUE designs share a large number of similarities. This makes OPAQUE a perfect candidate for performance comparison. But before that, we need to understand the difference to be able to compare them fairly.
 
 The benchmark is computed with a cipher suite that is close to the primitive used for KHAPE : ristretto255 curve for the OPRF group, Montgomery curve for the KE group, 3DH for the AKE and SHA3 for hashing.
 Note that the default cipher suite for OPAQUE use SHA2 instead of SHA3 and ristretto255 curve for both OPRF group and KE group but the performance obtained between the two cipher suites are relatively similar.
@@ -479,7 +479,7 @@ Firstly, we will compare OPAQUE and KHAPE with OPRF.
 For the registration, KHAPE with OPRF lose around 81 us to OPAQUE in the median.
 The \verb|client start| endpoint takes about the same time. KHAPE's \verb|server start| operations are split between \verb|server setup| and \verb|server start| for OPAQUE, which make it more flexible since it can be called before a request comes. In detail, it is the random key pair generation that is computed in the \verb|server setup| endpoint. The two endpoints combined take about the same time as KHAPE's \verb|server start| endpoint.
 
-Majority of KHAPE time lose is on the \verb|client finish| endpoint.
+Majority of KHAPE time loss is on the \verb|client finish| endpoint.
 This is probable due to the fact that KHAPE generate a key pair using the rejection method and then encrypt the private key and server's public key in an encrypted envelope.
 We saw earlier that encryption is not very time consuming (7.7 us) but key generation is (122 us).
 OPAQUE neither generate a key pair, nor use the rejection method nor encrypt the envelope.
@@ -535,7 +535,7 @@ Finally, KHAPE without OPRF is around 207 us faster than KHAPE with OPRF --- the
 
 
 \subsection*{Authentication}
-For the authentication, OPAQUE and KHAPE with OPRF have rather different endpoint performances but the overall performance of each protocol is almost equal with a difference of around 7 us.
+For the authentication, OPAQUE and KHAPE with OPRF have rather different endpoint performances but the overall performance of each protocol is almost equal with a difference of around seven us.
 This is because a lot of similar operations are computed on both protocol but they are executed in different endpoints.
 
 Similar to the registration, KHAPE without OPRF is the fastest protocol. It is faster by 197 us on OPAQUE and by 205 us on KHAPE with OPRF.
@@ -599,7 +599,7 @@ Even if it is the fastest in both registration and authentication, we believe th
 \section{Message size} \label{sec:comp_message_size}
 All the above benchmarks are only comparing computational performances by measuring the time consumption. In a real-world scenario, network delay during transmissions of messages between the client and the server also has to be considered. Network delay benchmark is difficult to evaluate and not very meaningful because it depends too much on the network infrastructure between the two parties.
 Nevertheless, this section compares the message size and message number for multiple OPAQUE and KHAPE configurations.
-OPAQUE results are taken from the standard draft test vector and verified with the OPAQUE rust library \cite{OPAQUE_KE_lib}. In these tests vector, the user identifier is 4 bytes long. The same length will be used for KHAPE's user id. It is interesting to note that in OPAQUE, the user id is not transmitted with the protocol's messages. It is the responsibility of the application to handle it. In KHAPE, the user id is included with the protocol's messages and accessible to the application.
+OPAQUE results are taken from the standard draft test vectors and verified with the OPAQUE rust library \cite{OPAQUE_KE_lib}. In these tests vectors, the user identifier is four bytes long. The same length will be used for KHAPE's user id. It is interesting to note that in OPAQUE, the user id is not transmitted with the protocol's messages. It is the responsibility of the application to handle it. In KHAPE, the user id is included with the protocol's messages and accessible to the application.
 
 For OPAQUE, the message size depends on the primitives used (cipher suite). In particular, the choice of the hashing function, MAC and KDF has a considerable impact since they can produce output of different length depending on the primitive used.
 For the benchmark, we will use a cipher suite with 256-bit output for hashing function, MAC and KDF because KHAPE also use this output size for these functions. A comparison is also made with a 512-bit output cipher suite.
