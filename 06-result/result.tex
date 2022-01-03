@@ -58,8 +58,7 @@ Both client and server functions have around the same performances. This is not 
 
 
 \subsection{Key generation}
-Key generation also takes a lot of time with a median of 122 us. Key generation consists of: 1) generating a 32 bytes random value, 2) generating a private key from the random bytes, 3) computing its associated public key --- a curve multiplication operation --- and then 4) converting the public key to a field element using the elligator2 map.
-
+Key generation also takes a lot of time with a median of 122 us. Key generation consists of: 1) generating a 32 bytes random value, 2) generating a private key from the random bytes, 3) computing its associated public key --- a curve multiplication operation --- and then 4) converting the public key to a field element using the Elligator2 mapping.
 For step 2, not all 32 bytes random value can be used to generate a private key and for step 4, not all public key can be mapped to a field element.
 In this case, the rejection method is used which means that the key generation process is restarted from step 1. This is more secure than trying to modify the value to make it fit but on the other hand, it is more costly in terms of performance as the key generation process can be made multiple time.
 This is also why the time distribution of this function is more spread out than for other functions.
@@ -137,7 +136,6 @@ The encryption and the decryption take almost exactly the same time in median be
 
 \section{KHAPE benchmark} % What endpoint take the most time during auth and register ? 
 In KHAPE, both registration and authentication process have multiple endpoints --- respectively four and five. These endpoints are shared between the client and the server to constitute the protocol.
-
 For this benchmark, each endpoints are tested to measure the time they take to complete and compare them using different parameters. 
 It is interesting to see Section \ref{sec:impl_function_def} to understand what operations are computed on each endpoint and to compare it with the benchmark result.
 Note that only the time taken for each endpoint to complete is measured. In a real-world scenario, the resulting messages have to be transmitted between the client and the server. The network delay is not very interesting to benchmark as it depends too much on the network infrastructure between the client and the server. Instead, Section \ref{sec:comp_message_size} shows a comparison of message size between multiple configuration of KHAPE and OPAQUE.
@@ -185,10 +183,8 @@ The \verb|server finish| endpoint take almost no time since it only builds a sto
 
 
 \subsection*{Authentication}
-It is important to note that the endpoints for the registration and authentication are obviously different. For readability reason, it is not specified on the label of the charts but in the chart's title, which could make it look like authentication and registration share the same function.
-
 We can see that \verb|client ke| endpoint takes the most time. This is because a lot of things are computed in this endpoint including the generation of an ephemeral key pair (122 us) and the computation of the 3DH (184 us).
-We also notice that both \verb|client start| and \verb|server start| take about the same time as their homonym endpoints in registration. This is because these two functions are relatively similar between registration and authentication.
+We also notice that both \verb|client start| and \verb|server start| take about the same time as their homonym endpoints in registration. This is because these two functions are relatively similar between registration and authentication.\footnote{It is important to note that the endpoints for the registration and authentication are obviously different. For readability reason, it is not specified on the label of the charts but in the chart's title, which could make it look like authentication and registration share the same function.}
 
 
 \begin{tikzpicture}
@@ -312,10 +308,8 @@ For the authentication, it is similar. The first three endpoints take between 67
 
 
 Using a memory-hard hashing function also increases the level of security of the protocol (see section \ref{sec:design_choice_slowhash}).
-
 This benchmark is not very meaningful since these functions are designed to be slow and the performance only depends on the parameters used. But it is still interesting to see the performance degradation attached to the use of these functions and the scale of it compared to the rest of the protocol.
 It also makes it easier to understand how these functions slow down attackers that build hashing table. Since we replace a simple and efficient hashing function that would not even take 0.5 us to compute by a slow and expensive hashing function that takes around 8,000 us to compute. That makes it 16,000 times slower to compute and so the attackers can compute 16,000 times less hash in the same time frame.
-
 This benchmark is using the rust library Argon2's default parameters. The default parameters of the KHAPE library are more resource intensive and time consuming since we believe that final user can wait a little bit more than 8 ms to register/authenticate to a secure system.
 
 
@@ -395,8 +389,7 @@ This benchmark is using the rust library Argon2's default parameters. The defaul
 
 
 KHAPE and OPAQUE designs share a large number of similarities. This makes OPAQUE a perfect candidate for performance comparison. But before that, we need to understand the difference to be able to compare them fairly.
-
-The benchmark is computed with a cipher suite that is close to the primitive used for KHAPE : ristretto255 curve for the OPRF group, Montgomery curve for the KE group, 3DH for the AKE and SHA3 for hashing.
+This benchmark is computed with a cipher suite that is close to the primitive used for KHAPE : ristretto255 curve for the OPRF group, Montgomery curve for the KE group, 3DH for the AKE and SHA3 for hashing.
 Note that the default cipher suite for OPAQUE use SHA2 instead of SHA3 and ristretto255 curve for both OPRF group and KE group but the performance obtained between the two cipher suites are relatively similar.
 
 
@@ -477,7 +470,7 @@ In this section, we compare the performances of the KHAPE protocol --- with and 
 \subsection*{Registration}
 Firstly, we will compare OPAQUE and KHAPE with OPRF.
 For the registration, KHAPE with OPRF lose around 81 us to OPAQUE in the median.
-The \verb|client start| endpoint takes about the same time. KHAPE's \verb|server start| operations are split between \verb|server setup| and \verb|server start| for OPAQUE, which make it more flexible since it can be called before a request comes. In detail, it is the random key pair generation that is computed in the \verb|server setup| endpoint. The two endpoints combined take about the same time as KHAPE's \verb|server start| endpoint.
+The \verb|client start| endpoints take about the same time. KHAPE's \verb|server start| operations are split between \verb|server setup| and \verb|server start| for OPAQUE, which make it more flexible since it can be called before a request comes. In detail, it is the random key pair generation that is computed in the \verb|server setup| endpoint. The two endpoints combined take about the same time as KHAPE's \verb|server start| endpoint.
 
 Majority of KHAPE time loss is on the \verb|client finish| endpoint.
 This is probable due to the fact that KHAPE generate a key pair using the rejection method and then encrypt the private key and server's public key in an encrypted envelope.
@@ -485,7 +478,6 @@ We saw earlier that encryption is not very time consuming (7.7 us) but key gener
 OPAQUE neither generate a key pair, nor use the rejection method nor encrypt the envelope.
 Instead of using the OPRF output to derive an encryption key to decrypt the encrypted private key, OPAQUE directly derive the private key (and the resulting public key) from the OPRF output. This solution allows OPAQUE to get rid of encryption altogether and to avoid computing a random key generation which makes it much faster.
 Also note that this method is only for the client side. The server still needs to generate a random key pair which is done in the \verb|server setup| endpoint. This is why we cannot see a similar performance gain in the server-side registration and that the first three endpoints are relatively similar in terms of time consumption.
-
 Finally, KHAPE without OPRF is around 207 us faster than KHAPE with OPRF --- the equivalent of about three exponentiations --- and 126 us faster than OPAQUE, which makes it the fastest protocol.
 
 
@@ -537,7 +529,6 @@ Finally, KHAPE without OPRF is around 207 us faster than KHAPE with OPRF --- the
 \subsection*{Authentication}
 For the authentication, OPAQUE and KHAPE with OPRF have rather different endpoint performances but the overall performance of each protocol is almost equal with a difference of around seven us.
 This is because a lot of similar operations are computed on both protocol but they are executed in different endpoints.
-
 Similar to the registration, KHAPE without OPRF is the fastest protocol. It is faster by 197 us on OPAQUE and by 205 us on KHAPE with OPRF.
 Even if it is the fastest in both registration and authentication, we believe that the security sacrifice is not worth the performance gain and therefore we recommend using OPAQUE or KHAPE with OPRF which is secure against pre-computation attacks (see Section \ref{sec:design_choice_oprf}).
 
@@ -622,13 +613,10 @@ Note that the 256-bit cipher suites use a P256 curve where the points are repres
 
 \subsection*{Registration}
 Firstly, comparing KHAPE with and without OPRF, we see that the first two messages contains 32 more bytes with OPRF. This is simply the size of the representation of a curve point used for OPRF. This difference is exactly the same for the authentication.
-
-Comparing KHAPE and OPAQUE 256-bit cipher suite, we notice that the last message is larger with OPAQUE.
+Secondly, comparing KHAPE and OPAQUE 256-bit cipher suite, we notice that the last message is larger with OPAQUE.
 This is because OPAQUE encrypt the envelope before transmission with a one-time pad key.
 This key is derived from a static shared secret which is included in this registration upload message (see Section \ref{sec:opaque_paper_vs_draft}). The difference of size is due to this additional key sent with OPAQUE.
-
-Comparison between the two OPAQUE's cipher suites, since there are two hashing function derived result
-Comparing the two OPAQUE's cipher suites, we see that the first two messages contain curve points since the 256-bit cipher suite represents curve points on 33 bytes instead of 32.
+Finally, comparing the two OPAQUE's cipher suites, we see that the first two messages contain curve points since the 256-bit cipher suite represents curve points on 33 bytes instead of 32.
 The last message contains two hash-derived output. Their size is doubled with the 512-bit cipher suites.
 
 
