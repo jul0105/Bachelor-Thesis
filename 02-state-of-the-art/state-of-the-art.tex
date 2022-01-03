@@ -239,7 +239,7 @@ The security of these two construction is based on Oblivious PRF (OPRF) function
 The OPAQUE protocol allows to secure authentication from the simplest applications to the most sensitive ones.
 
 
-\paragraph{OPRF.} \label{sec:opaque_oprf}
+\paragraph{OPRF.} \phantomsection \label{sec:opaque_oprf}
 OPRF \cite{VOPRF_Standard_Draft} is a two-party protocol that allows computing an output from two secret inputs. In other words, each party, namely the client and the server, input a secret value --- a password for the client, a secret salt for the server --- and the client can use the output as a key. What is interesting is that the client cannot learn the server's secret salt and the server cannot learn the user's password or the OPRF output.
 This feature allows OPRF to provide security against pre-computation attacks to OPAQUE and KHAPE.
 In addition to providing a Strong aPAKE protocol, OPRF provides other interesting security features that can be used with OPAQUE.
@@ -276,7 +276,7 @@ The steps are the following :
 \end{enumerate}
 
 
-\paragraph{\writingFormulationClean{Register.}} \label{sec:opaque_register}
+\paragraph{\writingFormulationClean{Register.}} \phantomsection \label{sec:opaque_register}
 The client registration is the only part of the protocol that requires a secure channel where both parties can authenticate each other.
 The protocol is proposed with a server-side registration where the client sends his password through the secure channel. The server generates a salt and computes OPRF function with the client's password and salt. Server also generates two private keys (one for the client and one for the server) and their corresponding public key. He encrypts client's private key and server's public key with OPRF output as a key and store the ciphertext.
 This method is not ideal as it requires that the user send its cleartext password to the server making it vulnerable to miss-handling or server-side vulnerabilities discussed in the introduction.
@@ -292,7 +292,7 @@ He then uses these keys to run an authenticated key exchange with the server.
 On the other hand, if the password is wrong, the OPRF output is totally different and the ciphertext decryption makes the keys incorrect and the server will refuse it during the key exchange. % TODO confirmation
 
 
-\paragraph{\writingFormulationClean{Differences with the internet standard draft.}} \label{sec:opaque_paper_vs_draft}
+\paragraph{\writingFormulationClean{Differences with the internet standard draft.}} \phantomsection \label{sec:opaque_paper_vs_draft}
 OPAQUE's paper \cite{OPAQUE_Paper} and OPAQUE's internet standard \cite{OPAQUE_Standard_Draft} --- which is still in a draft state and is susceptible to be modified --- have some differences. The standard draft has evolved in the last three years and is now at version seven (15th iteration).
 The draft standard is now much more detailed than before.
 One of the major differences in the core protocol design is the encryption of the client's private key.
@@ -338,11 +338,11 @@ He can then compute an offline dictionary attack using a list of password candid
 To avoid these kinds of attacks, KHAPE use two main mechanisms: Non-committing encryption and key-hiding AKE.
 
 
-\paragraph{Non-committing encryption.} \label{sec:non_committing_encryption}
+\paragraph{Non-committing encryption.} \phantomsection \label{sec:non_committing_encryption}
 Non-committing encryption makes it impossible for an adversary to identify the key that was used to encrypt a ciphertext even with a list of key candidates. This implies that the decryption of the ciphertext under any possible key provide a valid plaintext (i.e., a valid asymmetric key pair that can be used in the key exchange).
 
 
-\paragraph{Key-hiding AKE.} \label{sec:key_hiding_ake}
+\paragraph{Key-hiding AKE.} \phantomsection \label{sec:key_hiding_ake}
 The key-hiding feature makes it impossible for an adversary to use the key exchange output to identify the correct private/public key decrypted from the ciphertext using a list of password candidates.
 Even if provided with a full transcript of a key exchange between a client and a server and a list of key pair candidates --- including the correct key pair --- the adversary has no better chance than random to guess the right key pair that was used.
 
@@ -423,7 +423,7 @@ The server does not receive passwords in cleartext which avoid any miss-handling
 \emph{Comment:} For OPAQUE and KHAPE, it may be required during register depending on the implementation (See Section \ref{sec:opaque_register}).
 
 
-\paragraph{\writingFormulationClean{3. Secure against pre-computation attacks.}} \label{sec:secure_against_pca}
+\paragraph{\writingFormulationClean{3. Secure against pre-computation attacks.}} \phantomsection \label{sec:secure_against_pca}
 This is the main security property of Strong aPAKE \cite{OPAQUE_Paper}. The server does not leak any data that could allow an attacker to perform a pre-computation attack (for example SRP send the salt in cleartext in the first message). This attack allows an attacker to compute a table \emph{before} the server even get compromised. Once the attacker succeeds in compromising the server, he can use the precomputed table to retrieve the passwords \emph{instantaneously}. With this protection, an attacker can only perform an offline dictionary attack \emph{after} successfully compromising the server.
 This protection is provided by the OPRF (see Section \ref{sec:opaque_oprf}).
 % This vulnerability weaken the initial benefit of using an aPAKE \cite{aPAKE_Formalized} and even make password-over-TLS more secure \cite{OPAQUE_Paper} (than aPAKE vulnerable to pre-computation attacks).
@@ -444,7 +444,7 @@ Mutual authentication explicit that users must be authenticated to the server bu
 The transmission between client and server does not require to be secured with Public Key Infrastructure (PKI). This is a big improvement over classical authentication method (password-over-TLS) considering the occurrence of PKI failures nowadays. % "PKI failures include stealing of server private keys, software that does not verify certificates correctly, users that accept invalid or suspicious certificates, certificates issued by rogue CAs, servers that share their TLS keys with others e.g., CDN providers or security monitoring software, information (including passwords) that traverses networks in plaintext form after TLS termination; and more."
 
 
-\paragraph{\writingFormulationClean{7. User-side password hardening.}} \label{sec:password_hardening_comparison}
+\paragraph{\writingFormulationClean{7. User-side password hardening.}} \phantomsection \label{sec:password_hardening_comparison}
 Users can use password hardening technique to increase the cost of an offline attack if the server gets compromised. This is done by using resource-heavy functions such as Scrypt \cite{Scrypt_Paper} or Argon2 \cite{Argon2_Paper} instead of computing a simple and efficient hash. These functions allow to drastically slows down hashing process and so making offline attacks and online guessing attack much slower.
 
 \emph{Comment:} For EKE, it could be possible to compute a KDF function on the password before using it as a symmetrical key but this is closer to Augmented EKE \cite{AEKE_Paper} where the password is hashed client side and the server store the hash results.
@@ -485,7 +485,7 @@ OPAQUE and KHAPE both provide security proof in strong models.
 SRP provide no valuable security proof \cite{CAA, SRP_Green_blog}. It only proves that it can stand up to passive attacks, which is not enough for an authentication protocol. A proof against active attacks would be welcomed for such a widely used protocol.
 
 
-\paragraph{\writingFormulationBrut{13. Easily adaptable to elliptic curves.}} \label{sec:ecc_comparison}
+\paragraph{\writingFormulationBrut{13. Easily adaptable to elliptic curves.}} \phantomsection \label{sec:ecc_comparison}
 Elliptic curve cryptography allows to greatly reduce the size of asymmetric key.
 This is crucial in terms of performance because key size recommendations are always increasing to ensure a high level of security. Asymmetric keys are getting giant and difficult to manage --- in particular for keys that require long-term protection (up to 50 years). For example, for such a long-term protection, the discrete logarithm group is recommended to be 15,360 bits according to ECRYPT-CSA \cite{ECRYPT_Keylength}.
 Elliptic curves, only require 512 bits to achieve a similar security level.
