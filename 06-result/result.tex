@@ -652,10 +652,11 @@ The last message contains two hash-derived output. Their size is doubled with th
 %     xmin=0, xmax=600,
     enlarge y limits=0.45,
     enlarge x limits={0.15, upper},
-    legend style={
-        at={(0.5,-0.35)},
-        anchor=north
-    },
+%     legend style={
+%         at={(0.5,-0.35)},
+%         anchor=north
+%     },
+    legend pos=south east,
     legend columns=1,
     legend cell align=left,
     xlabel={bytes},
@@ -674,7 +675,7 @@ The last message contains two hash-derived output. Their size is doubled with th
 \addplot coordinates { % registration upload
     (192,OPAQUE 512 bits) (129,OPAQUE 256 bits) (100,KHAPE w/ OPRF) (100,KHAPE w/o OPRF)
 };
-\legend{Registration request, Registration response, Registration upload}
+\legend{Reg. request, Reg. response, Reg. upload}
 \end{axis}
 \end{tikzpicture}
 
