@@ -6,7 +6,7 @@
 This chapter shows a practical use case of using the newly implemented KHAPE library and demonstrate the security benefits.
 
 
-\section{Context}
+\section{Context} \label{sec:usecase_context}
 This section details use cases where using an aPAKE provide advantages over a classical authentication method.
 
 
@@ -211,7 +211,7 @@ The interactions between the user and the client are defined in the figure \ref{
 
 \subsection{Advantages of KHAPE}
 Using KHAPE for the authentication has two main advantages.
-Firstly, and most importantly, it allows to authenticate the client to the server with a password without the password being ever visible to the server. As specified in the context section \ref{sec:usecase_context}, it is especially important for an application where the sensitive data is encrypted with a key that is also derived from the password.
+Firstly, and most importantly, it allows to authenticate the client to the server with a password without the password being ever visible to the server. As specified in the  section \ref{sec:usecase_context}, it is especially important for an application where the sensitive data is encrypted with a key that is also derived from the password.
 Secondly, the utilization of the export key for the password registry decryption makes it more secure and more efficient.
 More secure because computing an OPRF is more secure than just deriving a key in local since it forces the client to interact with the server. Only the server knows the secret salt used to compute the OPRF output. 
 This mean that an attacker would be forced to compute online password guesses, making it easier to mitigate by the server.

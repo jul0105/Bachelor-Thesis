@@ -527,7 +527,7 @@ Finally, KHAPE without OPRF is around \unit{207}{\micro\second} faster than KHAP
 
 
 \subsection*{Authentication}
-For the authentication, OPAQUE and KHAPE with OPRF have rather different endpoint performances but the overall performance of each protocol is almost equal with a difference of around seven us.
+For the authentication, OPAQUE and KHAPE with OPRF have rather different endpoint performances but the overall performance of each protocol is almost equal with a difference of around \unit{seven }{\micro\second}.
 This is because a lot of similar operations are computed on both protocol but they are executed in different endpoints.
 Similar to the registration, KHAPE without OPRF is the fastest protocol. It is faster by \unit{197}{\micro\second} on OPAQUE and by \unit{205}{\micro\second} on KHAPE with OPRF.
 Even if it is the fastest in both registration and authentication, we believe that the security sacrifice is not worth the performance gain and therefore we recommend using OPAQUE or KHAPE with OPRF which is secure against pre-computation attacks (see Section \ref{sec:design_choice_oprf}).

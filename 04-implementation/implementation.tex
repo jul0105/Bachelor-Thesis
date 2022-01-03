@@ -257,7 +257,7 @@ Each function is defined step by step to understand the operation computed.
 This section shows the dependencies to implement the KHAPE library and the choice of using them.
 
 \begin{itemize}
- \item \verb|curve25519-dalek v3.2.0| : Pure rust implementation of group operations on Ristretto and Curve25519. Audited in 2019 \cite{Curve25519_Dalek_Audit}. Slightly modified to obtain full Elligator2 features (see Section \ref{elligator2_implementation_function}).
+ \item \verb|curve25519-dalek v3.2.0| : Pure rust implementation of group operations on Ristretto and Curve25519. Audited in 2019 \cite{Curve25519_Dalek_Audit}. Slightly modified to obtain full Elligator2 features (see Section \ref{sec:elligator2_implementation_function}).
  \item \verb|voprf v0.3| : Implementation of a verifiable OPRF based on the standard draft \cite{VOPRF_Standard_Draft}.
  \item \verb|sha3 v0.9| : Pure rust implementation of the SHA-3 (Keccak) hashing function.
  \item \verb|hkdf v0.11| : Pure rust implementation of the HMAC-based Extract-and-Expand Key Derivation Function (HKDF).
@@ -271,9 +271,13 @@ This section shows the dependencies to implement the KHAPE library and the choic
 
 \section{Interesting functions}
 In this section, we detail function that has interesting subtlety and that was not already deeply detailed in the last chapter.
+
+
 \subsection{Elligator element encoding} \label{sec:elligator2_implementation_function}
 For the implementation of the curve encoding, Elligator2 is used.
 \cite{Elligator2_Paper} defines how to implement and how to use this algorithm.
+
+
 \paragraph{Implementation}
 The rust library \verb|curve25519-dalek| provides a partial implementation of Elligator2 for Montgomery curves. Partial because only the encoding of a field element to a curve point is implemented. The inverse function --- the decoding --- is not implemented. 
 Fortunately, a pull request \footnote{https://github.com/dalek-cryptography/curve25519-dalek/pull/357} for this library propose an implementation of the decoding function to be able to retrieve field elements from curve points. This pull request is not merged in the library at the time of the writing but we will still use it since KHAPE require both Elligator2 encode and decode. 
