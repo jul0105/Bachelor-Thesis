@@ -86,9 +86,9 @@ Both these constructions are suitable for the implementation of KHAPE but since 
 Authenticated encryption is generally recommended for encryption.
 It is interesting to note that this encryption scheme must not be authenticated. 
 
-In contrary to the OPAQUE Paper, the OPAQUE standard draft does not encrypt the client's private key in the envelope.
-Instead, the envelope store a nonce of 32 bytes and an authentication tag. The envelope is not encrypted.
-The nonce is used --- with the randomized password --- to compute a seed, which is then used to derive the client's private and public keys. The authentication tag stored in the envelope is used to verify the derived public key.
+% In contrary to the OPAQUE Paper, the OPAQUE standard draft does not encrypt the client's private key in the envelope.
+% Instead, the envelope store a nonce of 32 bytes and an authentication tag. The envelope is not encrypted.
+% The nonce is used --- with the randomized password --- to compute a seed, which is then used to derive the client's private and public keys. The authentication tag stored in the envelope is used to verify the derived public key.
 
 
 \subsection{\writingFormulationBrut{Group $\mathbb{G}$}}
