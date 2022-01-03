@@ -7,8 +7,8 @@ This chapter shows a practical use case of using the newly implemented KHAPE lib
 
 
 \section{Context}
-
 This section details use cases where using an aPAKE provide advantages over a classical authentication method.
+
 
 \subsection{Online password manager}
 Online password managers are among the most sensitive applications out there because the leakage of users’ data cascades into numerous compromised accounts on other services such as email accounts, social media, online banking.
@@ -56,11 +56,11 @@ This is the reason why aPAKEs are very interesting in this case scenario. The se
 % client action (interaction)
 % limitation / considerations
 
+
 \section{Design}
 This section describes the design of the use case: a multi-user online password manager.
 The basic concept is that the server stores the encrypted user's data. 
 Each client can only access his personal encrypted data from the server.
-
 KHAPE is used for authentication between the client and the server. OPRF and SlowHash parameters are enabled to provide the highest level of security.
 
 
@@ -68,7 +68,6 @@ KHAPE is used for authentication between the client and the server. OPRF and Slo
 
 \subsection{Encrypted user data}
 Each user stores his encrypted user data on the server. This data include an Encrypted password registry and an Encrypted master key. Every encryption is computed by the authenticated encryption scheme XChaCha20-Poly1305.
-
 The Encrypted password registry is a structure that contains the user's password. Passwords are double encrypted. The external structure --- the password registry --- is encrypted, and then each individual password is also encrypted. Each encryption is performed with a different key, all derived from the master key.
 
 The Encrypted master key is simply a key --- the Master key --- that is encrypted with another key --- the KHAPE's export key. 
@@ -94,6 +93,7 @@ One could derive the Master key from the KHAPE's export key but this means that 
 % Password:
 % - data
 % - nonce
+
 
 \subsection{General process}
 The figure \ref{fig:Online_password_manager} shows the entire process of reading a protected password from the authentication request to the password decryption.
@@ -123,6 +123,7 @@ When the client adds, update or remove a password, he needs to update his Encryp
  \label{fig:Online_password_manager}
 \end{figure}
 
+
 \subsection{Server endpoints}
 The server has only four endpoints:
 \begin{itemize}
@@ -131,9 +132,9 @@ The server has only four endpoints:
  \item File download
  \item File upload
 \end{itemize}
-Registration and authentication are handled by KHAPE's protocol (see Section \ref{sec:khape_generic_algo}). Upon successful authentication, the client can use the outputted session key as an authentication token. He sends his session token with every request to prove to the server that he is authenticated. The session token expires after 24 hours.
 
-File download and file upload allow the user to retrieve and commit his protected data from the server. The interactions between the client and the server are defined in the figure \ref{fig:usecase_download} for the file download endpoint and in the figure \ref{fig:usecase_upload} for the file upload endpoint.
+Registration and authentication are handled by KHAPE's protocol (see Section \ref{sec:khape_generic_algo}). Upon successful authentication, the client can use the outputted session key as an authentication token. He needs to send his session token with every request to prove to the server that he is authenticated. The session token expires after 24 hours.
+File download and file upload allow the user to retrieve and commit his protected data from the server. The interactions between the client and the server are defined in the figure~\ref{fig:usecase_download} for the file download endpoint and in the figure \ref{fig:usecase_upload} for the file upload endpoint.
 
 
 \begin{figure}[h]
@@ -157,20 +158,18 @@ File download and file upload allow the user to retrieve and commit his protecte
 
 \subsection{Client actions}
 The end user interacts with the client to access its passwords.
-At client start, the user can either register or login.
+At the client start, the user can either register or login.
 After a successful registration, he still needs to login.
-
-Upon successful authentication, the client automatically download the user's data file and the user can select one of the following actions :
+Upon successful authentication, the client automatically download the user's data file and the user can select one of the following actions.
 \begin{itemize}
  \item Read a password
  \item Add a new password
  \item Modify a password
  \item Delete a password
 \end{itemize}
+
 For actions where the password registry is modified (adding, modifying or deleting a password), the password registry is re-encrypted by the client (with the External encryption key) and uploaded to the server.
-
 The interactions between the user and the client are defined in the figure \ref{fig:usecase_read} for reading a password entry, in the figure \ref{fig:usecase_add} for adding a new password entry, in the figure \ref{fig:usecase_modify} for adding a modifying an existing password entry and in the figure \ref{fig:usecase_delete} for deleting a password entry.
-
 
 
 \begin{figure}[h]
@@ -213,11 +212,9 @@ The interactions between the user and the client are defined in the figure \ref{
 \subsection{Advantages of KHAPE}
 Using KHAPE for the authentication has two main advantages.
 Firstly, and most importantly, it allows to authenticate the client to the server with a password without the password being ever visible to the server. As specified in the context section \ref{sec:usecase_context}, it is especially important for an application where the sensitive data is encrypted with a key that is also derived from the password.
-
-Secondly, the utilization of the export key for the password registry decryption, make it more secure and more efficient.
+Secondly, the utilization of the export key for the password registry decryption makes it more secure and more efficient.
 More secure because computing an OPRF is more secure than just deriving a key in local since it forces the client to interact with the server. Only the server knows the secret salt used to compute the OPRF output. 
-This mean that an attacker would be forced to compute online password guesses making it easier to mitigate by the server.
-
+This mean that an attacker would be forced to compute online password guesses, making it easier to mitigate by the server.
 More efficient because KHAPE already compute an OPRF and a SlowHash for the authentication and derive multiple keys from the output --- including the export key.
 If the export key was not provided to the application, the client would be forced to compute another SlowHash function on the password to derive a master key. This would drastically impact the performances of the application.
 
@@ -254,11 +251,9 @@ Mitigation to this would be to add a secret value to the Individual password key
 
 The online password manager has been developed \footnote{Implementation can be found here : https://github.com/jul0105/OnlinePasswordManager} in Rust. It is a functional proof of concept that demonstrates the usefulness of KHAPE for such applications.
 The implementation is based on an existing online password manager project that was developed earlier this year by Gil Balsiger and me.
-
 Currently, the client is a CLI (command line interface). It is planned to be adapted
 The server uses an SQLite database to store user information. Each user's encrypted data structure is stored on the server in a separated file. 
 The network between the client and the server is simulated meaning that the client simply call server’s function instead of sending an actual TCP or HTTP request.
-
 In the future, it is planned to adapt this prototype to be usable in practice. This will be done by implementing the network part. The client will also be adapted to compile the rust code in WebAssembly. The final goal is to build a client for web browsers.
 
 \end{document}
