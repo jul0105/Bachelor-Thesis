@@ -374,7 +374,7 @@ Instead, the paper proposes a client-side registration process.
 % ====================================================================================
 
 \section{\writingNotes{Comparing main solutions}}
-This section compares the main PAKEs on their security guarantees and performances. Details and comments on each criterion can be found on Section \ref{sec:comparison_details}.
+This section compares the main PAKEs on their security guarantees and performances. Details and comments on each criterion can be found on Section \ref{sec:comparison_details} and the comparison table is presented on Section \ref{sec:comparison_table}.
  
 \subsection{Details} \label{sec:comparison_details}
 
@@ -416,20 +416,23 @@ OPAQUE use OPRF as a main tool to builds Strong aPAKE. If OPRF breaks, the clien
 KHAPE has a weaker reliance on OPRF. It is optional and only used to archive Strong aPAKE. If OPRF breaks, KHAPE only fall back to a non-strong aPAKE (making it vulnerable to pre-computation attacks). 
 This makes KHAPE more resistant to OPRF compromise than OPAQUE. 
 
-\paragraph{\writingNotes{11. Standardization status.}}
-The standardization status is a good indicator to the maturity and adoption of a construction.
-% As it show that the construction is discussed. Generally, standard are far more precise 
-% Standards allow a better inter operability and easier implementation.
-\paragraph{\writingNotes{12. Security proof.}}
+\paragraph{\writingFormulationBrut{11. Standardization status.}}
+The standardization status is a good indicator to the maturity and the interest in a construction.
+Standards make it easier for a developer to implement the construction since it is generally far more precise than theoretical paper and that some design choice are made in the standard. This allow interoperability between multiple implementation of the same construction --- as long as they are following the standard.
+
+\paragraph{\writingFormulationBrut{12. Security proof.}}
+Security proof is an important factor to be able to put trust in a construction but not all security proof are valuable.
+OPAQUE and KHAPE both provide security proof in strong models.
 %OPAQUE "security proof in a very strong model"
 COMMENT: EKE only provide informal security analysis \cite{EKE_Informal_Security_Analysis}
 SRP provide no valuable security proof \cite{CAA, SRP_Green_blog}. It only proves that it can stand up to passive attacks, which is not enough for an authentication protocol. A proof against active attacks would be welcomed for such a widely used protocol.
-\paragraph{\writingNotes{13. Easily adaptable to elliptic curves.}} \label{sec:ecc_comparison}
+
+\paragraph{\writingFormulationBrut{13. Easily adaptable to elliptic curves.}} \label{sec:ecc_comparison}
 Elliptic curve cryptography allows to greatly reduce the size of asymmetric key.
-This is crucial in terms of performance because key size recommendations are always growing to ensure security and asymmetric keys are getting giant and difficult to manage --- in particular for keys that require long-term protection (up to 50 years). For example, for such a long-term protection, the discrete logarithm group is recommended to be 15,360 bits according to ECRYPT-CSA \cite{ECRYPT_Keylength}.
-In comparison, with elliptic curves, only 512 bits are recommended to archive similar security levels.
+This is crucial in terms of performance because key size recommendations are always increasing to ensure a high-level of security. Asymmetric keys are getting giant and difficult to manage --- in particular for keys that require long-term protection (up to 50 years). For example, for such a long-term protection, the discrete logarithm group is recommended to be 15,360 bits according to ECRYPT-CSA \cite{ECRYPT_Keylength}.
+Elliptic curves, only require 512 bits to achieve a similar security level.
 COMMENT: 
-In SRP, $\mathbb{Z}_p$ is used as a field, not a group. Therefore, SRP cannot be easily adapted to elliptic curves \cite{CAA}. % TODO voir SRP_Green_blog
+In SRP, $\mathbb{Z}_p$ is used as a field, not a group because it mixes addition and multiplication operations. Therefore, SRP cannot be easily adapted to elliptic curves \cite{CAA}. % TODO voir SRP_Green_blog
 % TODO ``SRP requires a ring as it mixes addition and multiplication operations, and thus does not work over plain elliptic curves''
 
 For DH-EKE, it is required that the content that will be encrypted --- namely $A$ and $B$ --- must be indistinguishable from random data. 
@@ -455,26 +458,67 @@ This requirement makes it impossible to implement it on elliptic curves \cite{EK
 % ``Finally, in both cases, DH-EKE and SPEKE do not hide the curve
 % parameters as they can easily be deduced from 2 eavesdropped points.'' \cite{EKE_ECC}
 
-\paragraph{14. Number of messages.}
-more messages means ``increasing latency and loads on the network''
+\paragraph{\writingFormulationBrut{14. Number of messages.}}
+The number of messages has a direct impact on the performance of the algorithm --- in particular on unstable or limited network. An increase in message number means a larger network latency and additional load on the network. Generally, it is preferred to have slightly larger message but less messages than the opposite due to all the network overhead on packages.
 
-\paragraph{15. Number of exponentiations.}
+\paragraph{\writingFormulationBrut{15. Number of exponentiations.}}
+Exponentiations are generally the most time consuming operation to compute in asymmetric cryptography. It make it interesting to count the number of exponentiations to have a rough idea of the performances of the algorithm.
+COMMENT: KHAPE with OPRF compute seven exponentiations where KHAPE without OPRF compute four.
 
-\paragraph{16. Computational cost compared to a KE (see \cite{KHAPE_Paper} presentation).}
+\paragraph{\writingFormulationBrut{16. Computational cost compared to a KE.}}
+The presentation of \cite{KHAPE_Paper} provide a performance comparison between existing algorithm and KHAPE. It shows that without an OPRF, KHAPE-HMQV has the same cost as an un-authenticated key exchange. And with using an OPRF (OPAQUE), the cost is similar to the computation of two un-authenticated key exchange.
+SRP is not mentioned in the presentation but due to it's complex exponentiations, it would probably be more costly than a single un-authenticated key exchange.
 
-\paragraph{17. Communication size.}
+Note that the cost of computation is theoretical and that the performance impact of using OPRF is not so blatant in practice. In fact, KHAPE without OPRF is around 25\% faster during authentication and 45\% faster during registration than with OPRF (see Section \ref{sec:oprf_performances} for more details).
 
-\paragraph{18. Server-side storage size.}
+\paragraph{\writingFormulationBrut{17. Communication size.}}
+Communication size can also have an impact on the perceived performance of the protocol --- in particular on unstable or limited network.
+It depends considerably on the primitives or the cipher suite used. Considering a group size suitable for near term protection \cite{ECRYPT_Keylength} --- 256-bit elliptic curve and 3072-bit group --- and 256-bit hashing function output size, we can simulate the communication size to compare them.
 
-\paragraph{19. Patented.}
+EKE transmit two encrypted group element and four encrypted challenges
+SRP transmit two group element, one salt and two hash outputs.
+For OPAQUE and KHAPE, see section \cite{sec:comp_message_size} for a detailed comparison of the communication size. For this table, KHAPE with OPRF is used.
 
-\paragraph{20. Year published.}
+We can see that there is a considerable difference in communication size between EKE~-~SRP in one side and OPAQUE~-~KHAPE on the other side. This is because the latters use elliptic curve which greatly reduce the size of the underlying group representation without reducing the security level.
 
-\paragraph{21. Got broken.}
+% EKE: 2 encrypted group element and 4 encrypted challenge
+% => 3072/8*2 + 32*4 = 896
+% SRP: 2 group element, salt (hashed after), 2 hash output
+% => 3072/8*2 + 32*3 = 864
+
+\paragraph{\writingFormulationBrut{18. Server-side storage size.}}
+Server-side storage size has not much impact on the perceived performance but it is interesting to compare in term of server administration. Considering that servers can handle several thousand or millions of users, a small difference in storage per user can have a great impact on the overall storage required.
+To compare the algorithm, we use the same parameters than with the communication size.
+
+With EKE, the server only needs to store the cleartext password.
+With SRP, the server stores a salt and a verifier (group element).
+With OPAQUE, the server stores the OPRF's secret salt (32 bytes), the envelope (96 bytes) and AKE credentials (two group elements, 64 bytes).
+With KHAPE, the server stores the OPRF's secret salt (optionally, 32 bytes), the encrypted envelope (two group element, 64 bytes) and AKE credentials (64 bytes).
+
+Similar to the conclusion made for the communication size, algorithm that does not use elliptic curve (SRP) require larger storage size.
+
+% EKE: password
+% => 
+% SRP: salt (hashed after, 32 bytes) and verifier (group element)
+% => 32 + 3072/8 = 416
+% OPAQUE: secret salt (curve, 32 bytes), encrypted envelope + private key + client public key
+% => 32 + 3*32 + 32 + 32 = 192
+% KHAPE: secret salt (32) and encrypted envelope (64 bytes) + private key + client public key
+% => 32 + 64 + 32 + 32 = 160
 
 
-\subsection{Table}
+% \paragraph{19. Patented.}
+% Patent 
+% In fact, one of the main goal of SRP was to provide a PAKE protocol that is patent-free.
+% 
+% \paragraph{20. Year published.}
+% 
+% \paragraph{21. Got broken.}
+
+
+\subsection{Table} \label{sec:comparison_table}
 For value where there is a ``*'', please refer to the appropriate comment in Section \ref{sec:comparison_details} for precision.
+
 \begin{center}
    \begin{tabular}{ | c | p{5cm} || p{2cm} | p{2cm} | p{2cm} | p{2cm} | }
      \hline
@@ -487,15 +531,15 @@ For value where there is a ``*'', please refer to the appropriate comment in Sec
      1 & Server does not process passwords in cleartext & No & Yes & Yes & Yes \\ \hline
      2 & Avoid sending cleartext password to the server & No & Yes & Yes* & Yes* \\ \hline
      
-     3 & Secure against pre-computation attacks & - (no hash) & No & Yes & Yes, if using OPRF \\ \hline
+     3 & Secure against pre-computation attacks & - (no hash) & No & Yes & Yes, with OPRF \\ \hline
 %      3 & Server doesn't send salt in cleartext & - (no salt) & x & Yes & Yes (OPRF) (without OPRF there is no salt) \\ \hline
      4 & Forward secrecy & Yes* & Yes & Yes & Yes \\ \hline
      5 & Mutual authentication & Yes & Yes & Yes & Yes \\ \hline
-     6 & PKI-free & Yes, except during register & Yes, except during register & Yes, except during register & Yes, except during register \\ \hline
-     7 & User-side password hardening & No* & Yes* & Yes & Yes, if using OPRF \\ \hline
+     6 & PKI-free & Yes, except during reg. & Yes, except during reg. & Yes, except during reg. & Yes, except during reg. \\ \hline
+     7 & User-side password hardening & No* & Yes* & Yes & Yes, with OPRF \\ \hline
      8 & Built-in mechanism to store client's secrets on the server & No & No & Yes & Yes \\ \hline
-     9 & Server threshold implementation & No & No & Yes, user-transparent & Yes, if using OPRF \\ \hline
-     10 & Resistant upon Oblivious PRF compromise & - (no OPRF) & - (no OPRF) & No, entire security is compromised & Fall back to non-strong aPAKE \\ \hline
+     9 & Server threshold implementation & No & No & Yes, user-transparent & Yes, with OPRF \\ \hline
+     10 & Resistant upon Oblivious PRF compromise & -- (no OPRF) & -- (no OPRF) & No, entire security is compromised & Fall back to non-strong aPAKE \\ \hline
      11 & Standardization status & RFC for EAP-EKE \cite{EAP_EKE_RFC} & 3 RFC \cite{SRP_RFC_1, SRP_RFC_2, SRP_RFC_3}, 1 ISO \cite{SRP_ISO}, 1 IEEE \cite{SRP_IEEE} & Internet standard draft \cite{OPAQUE_Standard_Draft} & CRYPTO 2021 Paper \cite{KHAPE_Paper} \\ \hline
      12 & Security proof & No* & No valuable security proof & Yes, in the random oracle model & Yes, in the ideal cipher model \\ \hline
      
@@ -509,11 +553,11 @@ For value where there is a ``*'', please refer to the appropriate comment in Sec
      % Performances
      
      13 & Easily adaptable to elliptic curves & No* & No* & Yes & Yes \\ \hline
-     14 & Number of messages & 4 ? & 4 ? & 3 & 4 (3 if client initiate) \\ \hline
-     15 & Number of exponentiations & 4 ? & 4 ? & 3 or 4 ? & 2 + 1 hash-to-curve \\ \hline
-     16 & Computational cost compared to a KE (see \cite{KHAPE_Paper} presentation) & 1x & TBD & 2x & 1x without OPRF, 2x with OPRF \\ \hline
-     17 & Communication size & TBD & TBD & TBD & TBD \\ \hline
-     18 & Server-side storage size & TBD & TBD & TBD & TBD \\ \hline
+     14 & Number of messages & 4 & 4 & 3 & 4 \\ \hline
+     15 & Number of exponentiations & 4 & 4 & 7 & 7 / 4* \\ \hline
+     16 & Computational cost compared to a KE (see \cite{KHAPE_Paper} presentation) & 1x & -- & 2x & 1x w/o OPRF, 2x w/ OPRF \\ \hline
+     17 & Communication size & 896 bytes & 864 bytes & 389 bytes & 264 bytes \\ \hline
+     18 & Server-side storage size & password size & 416 bytes & 192 bytes & 160 bytes \\ \hline
      
      19 & Patented & Yes, expired in 2011 & No & No & No \\ \hline
      20 & Year published & 1992 & 1998 & 2018 & 2021 \\ \hline
