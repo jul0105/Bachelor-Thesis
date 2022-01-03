@@ -415,7 +415,7 @@ Communication size can also have an impact on the perceived performance of the p
 It depends considerably on the primitives used. Considering a group size suitable for near-term protection \cite{ECRYPT_Keylength} --- 256-bit elliptic curve and 3072-bit group --- and 256 bits hashing function output size, we can simulate the communication size to compare them.
 EKE transmit two encrypted group elements and four encrypted challenges
 SRP transmit two group elements, one salt and two hash outputs.
-For OPAQUE and KHAPE, see section \cite{sec:comp_message_size} for a detailed comparison of the communication size. For this table, KHAPE with OPRF is used.
+For OPAQUE and KHAPE, see section \ref{sec:comp_message_size} for a detailed comparison of the communication size. For this table, KHAPE with OPRF is used.
 We can see that there is a considerable difference in communication size between EKE~--~SRP in one side and OPAQUE~--~KHAPE on the other side. This is because the latter use elliptic curve which greatly reduces the size of the underlying group representation without reducing the security level.
 % EKE: 2 encrypted group element and 4 encrypted challenge
 % => 3072/8*2 + 32*4 = 896
