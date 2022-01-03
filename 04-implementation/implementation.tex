@@ -1,7 +1,5 @@
 ﻿\documentclass[../report.tex]{subfiles}
-
 \begin{document}
-\chapter{\writingNotes{Implementation}} \label{cha:implementation}
 % - Choice of rust
 % - Parameters
 % - Messages exchanges
@@ -21,66 +19,100 @@
 %   - Elligator element encoding
 %   - Serialization
 %   - Discharge password from memory directly after use
+
+
+\chapter{\writingNotes{Implementation}} \label{cha:implementation}
 This chapter define specific implementation details for the KHAPE library \footnote{KHAPE's library implementation is available here : https://github.com/jul0105/KHAPE}.
+
+
 \section{Parameters}
 Both the client and the server has to define their parameters. For a client and a server to authenticate, they need to have the same parameters. 
 Generally parameters are fixed by the application developer and are the same for all clients of the application.
 They can also be negotiated during registration but this require the server to store each client specific parameters as it can be different. This use case is not in the scope of the KHAPE library.
+
+
 \paragraph{OPRF}
 It is strongly encouraged to use the OPRF.
 It provides a higher security level (see Section \ref{sec:opaque_oprf}) without impacting too much on the performances (see Section \ref{sec:oprf_performances}).
 
+
 \paragraph{Slow Hash}
 It is also encouraged to use a Slow Hash function. It allows to be more resistant against attackers (see Section \ref{sec:password_hardening_comparison}) but it has a high impact on the performances (see Section \ref{sec:slowhash_performances}).
+
 Overall, it is strongly discouraged from using neither of them because this mean that the credentials envelope is encrypted by a weak key resulting only of an HKDF derivation of the low-entropy password.
+
 
 \section{Exchanges}
 This section shows which function is called to produce each messages during the exchange between the client and the server for both registration and authentication.
+
+
 \subsection{Registration}
 The registration is processed on three messages. The client needs to keep the \verb|oprf_client_state| and the server keeps \verb|pre_register_secrets|. At the end of a successful exchange, the client can use the \verb|export key| for application specific usage and the server stores the  user's file entry.
+
+
 \begin{verbatim}
 Client                                                           Server
 -----------------------------------------------------------------------
 (register_request, oprf_client_state) = client.register_start(password)
+
   ------------------------ register_request ------------------------>
+  
 (register_response, pre_register_secrets)
     = server.register_start(register_request)
+    
   <----------------------- register_response ------------------------
+  
 (register_finish, export_key)
     = client.register_finish(register_response, oprf_client_state)
+    
   ------------------------ register_finish ------------------------->
+  
 file_entry 
     = server.register_finish(register_finish, pre_register_secrets)
 -----------------------------------------------------------------------
 Client can use export_key                       Server store file_entry
 \end{verbatim}
+
+
 \subsection{Authentication}
 The authentication is processed on four messages.
 The client needs to keep the \verb|oprf_client_state| and the \verb|ke_output| and the server keeps \verb|server_ephemeral_keys|. At the end of a successful exchange, the client can use the \verb|export key| for application specific usage and both parties has the same output key.
+
 
 \begin{verbatim}
 Client                                                           Server
 -----------------------------------------------------------------------
 (auth_request, oprf_client_state) = client.auth_start(password)
+
   -------------------------- auth_request -------------------------->
+  
 (auth_response, server_ephemeral_keys) 
     = server.auth_start(auth_request, &file_entry)
+    
   <------------------------- auth_response --------------------------
+  
 (auth_verify_request, ke_output, export_key) 
     = client.auth_ke(auth_response, oprf_client_state)
+    
   ----------------------- auth_verify_request ---------------------->
+  
 (auth_verify_response, server_output_key) 
     = server.auth_finish(auth_verify_request, server_ephemeral_keys,
                          &file_entry)
+                         
   <---------------------- auth_verify_response ----------------------
+  
 client_output_key = client.auth_finish(auth_verify_response, ke_output)
 -----------------------------------------------------------------------
 client_output_key and export_key                      server_output_key
 \end{verbatim}
 
+
 \section{Function definition} \label{sec:impl_function_def}
 This section shows the client and the server API.
 Each function is defined step by step to understand the operation computed.
+
+
 \subsection{Client}
 \begin{itemize}
  \item \verb|register_start(Password) -> (RegisterRequest, ClientState)|
@@ -170,6 +202,7 @@ Each function is defined step by step to understand the operation computed.
   
 \end{itemize}
 
+
 % \section{Messages structures}
 % 
 % 
@@ -219,8 +252,10 @@ Each function is defined step by step to understand the operation computed.
 % \end{verbatim}
 % TODO server storage struct, client state, envelope ?
 
+
 \section{Library choices}
 This section shows the dependencies to implement the KHAPE library and the choice of using them.
+
 \begin{itemize}
  \item \verb|curve25519-dalek v3.2.0| : Pure rust implementation of group operations on Ristretto and Curve25519. Audited in 2019 \cite{Curve25519_Dalek_Audit}. Slightly modified to obtain full Elligator2 features (see Section \ref{elligator2_implementation_function}).
  \item \verb|voprf v0.3| : Implementation of a verifiable OPRF based on the standard draft \cite{VOPRF_Standard_Draft}.
@@ -241,17 +276,19 @@ For the implementation of the curve encoding, Elligator2 is used.
 \cite{Elligator2_Paper} defines how to implement and how to use this algorithm.
 \paragraph{Implementation}
 The rust library \verb|curve25519-dalek| provides a partial implementation of Elligator2 for Montgomery curves. Partial because only the encoding of a field element to a curve point is implemented. The inverse function --- the decoding --- is not implemented. 
-Fortunately, a pull request \footnote{https://github.com/dalek-cryptography/curve25519-dalek/pull/357} for this library propose an implementation of the decoding function to be able to retrieve field elements from curve points. This pull request is not merged in the library at the time of the writing but we will still use it since KHAPE require both Elligator2 encoding and decoding. 
+Fortunately, a pull request \footnote{https://github.com/dalek-cryptography/curve25519-dalek/pull/357} for this library propose an implementation of the decoding function to be able to retrieve field elements from curve points. This pull request is not merged in the library at the time of the writing but we will still use it since KHAPE require both Elligator2 encode and decode. 
 So for the implementation of the KHAPE library, a modified version of the library \verb|curve25519-dalek| is used. It applies the pull request to provide the Elligator2 decoding function.  It also makes available the \verb|FieldElement| structure that is used for the encoding function’s input and the decoding function's output but was reserved for the internal library usage. 
 Note that this library has been audited \cite{Curve25519_Dalek_Audit} but the code of the pull request is obviously out of the scope of the audit and therefore one should be careful when using the KHAPE's library since it used unverified code. Still, the pull request only implement the operations detailed in \cite{Elligator2_Paper} for the decoding function.
 
+
 \paragraph{Usage}
 \cite{Elligator2_Paper} also define the usage to encode long-term Diffie-Hellman keys. 
-The idea is to generate a random private key and compute the associated public key. Then, try to elligator2 decode the public key. 
+The idea is to generate a random private key and compute the associated public key. Then, try to decode the public key with the Elligator2 mapping. 
 If the decoding is successful, the outputted field element is used as the public key material but if the decoding failed, the key generation is restarted from the first step.
 Not all curve points can be mapped with Elligator2. 
 In fact, only half the points can be mapped, which means that the key generation has to be processed twice in average.
 Listing \ref{lst:key_generation} shows how the key generation is implemented for the KHAPE library. It follows the pattern detailed earlier, where the public key is tested to be decoded and as long as the public key does not fit, the key generation is started over. Since the key generation is absolutely mandatory, there is no other exit condition to the loop than finding a valid key pair.
+
 
 \begin{lstlisting}[language=Rust, caption=Key generation function, label={lst:key_generation}]
 pub(crate) fn generate_keys() -> (PrivateKey, PublicKey) {
@@ -266,13 +303,17 @@ pub(crate) fn generate_keys() -> (PrivateKey, PublicKey) {
 }
 \end{lstlisting}
 
+
 \subsection{Rejection method}
 The rejection method \cite{CAA} is used for the generation of the private key.
 This simple method defines that if a randomly generated value does not fit as an input to generate some cryptographic material, reject the random value and regenerate a new one instead of trying to make the value fit (i.e., computing the modulus, clear the most significant bit, subtracting, etc.). 
 It is safer to generate random numbers this way as it preserves the uniformly random distribution of the value. However, the performance is impacted since the algorithm is generally computed multiple time before finding a valid value.
+
 Listing \ref{lst:private_key_generation} shows the usage of the rejection method for the KHAPE implementation. During the private key generation, a random 32-byte value is generated and made into a scalar type. Then, this value is tested if it can be reduced. The reduce function modify the value to make it fit to a valid private key but this is not what we want to use.
 Instead, we compare that the reduced value is not different than the initial value and if it is the case, we know that it is a valid private key. If not, the process start over with a new random value generation.
 In average, the process is completed in 6.8 tries.
+
+
 \begin{lstlisting}[language=Rust, caption=Private key generation function, label={lst:private_key_generation}]
 fn generate_private_key() -> PrivateKey {
     loop {
