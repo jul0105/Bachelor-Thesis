@@ -12,16 +12,24 @@
 % (Attack on PAKEs ?)
 % Chapter OPAQUE or Chapter KHAPE (depending on the PAKE choice)
 % - detail construction (protocol) of the choosen PAKE
+
+
 \chapter{State of the art} \label{cha:state_of_the_art}
 This chapter aims to provide a detailed view of the current PAKE landscape and its main protocols.
+
+
 \section{Notation}
 Schemas will use the notation described in Fig \ref{fig:notation}.
+
+
 \begin{figure}[h]
  \centering
  \includegraphics[width=10cm]{notation.png}
  \caption{Schema notation.}
  \label{fig:notation}
 \end{figure}
+
+
 % \section{History of PAKEs}
 % citer, annee, artuble, ce qu0il fait, patent?, cassÃ© ?, ce qu'il apport en plus, citer l'article et citer l'arcile qui l'a cassÃ©. pourquoi il y a un saut entre SRP et OPAQUE (dans le temps) ?
 % 
@@ -36,6 +44,8 @@ Schemas will use the notation described in Fig \ref{fig:notation}.
 % \paragraph{SRP (1998).}
 % \paragraph{OPAQUE (2018).}
 % \paragraph{KHAPE (2021).}
+
+
 \section{Main PAKEs}
 This section describe in more details four fundamental PAKE construction. 
 EKE as it is the first ever PAKE. 
@@ -43,6 +53,8 @@ SRP because it is the most used.
 OPAQUE because it is very promising, in the process of standardization and the first construction of this new generation of Strong aPAKE.
 OPAQUE because it is the first construction of Strong aPAKE
 KHAPE because it is most recent one and provide slightly better security guarantees than OPAQUE in certain conditions.
+
+
 \subsection{\writingFormulationClean{EKE}}
 \paragraph{\writingFormulationClean{Introduction.}}
 EKE (for Encrypted Key Exchange) was proposed in 1992 by Bellovin and Merritt \cite{EKE_Paper} and is the first PAKE protocol. 
@@ -53,12 +65,14 @@ The asymmetric keys are ephemeral and are exchanged between the client and the s
 This allows securing the exchange against Man-in-the-middle attack. % more ?
 It is a symmetric PAKE so it requires that both party share a secret --- namely the password. This means that the server has to store and process the password in cleartext which is strongly discouraged. % details ?
 Multiple cryptographic primitive can be used for the asymmetric part such as RSA, ElGamal or DH but the majority of EKE variants use DH \cite{Breaking_EKE}. % more ? why ?
-Note that some of the EKE variant got broken. 
+Note that some of the variant got broken and 
 % Some EKE variants got broken and therefore should not be used. % TODO source. all EKE ? DH-EKE also ? See http://www.jablon.org/jab96.pdf chapter 4
 EKE was patented until 2011 which might have severely impacted its adoption.
 % ``Diffie-Hellman Encrypted Key Exchange (DH-EKE) is the earliest widely deployed PAKE. It works by encrypting the public keys of a Diffie-Hellman key exchange with a shared secret. However, it requires both that unauthenticated encryption be used and that the public keys be indistinguishable from random data. This last requirement makes it impossible to use this form of PAKE with elliptic curve cryptography. For these reasons, DH-EKE is not a good fit.'' Source : https://tools.ietf.org/id/draft-ietf-kitten-krb-spake-preauth-00.html#rfc.section.1.2
 
 \paragraph{\writingFormulationClean{Construction.}}
+
+
 \begin{figure}[h]
  \centering
  \setlength{\fboxsep}{10pt}
@@ -67,8 +81,12 @@ EKE was patented until 2011 which might have severely impacted its adoption.
  \caption{Login process with EKE (DH-EKE) protocol.}
  \label{fig:EKE_DH}
 \end{figure}
+
+
 The figure \ref{fig:EKE_DH} shows the EKE protocol --- built with DH ---  during login process.
 The steps are the following :
+
+
 \begin{enumerate}
  \item Like a standard DH exchange, both client and server pick a random secret value $a$ and $b$.
  \item Client computes $A$, encrypt it using the password and send the result to the server in addition to it identifies (e.g., username).
@@ -78,19 +96,24 @@ The steps are the following :
  \item Client decrypts the ciphertext and check that both sent and received $c2$ match. If it is the case, the client is assured that the server possesses the same password and therefore is authenticated. The client has authenticated the server.
 \end{enumerate}
 %%% Login ?
+
+
 \paragraph{\writingFormulationClean{Register.}}
 The protocol does not mention registration. It is assumed that both parties already share a common secret, the password. A secure channel is therefore necessary to share the password in the first place.
 % ====================================================================================
+
+
 \subsection{\writingNotes{SRP}}
 \paragraph{\writingNotes{Introduction.}}
 SRP \cite{SRP_Paper, SRP_6_Paper} (for Secure Remote Password) was proposed in 1998 and is the most widely implemented PAKE protocol in the world \cite{PAKE_Green_blog}.
-It is largely used in iCloud Key Vault --- which could make it one of the most widely used cryptographic protocols \cite{PAKE_Green_blog} considering the number of active Apple devices worldwide --- and in 1Password's password manager.
+It is largely used in iCloud Key Vault --- which could make it one of the most widely used cryptographic protocols \cite{PAKE_Green_blog} considering the number of active Apple devices worldwide --- and in 1Password's password manager \cite{SRP_1Password_blog}.
 It is well standardized and has numerous implementation in different programming languages. %\cite{http://srp.stanford.edu/links.html}.
 It is in fact a TLS cipher suite \cite{SRP_RFC_3}, implemented in OpenSSL.
 This success is partly due to the SRP's creators will to avoid patents --- unlike most of the PAKE of its time --- but also to avoid export restriction imposed by US law by not using any encryption schema \cite{SRP_Formal_Analysis}.
 Their goal was to provide a technology that improve the security of existing password protocols while keeping the ease-of-use of passwords. In other words, provide a drop-in replacement to the classical authentication methods where the implementation does not require a deep change in contrary to EKE where the shared secret --- the password --- need to be stored in cleartext on the server making it difficult to manage correctly.
 This makes SRP easy to implement for developers and transparent for the user.
 One of the main strengths of SRP is that the server does not store the cleartext password or the hashed password. Instead it stores a password verifier that is a discrete logarithm one-way function of the password.
+
 Even though SRP is in interesting construction and does some things right, it is not ideal.
 It got broken and patched multiple time --- current version is SRP v6a, which is not broken.
 It is vulnerable to pre-computation attack because the server sends the cleartext salt to the client at the start of the exchange. With the salt, an adversary could build a table of password hashes --- a time-consuming process --- before compromising the server making it able to retrieve passwords instantaneously upon server compromise.
@@ -98,7 +121,11 @@ In addition, the construction is weirdly complex.
 The protocol mix addition and multiplication in calculation. Using both operations require a ring rather than a cyclic group. This requirement makes it impossible to easily transfer the integer-based algorithm to elliptic curves. % because in integer-based group like DH, multiplication become EC point addition in ECC. SRP use both mutliplication and addition
 This requirement, also makes it challenging to provide a formal analysis of SRP because 
 ``existing tools provide no simple way to reason about its use of the mathematical expression $v+g^b \mod{q}$'' \cite{SRP_Formal_Analysis}. % TODO rephraase and add this to comparison details
+
+
 \paragraph{\writingFormulationClean{Construction.}}
+
+
 \begin{figure}[h]
  \centering
  \setlength{\fboxsep}{10pt}
@@ -107,8 +134,12 @@ This requirement, also makes it challenging to provide a formal analysis of SRP 
  \caption{Login process with SRP-6a protocol.}
  \label{fig:SRP}
 \end{figure}
+
+
 The figure \ref{fig:SRP} shows the SRP-6a protocol during login process.
 The steps are the following :
+
+
 \begin{enumerate}
  \item Client picks a random $a$ and computes $A$.
  \item The client sends $A$ and its identity $I$ (username) to the server.
@@ -120,6 +151,8 @@ The steps are the following :
  \item They finish with a mutual key-confirmation process where the client sends his proof of $K$ first.
  \item If the server finds that the user's proof is incorrect, he stops the exchange and does not send its own proof of $K$.
 \end{enumerate}
+
+
 If the password is correct, the client and the server end up with having the same $S$ --- and so the same key. The derivation of $S$ is less straightforward than other constructions so it is detailed below.
 \begin{align*}
  S_{client}
@@ -131,14 +164,17 @@ If the password is correct, the client and the server end up with having the sam
  &\equiv (Av^u)^b\notag\\
  &\equiv S_{server} \pmod{p}
 \end{align*}
+
+
 \paragraph{\writingFormulationClean{Register.}}
 The registration process is not covered in SRP papers.
 Clients must come with a password, and server need to generate a random salt. One of them also need to compute the verifier $v = g^x$ where $x = H(salt, password)$.
 This means that either the server sends the salt to the client and the client compute the verifier and send it back to the server through a secure channel (more secure as the server never see the user's password but more complicated to implement).
 Or the client sends its password to the server with its registration request --- through a secure channel --- and the server generates a salt and computes the verifier (easier to implement on the server side, less transmission, but password is handled in cleartext on the server).
 Either way, the registration require to use a secure channel.
-Upon a successful registration, the server store the following triplet : \\
+Upon a successful registration, the server store the following triplet : 
 \verb|<username, verifier, salt>|
+
 
 % ------------- Formal Methods Analysis of the Secure Remote Password Protocol (2020) -----------------
 % "avoid export controls by not using encryption"
@@ -193,19 +229,27 @@ Upon a successful registration, the server store the following triplet : \\
 % - 5 prior versions that each contains vulnerabilities
 % - The construction we have today is not really by design but more by patching ~~
 % ====================================================================================
+
+
 \subsection{\writingFormulationClean{OPAQUE}}
 \paragraph{\writingFormulationClean{Introduction.}}
 Jarecki et al. \cite{OPAQUE_Paper}. introduce the definition of Strong aPAKE (SaPAKE): an aPAKE secure against pre-computation attacks.
 They provide two modular constructions, called the OPAQUE protocol that allow building SaPAKE protocols. The first construction allows enhancing any aPAKE to a SaPAKE while the second allows enhancing any Authenticated Key-Exchange (AKE) protocol (that are secure against KCI attacks) to a SaPAKE.
 The security of these two construction is based on Oblivious PRF (OPRF) functions. % cite ?
 The OPAQUE protocol allows to secure authentication from the simplest applications to the most sensitive ones.
+
+
 \paragraph{OPRF.} \label{sec:opaque_oprf}
 OPRF \cite{VOPRF_Standard_Draft} is a two-party protocol that allows computing an output from two secret inputs. In other words, each party, namely the client and the server, input a secret value --- a password for the client, a secret salt for the server --- and the client can use the output as a key. What is interesting is that the client cannot learn the server's secret salt and the server cannot learn the user's password or the OPRF output.
 This feature allows OPRF to provide security against pre-computation attacks to OPAQUE and KHAPE.
 In addition to providing a Strong aPAKE protocol, OPRF provides other interesting security features that can be used with OPAQUE.
 Mainly, it supports the use of password hardening function, it allows an easy implementation of server threshold --- instead of a single server providing its secret salt, multiple server would do it --- and overall computing an OPRF provide a far more secure key than deriving directly from a password \cite{OPAQUE_Paper}.
 The figure \ref{fig:OPAQUE_AKE} shows the OPRF process in the blue rectangle.
+
+
 \paragraph{\writingFormulationClean{Construction.}}
+
+
 \begin{figure}[h]
  \centering
  \setlength{\fboxsep}{10pt}
@@ -214,8 +258,12 @@ The figure \ref{fig:OPAQUE_AKE} shows the OPRF process in the blue rectangle.
  \caption{Login process with generic OPAQUE (OPRF-AKE) protocol.}
  \label{fig:OPAQUE_AKE}
 \end{figure}
+
+
 The figure \ref{fig:OPAQUE_AKE} shows the OPAQUE protocol --- built with OPRF and AKE --- during login process.
 The steps are the following :
+
+
 \begin{enumerate}
  \item Generate a random value $r$ to blind the hash of passwords so that the server cannot retrieve the password from the mapping.
  \item Send result to the server.
@@ -226,43 +274,52 @@ The steps are the following :
  \item If the password entered is correct, client uses $rw$ to decrypt $C$ and retrieve his private key $priv_U$.
  \item With both keys, client and server run an authenticated key exchange for mutual authentication.
 \end{enumerate}
+
+
 \paragraph{\writingFormulationClean{Register.}} \label{sec:opaque_register}
 The client registration is the only part of the protocol that requires a secure channel where both parties can authenticate each other.
 The protocol is proposed with a server-side registration where the client sends his password through the secure channel. The server generates a salt and computes OPRF function with the client's password and salt. Server also generates two private keys (one for the client and one for the server) and their corresponding public key. He encrypts client's private key and server's public key with OPRF output as a key and store the ciphertext.
 This method is not ideal as it requires that the user send its cleartext password to the server making it vulnerable to miss-handling or server-side vulnerabilities discussed in the introduction.
-\cite{OPAQUE_Paper} also note that ideally, one wants to implement a client-side registration where the client choose a password and the server choose a secret salt and input them in the OPRF function. The client generates a public/private key pair, and the server do the same. Server sends his public key to the client. Client encrypts his private key and server's public key using OPRF output as a key. He then sends the ciphertext to the server with his public key.
+OPAQUE's paper \cite{OPAQUE_Paper} mention that ideally, one wants to implement a client-side registration where the client choose a password and the server choose a secret salt and input them in the OPRF function. The client generates a public/private key pair, and the server do the same. Server sends his public key to the client. Client encrypts his private key and server's public key using OPRF output as a key. He then sends the ciphertext to the server with his public key.
 This way, the server never see the cleartext password, the OPRF output and the client's private key. This is a major improvement in terms of security.
-However, this also comes with a downside as the server is no longer able to check password rules. This operation needs to be done client side.
+However, this also comes with a downside as the server is no longer able to check password rules. This operation needs to be done on the client side.
+
+
 \paragraph{\writingFormulationClean{Login.}}
 For the login phase, the client enters its password in the OPRF and the server send the ciphertext to the client.
 If the password entered is correct, the client can decrypt the ciphertext with OPRF output to obtain his private key and the server's public key.
 He then uses these keys to run an authenticated key exchange with the server.
 On the other hand, if the password is wrong, the OPRF output is totally different and the ciphertext decryption makes the keys incorrect and the server will refuse it during the key exchange. % TODO confirmation
+
+
 \paragraph{\writingFormulationClean{Differences with the internet standard draft.}} \label{sec:opaque_paper_vs_draft}
-OPAQUE's paper \cite{OPAQUE_Paper} and OPAQUE's internet standard draft \cite{OPAQUE_Standard_Draft} have some differences. The standard draft has evolved in the last three years and is now at version seven (15th iteration).
+OPAQUE's paper \cite{OPAQUE_Paper} and OPAQUE's internet standard \cite{OPAQUE_Standard_Draft} --- which is still in a draft state and is susceptible to be modified --- have some differences. The standard draft has evolved in the last three years and is now at version seven (15th iteration).
 The draft standard is now much more detailed than before.
 One of the major differences in the core protocol design is the encryption of the client's private key.
-In the paper, it is specified that the client uses an authenticated encryption scheme to encrypt and decrypt its credentials --- i.e., client's private and public keys and the server's public key. The encryption key is the OPRF output.
+In the paper, it is specified that the client uses an authenticated encryption scheme to encrypt and decrypt its credentials --- i.e., the client's key pair and the server's public key --- with the OPRF output as encryption key.
+%
 In the draft standard, it is rather different.
 Firstly, the envelope does not contain the client's keys anymore. It only contains a nonce and an authentication tag. 
 The nonce is used --- with a derivation of the OPRF output --- to derive an authentication key, and export key and a seed.
 The authentication key is used to verify the envelope,'s authentication tag to ensure that the envelope content has not been modified.
 The export key is exposed to the client for application specific usage.
 The seed is used to derive the client's key pair.
-The envelope is not encrypted at rest anymore. It is only encrypted during transmission between the client and the server with a one-time pad encryption. The rest of the time, the envelope is stored in cleartext on the server.
+Secondly, the envelope is not encrypted at rest anymore. It is only encrypted during transmission between the client and the server with a one-time pad encryption. The rest of the time, the envelope is stored in cleartext on the server.
 During registration, the client derives a masking key from the OPRF output and sends it to the server with the envelope. The server stores the envelope and the masking key.
 Then, at login, the server generates a masking nonce and derive a one-time pad key using masking keys and masking nonce. He encrypts the envelope and his public key with the one-time pad key and sends the ciphertext with the masking nonce to the client.
 The client can compute the masking key with the OPRF output to compute the one-time pad key and decrypt the envelope.
 
-Note that the standard is still in a draft state and is susceptible to be modified.
 
 % ====================================================================================
+
+
 \subsection{\writingFormulationBrut{KHAPE}}
 \paragraph{\writingFormulationBrut{Introduction.}}
 OPAQUE security relies entirely on the strength of the OPRF. If OPRF gets broken --- for example by cryptanalysis, quantum attacks or security compromise --- an adversary can compute an offline dictionary attack on the user's password. This is especially critical considering that there are currently no known quantum-safe OPRFs.
 KHAPE (for Key-Hiding Asymmetric PakE) \cite{KHAPE_Paper} is a variant to the OPAQUE protocol. Instead of using OPRF as a main tool to archive security, it becomes an optional part of the protocol and KHAPE use two other concepts to archive security: non-committing encryption and key-hiding AKE.
 KHAPE is not a Strong aPAKE like OPAQUE. But it can be made a SaPAKE following the aPAKE to SaPAKE compiler from \cite{OPAQUE_Paper} using OPRF.
 So OPRF is optional with KHAPE and just allow making it a SaPAKE. In addition, it also allows using OPRF features such as a server-side threshold implementation that does not require any change from the client (see all feature in section \ref{sec:opaque_oprf}). If OPRF fails, KHAPE just loss these functionalities but the rest of the security remain in contrary to OPAQUE.
+
 
 % ``Two key ideas are: (i) dispense with authentication of the
 % credentials4 and instead use a non-committing encryption where decryption of
@@ -272,16 +329,23 @@ So OPRF is optional with KHAPE and just allow making it a SaPAKE. In addition, i
 % active one, can identify the long-term keys used by the peers to an exchange even
 % if provided with a list of candidate keys (a notion reminiscent of key anonymity
 % for public key encryption [8]).'' \cite{KHAPE_Paper}
+
+
 \paragraph{Security without OPRF.}
 Like OPAQUE, in KHAPE each party has a private/public key pair that is used to compute the key exchange and the client store its private key and server's public key on the server, encrypted by his password.
-Without using an OPRF, an adversary could try to retrieve the ciphertext and the server's public key from a valid key exchange between an existing client and the server.
+If no OPRF is used, an adversary could try to retrieve the ciphertext and the server's public key from a valid key exchange between an existing client and the server.
 He can then compute an offline dictionary attack using a list of password candidates to decrypt the ciphertext until he finds a match with the server's public key that he recorded sooner.
 To avoid these kinds of attacks, KHAPE use two main mechanisms: Non-committing encryption and key-hiding AKE.
+
+
 \paragraph{Non-committing encryption.} \label{sec:non_committing_encryption}
-Non-committing encryption makes it impossible for an adversary to identify the key used to encrypt the ciphertext event with a list of key candidates. This implies that the decryption of the ciphertext under any possible key provide a valid plaintext (i.e., a valid asymmetric key pair that can be used in the key exchange).
+Non-committing encryption makes it impossible for an adversary to identify the key that was used to encrypt a ciphertext even with a list of key candidates. This implies that the decryption of the ciphertext under any possible key provide a valid plaintext (i.e., a valid asymmetric key pair that can be used in the key exchange).
+
+
 \paragraph{Key-hiding AKE.} \label{sec:key_hiding_ake}
-The key-hiding feature makes it impossible for an adversary to use the key exchange (output) to identify the correct private/public key decrypted from the ciphertext using a list of password candidates.
+The key-hiding feature makes it impossible for an adversary to use the key exchange output to identify the correct private/public key decrypted from the ciphertext using a list of password candidates.
 Even if provided with a full transcript of a key exchange between a client and a server and a list of key pair candidates --- including the correct key pair --- the adversary has no better chance than random to guess the right key pair that was used.
+
 
 % \paragraph{\writingNotes{Mains differences with OPAQUE}}
 % - KHAPE is computationally more performant than OPAQUE when the OPRF is not used and the performances become similar when OPRF is used.
@@ -295,7 +359,11 @@ Even if provided with a full transcript of a key exchange between a client and a
 % Both client and server needs a public/private key pair to compute a AKE. The client encrypt it's credentials (his private key and server's public key) and store it in the server.
 %%% How Key-hiding AKE works ?
 %%% Ideal cipher ?
+
+
 \paragraph{\writingFormulationClean{Construction.}}
+
+
 \begin{figure}[h]
  \centering
  
@@ -306,8 +374,12 @@ Even if provided with a full transcript of a key exchange between a client and a
  \caption{Login process with generic KHAPE protocol.}
  \label{fig:Generic_KHAPE}
 \end{figure}
+
+
 The figure \ref{fig:Generic_KHAPE} shows the KHAPE protocol during login process.
 The steps are the following :
+
+
 \begin{enumerate}
  \item Optionally, an OPRF can be used to archive Strong aPAKE following the aPAKE to SaPAKE compiler using OPRF from \cite{OPAQUE_Paper}. The OPRF takes the client's password and server's salt as an input. Client uses the output in place of his password for the rest of the protocol.
  \item The server sends the client's encrypted envelope containing the client's private key and server's public key.
@@ -315,70 +387,110 @@ The steps are the following :
  \item Both parties use the public/private keys to compute a Key-Hiding Authenticated Key-Exchange.
  \item Mutual key-confirmation process initiated by the client.
 \end{enumerate}
+
+
 %%% Login and register steps
 \paragraph{\writingFormulationBrut{Login.}}
 When the client wants to login, the server sends its encrypted credentials and the client use its password to decrypt the credentials (with or without OPRF depending on the implementation). Then he can use his credentials to compute a Key-Hiding AKE with the server.
 Both party finish with a mutual key confirmation initiated by the client.
+
+
 \paragraph{\writingFormulationBrut{Register.}}
-KHAPE has the same problem that is addressed in \ref{sec:opaque_register}.
+KHAPE has the same problem than OPAQUE concerning the registration.
 The protocol proposes a server-side register which is less than ideal because the server can see the client's password and client's private key in cleartext at registration.
-Instead, the paper proposes a client-side registration process.
+Instead, it is recommended to use a client-side registration process.
+This problem and the solution is addressed in Section \ref{sec:opaque_register} for the OPAQUE protocol but also apply for the KHAPE protocol.
+
+
 % ====================================================================================
+
+
 \section{\writingNotes{Comparing main solutions}}
 This section compares the main PAKEs on their security guarantees and performances. Details and comments on each criterion can be found on Section \ref{sec:comparison_details} and the comparison table is presented on Section \ref{sec:comparison_table}.
+
  
 \subsection{Details} \label{sec:comparison_details}
+
+
 \paragraph{\writingFormulationClean{1. Server does not process passwords in cleartext.}}
 This is the main security property of asymmetric PAKE \cite{aPAKE_Formalized}. Server does not have to store passwords in cleartext which should make it more resilient in case of server compromise. Adversary has to compute an offline attack to retrieve passwords from the compromised server.
+
+
 \paragraph{\writingFormulationClean{2. Avoid sending cleartext password to the server.}}
-Even though it seems similar to criteria 1, it is not. Criterion 1 is about password processing, but this criterion is about password transmission. Transmission and processing of passwords are vulnerable to different attacks vectors.
+Even though it seems similar to the first criterion, it is not. The first criterion is about password processing, but this criterion is about password transmission. Transmission and processing of passwords are vulnerable to different attacks vectors.
 The server does not receive passwords in cleartext which avoid any miss-handling vulnerabilities such as logging or caching cleartext passwords on the server.
-COMMENT: May be required during register depending on the implementation (See Section \ref{sec:opaque_register}).
+
+\emph{Comment:} For OPAQUE and KHAPE, it may be required during register depending on the implementation (See Section \ref{sec:opaque_register}).
+
+
 \paragraph{\writingFormulationClean{3. Secure against pre-computation attacks.}} \label{sec:secure_against_pca}
 This is the main security property of Strong aPAKE \cite{OPAQUE_Paper}. The server does not leak any data that could allow an attacker to perform a pre-computation attack (for example SRP send the salt in cleartext in the first message). This attack allows an attacker to compute a table \emph{before} the server even get compromised. Once the attacker succeeds in compromising the server, he can use the precomputed table to retrieve the passwords \emph{instantaneously}. With this protection, an attacker can only perform an offline dictionary attack \emph{after} successfully compromising the server.
 This protection is provided by the OPRF (see Section \ref{sec:opaque_oprf}).
 % This vulnerability weaken the initial benefit of using an aPAKE \cite{aPAKE_Formalized} and even make password-over-TLS more secure \cite{OPAQUE_Paper} (than aPAKE vulnerable to pre-computation attacks).
+
+
 \paragraph{\writingFormulationClean{4. Forward secrecy.}}
 In key-exchange protocol, Forward Secrecy (also called Full Forward Secrecy or Perfect Forward Secrecy) ensures that upon compromise of any long-term key used to negotiate sessions key, an attacker cannot compromise previous session keys.
 In detail key-exchange protocol use long-lived keys to authenticate the user and short-lived keys to encrypt sessions. With Forward Secrecy, an attacker that successfully compromised a long-lived key cannot retrieve any previous session data even if he recorded the previous encrypted transmissions. % TODO cite Duc CAA 05-password ?
-COMMENT: For EKE, only DH-EKE provide forward secrecy. ElGamal-EKE and RSA-EKE does not.
+
+\emph{Comment:} For EKE, only DH-EKE provide forward secrecy. ElGamal-EKE and RSA-EKE does not.
+
+
 \paragraph{\writingFormulationClean{5. Mutual authentication.}}
 Mutual authentication explicit that users must be authenticated to the server but also that the server must authenticate itself to the user to avoid that an adversary impersonates the server to maliciously communicate with the client.
+
+
 \paragraph{\writingFormulationBrut{6. PKI-free.}} % TODO rename to: Doesn't require transmission over a secure channel
 The transmission between client and server does not require to be secured with Public Key Infrastructure (PKI). This is a big improvement over classical authentication method (password-over-TLS) considering the occurrence of PKI failures nowadays. % "PKI failures include stealing of server private keys, software that does not verify certificates correctly, users that accept invalid or suspicious certificates, certificates issued by rogue CAs, servers that share their TLS keys with others e.g., CDN providers or security monitoring software, information (including passwords) that traverses networks in plaintext form after TLS termination; and more."
+
+
 \paragraph{\writingFormulationClean{7. User-side password hardening.}} \label{sec:password_hardening_comparison}
 Users can use password hardening technique to increase the cost of an offline attack if the server gets compromised. This is done by using resource-heavy functions such as Scrypt \cite{Scrypt_Paper} or Argon2 \cite{Argon2_Paper} instead of computing a simple and efficient hash. These functions allow to drastically slows down hashing process and so making offline attacks and online guessing attack much slower.
-COMMENT: For EKE, it could be possible to compute a KDF function on the password before using it as a symmetrical key but this is closer to Augmented EKE \cite{AEKE_Paper} where the password is hashed client side and the server store the hash results.
+
+\emph{Comment:} For EKE, it could be possible to compute a KDF function on the password before using it as a symmetrical key but this is closer to Augmented EKE \cite{AEKE_Paper} where the password is hashed client side and the server store the hash results.
 For SRP, the client-side operation $x = H(salt||pwd)$ can be modified to use a resource-heavy hashing function \cite{SRP_1Password_blog}.
+
+
 \paragraph{\writingFormulationBrut{8. Built-in mechanism to store client's secrets on the server.}}
 %OPAQUE "has a built-in facility for password-based storage-and-retrieval of secrets and credentials"
 %~~New protocol such as OPAQUE and KHAPE use client-side decryption of server-stored ciphertext to retrieve the key. This allows running exchange in an unsecured channel because...
 Securely store client's sensitive data such as secrets or credentials in the server without the server being able to read it. With OPAQUE and KHAPE, the user credentials (private/public keys) are encrypted with the password or OPRF output and then stored in the server. Additional secrets specific to the application could be added to this encrypted envelope and stored on the server.
+
+
 \paragraph{\writingFormulationBrut{9. Server threshold implementation.}}
 %OPAQUE "accommodates a user-transparent server-side threshold implementation."
 Require the interaction with $n$ servers to authenticate. This means that $n$ server has to be compromised in order for an adversary to compute an offline dictionary attack on the password. This scenario can be useful in the case of a highly sensitive application.
 OPRF transparently provides this functionality where each server adds its independent secret salt to the blinded password hash before sending it back to the client.
+
+
 \paragraph{\writingFormulationClean{10. Resistant upon Oblivious PRF compromise.}}
 This criterion is a bit arbitrary because only the two recent PAKE uses an OPRF but it is still an important criterion because it is the main difference of security guarantees between OPAQUE and KHAPE.
 If OPRF breaks for example by cryptanalysis, security compromise or even quantum attacks, the consequences could be disastrous depending on the way it is used. This is especially important because there is ``currently no known efficient OPRFs considered to be quantum safe'' \cite{KHAPE_Paper}.
 OPAQUE use OPRF as a main tool to builds Strong aPAKE. If OPRF breaks, the client's password is vulnerable to an offline dictionary attack.
 KHAPE has a weaker reliance on OPRF. It is optional and only used to archive Strong aPAKE. If OPRF breaks, KHAPE only fall back to a non-strong aPAKE (making it vulnerable to pre-computation attacks). 
 This makes KHAPE more resistant to OPRF compromise than OPAQUE. 
+
+
 \paragraph{\writingFormulationBrut{11. Standardization status.}}
 The standardization status is a good indicator to the maturity and the interest in a construction.
 Standards make it easier for a developer to implement the construction since it is generally far more precise than theoretical paper and that some design choices are made in the standard. This allows interoperability between multiple implementation of the same construction --- as long as they are following the standard.
+
+
 \paragraph{\writingFormulationBrut{12. Security proof.}}
 Security proof is an important factor to be able to put trust in a construction, but not all security proof are valuable.
 OPAQUE and KHAPE both provide security proof in strong models.
 %OPAQUE "security proof in a very strong model"
-COMMENT: EKE only provide informal security analysis \cite{EKE_Informal_Security_Analysis}
+
+\emph{Comment:} EKE only provide informal security analysis \cite{EKE_Informal_Security_Analysis}
 SRP provide no valuable security proof \cite{CAA, SRP_Green_blog}. It only proves that it can stand up to passive attacks, which is not enough for an authentication protocol. A proof against active attacks would be welcomed for such a widely used protocol.
+
+
 \paragraph{\writingFormulationBrut{13. Easily adaptable to elliptic curves.}} \label{sec:ecc_comparison}
 Elliptic curve cryptography allows to greatly reduce the size of asymmetric key.
 This is crucial in terms of performance because key size recommendations are always increasing to ensure a high level of security. Asymmetric keys are getting giant and difficult to manage --- in particular for keys that require long-term protection (up to 50 years). For example, for such a long-term protection, the discrete logarithm group is recommended to be 15,360 bits according to ECRYPT-CSA \cite{ECRYPT_Keylength}.
 Elliptic curves, only require 512 bits to achieve a similar security level.
-COMMENT: 
-In SRP, $\mathbb{Z}_p$ is used as a field, not a group because it mixes addition and multiplication operations. Therefore, SRP cannot be easily adapted to elliptic curves \cite{CAA}. % TODO voir SRP_Green_blog
+
+\emph{Comment:} In SRP, $\mathbb{Z}_p$ is used as a field, not a group because it mixes addition and multiplication operations. Therefore, SRP cannot be easily adapted to elliptic curves \cite{CAA}. % TODO voir SRP_Green_blog
 % TODO ``SRP requires a ring as it mixes addition and multiplication operations, and thus does not work over plain elliptic curves''
 For DH-EKE, it is required that the content that will be encrypted --- namely $A$ and $B$ --- must be indistinguishable from random data. 
 This requirement makes it impossible to implement it on elliptic curves \cite{EKE_ECC}. %also source : https://tools.ietf.org/id/draft-ietf-kitten-krb-spake-preauth-00.html#rfc.section.1.2
@@ -401,15 +513,24 @@ This requirement makes it impossible to implement it on elliptic curves \cite{EK
 % and becomes much less simple than DH-EKE.'' \cite{EKE_ECC}
 % ``Finally, in both cases, DH-EKE and SPEKE do not hide the curve
 % parameters as they can easily be deduced from 2 eavesdropped points.'' \cite{EKE_ECC}
+
+
 \paragraph{\writingFormulationBrut{14. Number of messages.}}
 The number of messages has a direct impact on the performance of the algorithm --- in particular on unstable or limited network. An increase in message number means a larger network latency and additional load on the network. Generally, it is preferred to have slightly larger message but fewer messages than the opposite due to all the networks overhead on packages.
+
+
 \paragraph{\writingFormulationBrut{15. Number of exponentiations.}}
 Exponentiations are generally the most time-consuming operation to compute in asymmetric cryptography. It makes it interesting to count the number of exponentiations to have a rough idea of the performances of the algorithm.
-COMMENT: KHAPE with OPRF compute seven exponentiations where KHAPE without OPRF compute four.
+
+\emph{Comment:} KHAPE with OPRF compute seven exponentiations where KHAPE without OPRF compute four.
+
+
 \paragraph{\writingFormulationBrut{16. Computational cost compared to a KE.}}
 The presentation of \cite{KHAPE_Paper} provide a performance comparison between existing algorithms and KHAPE. It shows that without an OPRF, KHAPE-HMQV has the same cost as an un-authenticated key exchange. And with using an OPRF (OPAQUE), the cost is similar to the computation of two un-authenticated key exchange.
 SRP is not mentioned in the presentation but due to its complex exponentiations, it would probably be more costly than a single un-authenticated key exchange.
 Note that the cost of computation is theoretical and that the performance impact of using OPRF is not so blatant in practice. In fact, KHAPE without OPRF is around 25\% faster during authentication and 45\% faster during registration than with OPRF (see Section \ref{sec:oprf_performances} for more details).
+
+
 \paragraph{\writingFormulationBrut{17. Communication size.}}
 Communication size can also have an impact on the perceived performance of the protocol --- in particular on unstable or limited network.
 It depends considerably on the primitives used. Considering a group size suitable for near-term protection \cite{ECRYPT_Keylength} --- 256-bit elliptic curve and 3072-bit group --- and 256 bits hashing function output size, we can simulate the communication size to compare them.
@@ -421,6 +542,8 @@ We can see that there is a considerable difference in communication size between
 % => 3072/8*2 + 32*4 = 896
 % SRP: 2 group element, salt (hashed after), 2 hash output
 % => 3072/8*2 + 32*3 = 864
+
+
 \paragraph{\writingFormulationBrut{18. Server-side storage size.}}
 Server-side storage size does not have much impact on the perceived performance, but it is interesting to compare in terms of server administration. Considering that server can handle several thousand or millions of users, a small difference in storage per user can have a great impact on the overall storage required.
 To compare the algorithm, we use the same parameters as with the communication size.
@@ -446,8 +569,11 @@ Similar to the conclusion made for the communication size, algorithm that does n
 % 
 % \paragraph{21. Got broken.}
 
+
 \subsection{Table} \label{sec:comparison_table}
-For value where there is a ``*'', please refer to the appropriate comment in Section \ref{sec:comparison_details} for precision.
+For result where there is a symbol ``*'', please refer to the criterion's precision marked with ``\emph{Comment}'' in Section \ref{sec:comparison_details}.
+
+
 \begin{center}
    \begin{tabular}{ | c | p{5cm} || p{2cm} | p{2cm} | p{2cm} | p{2cm} | }
      \hline
@@ -463,14 +589,6 @@ For value where there is a ``*'', please refer to the appropriate comment in Sec
      3 & Secure against pre-computation attacks & -- (no hash) & No & Yes & Yes, with OPRF \\ \hline
 %      3 & Server doesn't send salt in cleartext & -- (no salt) & x & Yes & Yes (OPRF) (without OPRF there is no salt) \\ \hline
      4 & Forward secrecy & Yes* & Yes & Yes & Yes \\ \hline
-     5 & Mutual authentication & Yes & Yes & Yes & Yes \\ \hline
-     6 & PKI-free & Yes, except during reg. & Yes, except during reg. & Yes, except during reg. & Yes, except during reg. \\ \hline
-     7 & User-side password hardening & No* & Yes* & Yes & Yes, with OPRF \\ \hline
-     8 & Built-in mechanism to store client's secrets on the server & No & No & Yes & Yes \\ \hline
-     9 & Server threshold implementation & No & No & Yes, user-transparent & Yes, with OPRF \\ \hline
-     10 & Resistant upon Oblivious PRF compromise & -- (no OPRF) & -- (no OPRF) & No, entire security is compromised & Fall back to non-strong aPAKE \\ \hline
-     11 & Standardization status & RFC for EAP-EKE \cite{EAP_EKE_RFC} & 3 RFC \cite{SRP_RFC_1, SRP_RFC_2, SRP_RFC_3}, 1 ISO \cite{SRP_ISO}, 1 IEEE \cite{SRP_IEEE} & Internet standard draft \cite{OPAQUE_Standard_Draft} & CRYPTO 2021 Paper \cite{KHAPE_Paper} \\ \hline
-     12 & Security proof & No* & No valuable security proof & Yes, in the random oracle model & Yes, in the ideal cipher model \\ \hline
      
      \end{tabular}
  \end{center}
@@ -479,6 +597,16 @@ For value where there is a ``*'', please refer to the appropriate comment in Sec
    \begin{tabular}{ | c | p{5cm} || p{2cm} | p{2cm} | p{2cm} | p{2cm} | }
      \hline
      \textbf{\#} & \textbf{Criteria} & \textbf{EKE} & \textbf{SRP} & \textbf{OPAQUE} & \textbf{KHAPE} \\ \hline
+     5 & Mutual authentication & Yes & Yes & Yes & Yes \\ \hline
+     6 & PKI-free & Yes, except during reg. & Yes, except during reg. & Yes, except during reg. & Yes, except during reg. \\ \hline
+     7 & User-side password hardening & No* & Yes* & Yes & Yes, with OPRF \\ \hline
+     8 & Built-in mechanism to store client's secrets on the server & No & No & Yes & Yes \\ \hline
+     9 & Server threshold implementation & No & No & Yes, user-transparent & Yes, with OPRF \\ \hline
+     10 & Resistant upon Oblivious PRF compromise & -- (no OPRF) & -- (no OPRF) & No, entire security is compromised & Fall back to non-strong aPAKE \\ \hline
+     11 & Standardization status & RFC for EAP-EKE \cite{EAP_EKE_RFC} & 3 RFC \cite{SRP_RFC_1, SRP_RFC_2, SRP_RFC_3}, 1 ISO \cite{SRP_ISO}, 1 IEEE \cite{SRP_IEEE} & Internet standard draft \cite{OPAQUE_Standard_Draft} & CRYPTO 2021 Paper \cite{KHAPE_Paper} \\ \hline
+     12 & Security proof & No* & No valuable security proof & Yes, in the random oracle model & Yes, in the ideal cipher model \\ \hline
+
+     
      % Performances
      
      13 & Easily adaptable to elliptic curves & No* & No* & Yes & Yes \\ \hline
