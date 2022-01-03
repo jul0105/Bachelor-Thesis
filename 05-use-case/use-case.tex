@@ -67,11 +67,11 @@ KHAPE is used for authentication between the client and the server. OPRF and Slo
 % The end user interact with a client which in turn communicate with the server.
 
 \subsection{Encrypted user data}
-Each user stores his encrypted user data on the server. This data include an Encrypted password registry and an Encrypted master key. Every encryption is computed by the authenticated encryption scheme XChaCha20-Poly1305.
-The Encrypted password registry is a structure that contains the user's password. Passwords are double encrypted. The external structure --- the password registry --- is encrypted, and then each individual password is also encrypted. Each encryption is performed with a different key, all derived from the master key.
+Each user stores his encrypted user data on the server. This data include an \textsc{encrypted password registry} and an \textsc{encrypted master key}. Every encryption is computed by the authenticated encryption scheme XChaCha20-Poly1305.
+The \textsc{encrypted password registry} is a structure that contains the user's password. Passwords are double encrypted. The external structure --- the \textsc{password registry} --- is encrypted, and then each individual password is also encrypted. Each encryption is performed with a different key, all derived from the master key.
 
-The Encrypted master key is simply a key --- the Master key --- that is encrypted with another key --- the KHAPE's export key. 
-One could derive the Master key from the KHAPE's export key but this means that if the user wants to change his authentication password, it is necessary to decrypt and re-encrypt every single password entry and the password registry with the new export key. This is not conceivable for a scalable password manager. Instead, in case of change in the authentication password, only the Master key is re-encrypted with the new export key. This idea is inspired from Bitwarden's online password manager design \cite{Bitwarden_Paper}.
+The \textsc{encrypted master key} is simply a key --- the \textsc{master key} --- that is encrypted with another key --- the KHAPE's export key. 
+One could derive the \textsc{master key} from the KHAPE's export key but this means that if the user wants to change his authentication password, it is necessary to decrypt and re-encrypt every single password entry and the \textsc{password registry} with the new export key. This is not conceivable for a scalable password manager. Instead, in case of change in the authentication password, only the \textsc{master key} is re-encrypted with the new export key. This idea is inspired from Bitwarden's online password manager design \cite{Bitwarden_Paper}.
 
 % ProtectedRegistry:
 % - ciphertext
@@ -101,18 +101,18 @@ The figure \ref{fig:Online_password_manager} shows the entire process of reading
  \item The user input his password in the client and the KHAPE authentication start (see section \ref{sec:khape_generic_algo} for details on the process).
  \item KHAPE authentication output a session key and an export key to the client. The session key is verified with the server. If the inputted password is invalid, no session key is outputted. An export key would still be outputted since it is not verifiable.
  \item Client request to download its encrypted data from the server using the session key as an authentication token. The server also stores the session key and can verify that the client has been successfully authenticated. An authentication token expires after 24 hours.
- \item If the authentication token is valid, the client receives his Encrypted master key and his Encrypted password registry.
- \item He decrypts the Encrypted master key with the KHAPE's export key to obtain his private key
- \item He computes two HKDF Expand with the Master key as an input and constant labels to obtain an External encryption key and an Internal encryption key
- \item He decrypts the Encrypted password registry with the External encryption key to obtain the Indexable password registry
- \item Now that the client has decrypted the external layer of the password registry, he remove the following value from memory: Export key, Master key, Encrypted master keys and Encrypted password registry. He still has to keep the Session key to communicate with the server, and the external encryption key to re-encrypt the password registry upon modification.
- \item In the Indexable password registry each entry's label and username are in cleartext but the password is still unreadable. 
- \item When the user chooses to read a password entry, the client uses Internal encryption keys to compute an HKDF Expand with the entry's label and username as context. The result is a key that is unique for this password.
+ \item If the authentication token is valid, the client receives his \textsc{encrypted master key} and his \textsc{encrypted password registry}.
+ \item He decrypts the \textsc{encrypted master key} with the KHAPE's export key to obtain his private key.
+ \item He computes two HKDF Expand with the \textsc{master key} and constant labels as input to obtain the \textsc{external encryption key} and the \textsc{internal encryption key}.
+ \item He decrypts the \textsc{encrypted password registry} with the \textsc{external encryption key} to obtain the \textsc{indexable password registry}.
+ \item Now that the client has decrypted the external layer of the \textsc{password registry}, he remove the following values from memory: \textsc{export key}, \textsc{master key}, \textsc{encrypted master key} and \textsc{encrypted password registry}. He still has to keep the \textsc{session key} to communicate with the server, and the \textsc{external encryption key} to re-encrypt the \textsc{password registry} upon modification.
+ \item In the \textsc{indexable password registry} each entry's label and username are in cleartext but the password is still unreadable. 
+ \item When the user chooses to read a password entry, the client uses the \textsc{internal encryption key} to compute an HKDF Expand with the entry's label and username as context. The result is a key that is unique for this password.
  \item The client finish by decrypting the encrypted password with the computed key. He obtains the readable password.
- \item After sending the cleartext password to the user, the client remove the cleartext password and the Individual password key from memory. This means that in IDLE the client only keeps Session key, External encryption keys, Internal encryption keys and Indexable password registry in memory.
+ \item After sending the cleartext password to the user, the client remove the cleartext password and the \textsc{individual password key} from memory. This means that at rest the client only keeps \textsc{session key}, \textsc{external encryption keys}, \textsc{internal encryption keys} and \textsc{indexable password registry} in memory.
 \end{enumerate}
 
-When the client adds, update or remove a password, he needs to update his Encrypted password registry and upload it to the server. This is done by computing an Individual password key from the Internal encryption key and the password entry's label and encrypting the password with this key. Then the password entry is added or updated in the password registry which is then encrypted with the External encryption key. The resulting ciphertext is sent to the server.
+When the client adds, update or remove a password, he needs to update his \textsc{encrypted password registry} and upload it to the server. This is done by computing an \textsc{individual password key} from the \textsc{internal encryption key} and the password entry's label and encrypting the password with this key. Then the password entry is added or updated in the \textsc{password registry} which is then encrypted with the \textsc{external encryption key}. The resulting ciphertext is sent to the server.
 
 \begin{figure}[h]
  \centering
@@ -168,7 +168,7 @@ Upon successful authentication, the client automatically download the user's dat
  \item Delete a password
 \end{itemize}
 
-For actions where the password registry is modified (adding, modifying or deleting a password), the password registry is re-encrypted by the client (with the External encryption key) and uploaded to the server.
+For actions where the password registry is modified (adding, modifying or deleting a password), the password registry is re-encrypted by the client (with the \textsc{external encryption key}) and uploaded to the server.
 The interactions between the user and the client are defined in the figure \ref{fig:usecase_read} for reading a password entry, in the figure \ref{fig:usecase_add} for adding a new password entry, in the figure \ref{fig:usecase_modify} for adding a modifying an existing password entry and in the figure \ref{fig:usecase_delete} for deleting a password entry.
 
 
@@ -220,8 +220,8 @@ If the export key was not provided to the application, the client would be force
 
 
 \subsection{Security considerations}
-It is important to consider that even though each password is double encrypted, it is still possible to an attacker to retrieve all passwords. Since both the Indexable password registry and the Internal encryption key are kept in memory at rest, an attacker could dump the client's memory and derive every Individual password key to decrypt all passwords.
-Mitigation to this would be to add a secret value to the Individual password key derivation. This secret value would be stored outside of the memory in a secure location such as an HSM or a YubiKey. This way, even if an attacker can dump the client's memory, he cannot derive any Individual password key and so he cannot retrieve any cleartext password. 
+It is important to consider that even though each password is double encrypted, it is still possible to an attacker to retrieve all passwords. Since both the \textsc{indexable password registry} and the \textsc{internal encryption key} are kept in memory at rest, an attacker could dump the client's memory and derive every \textsc{individual password key} to decrypt all passwords.
+Mitigation to this would be to add a secret value to the \textsc{individual password key} derivation. This secret value would be stored outside of the memory in a secure location such as an HSM or a YubiKey. This way, even if an attacker can dump the client's memory, he cannot derive any \textsc{individual password key} and so he cannot retrieve any cleartext password. 
 
 % \section{Implementation}
 % At the moment, the implemented client is a CLI (command line interface)
