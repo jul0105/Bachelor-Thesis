@@ -6,6 +6,7 @@
 % 2. Generalities
 %     - Contexte du travail, volume d'heure, dates, temps plein, etc...
 
+
 \chapter{\writingNotes{Introduction}}
 This chapter describes the context of this project. We discuss about classical authentication methods, their weakness and the necessity to use stronger construction such as PAKEs.
 
@@ -24,8 +25,11 @@ This chapter describes the context of this project. We discuss about classical a
 % 9. OPAQUE
 % 10. KHAPE ?
 
+
 \section{\writingNotes{Problematic}}
 % \subsection{\writingFormulationBrut{Authentication}}
+
+
 \paragraph{\writingFormulationClean{How to authenticate a user ?}}
 When a user wants to connect itself to an online service, he sends its username or email for identification. Then, he needs a way to prove to the server that he is indeed the person he pretends to be. This is what we call authentication. Without it, anybody can impersonate the account of someone else.
 Authentication can be based on multiple factors. Something that the user \emph{knows} (e.g., passwords, PINs, …), something that the user \emph{has} (e.g., digital certificates, OTP token devices, smartphones, …) or something that the user \emph{is} (e.g., fingerprints, iris, …). Multiple factors can be combined to obtain a strong authentication.
@@ -33,14 +37,15 @@ Traditionally, the user sends the authentication value to the server through a s
 This means that the server has to know and store this sensible value before authentication --- generally during the register.
 Currently, the vast majority of web sites and software use passwords as the authentication value. They are the easier to implement and the most familiar to the users.
 
+
 \paragraph{\writingFormulationClean{Attacks and mitigations.}}
 This setup is not ideal and can lead to multiple attacks.
 In case where the server gets compromised, the attacker immediately obtain access to all accounts since the server stores the passwords. This means that the adversary can impersonate every user.
 To avoid this scenario, numerous techniques have been developed.
 Mainly, hashing the password and storing the result, adding hashing salt, adding hashing pepper --- a secret salt --- and using memory-hard password hashing function such as Scrypt \cite{Scrypt_Paper} or Argon2 \cite{Argon2_Paper}.
-
 These techniques improve the security of storing password but they do not address the deeper problem;
 When the user wants to login, he has to send its \emph{cleartext} password to the server in order for the server to authenticate the user. This necessity void any password storing improvement if the server is ever persistently compromised or if passwords are accidentally logged or cached.
+
 
 \paragraph{\writingFormulationClean{Why passwords are bad ?}}
 Passwords are a problem. They are hard to remember and to manage for the user. They are generally low-entropy, and users are reusing the same passwords too often. A password manager can help the client to handle this problem, but there is a greater underlying problem.
@@ -52,6 +57,8 @@ and even if on the server side every password storing techniques are carefully i
 As stated before, there can be some software issue like accidental logging or caching of the password. But hardware vulnerabilities are not to forget. While the password is processed in clear, it resides on the memory. It uses a shared bus between the CPU and the memory. Hardware attacks are less likely to occur but are no less severe (remember Spectre \cite{Spectre_Paper} and Meltdown \cite{Meltdown_Paper} attacks).
 In an ideal world, the server should never see the user's password in cleartext at all.
 One could think that hashing the password on the client side would solve the problem but if the server ever gets compromised, every account is immediately accessible to the attacker. The client hash should be hashed again on the server, but this does not solve the initial problem. The password is just replaced by a longer password --- the hash.
+
+
 \paragraph{\writingFormulationBrut{Get rid of password.}}
 In summary, passwords are not ideal. They are difficult to remember, annoying to type and insecure.
 So why don't we try to get rid of them altogether ?
@@ -93,10 +100,10 @@ For the moment, we will focus on asymmetric PAKE (aPAKE) because it is the one t
 aPAKEs guarantee that the client's password is protected because it \textbf{never} leaves the client's machine in cleartext.
 It is done by computing a key exchange between the two parties and then mutually verifying that they share the same output key. The password is used to compute or retrieve values inputted in the key exchange protocol.
 This allows a client and a server to mutually authenticate without requiring a secure channel --- except for the initial registration.
-
 The goal of PAKEs protocol is to provide a shared key between two parties and that the only way for an attacker to execute a dictionary attack --- to test a list of password candidates --- is to perform online guesses. The attacker is forced to become active and to interact with the server, which is easier to mitigate than passive attacks.
-
 Overall, ``A secure aPAKE should provide the best possible security for a password protocol'' \cite{OPAQUE_Standard_Draft} and it should only be vulnerable to inevitable attacks such as online guess or offline dictionary attacks upon server compromise.
+
+
 \paragraph{\writingFormulationBrut{Why PAKEs have almost no adoption ?}}
 % Why PAKE have almost no adoption :
 % PAKE provides "an obvious security benefit compared to the naive approach we use to log into servers today." 
@@ -117,7 +124,6 @@ Another factor is the insufficiency of well-implemented PAKE libraries in some p
 which make them difficult to use.
 One exception to that is SRP, the most used PAKE protocol in the world \cite{PAKE_Green_blog}.
 It is a TLS cipher suite is implemented in OpenSSL and used in Apple's iCloud Key Vault. Even though it has far more adoption than other PAKEs, it is not the ideal PAKE.
-
 In the last few years, a new generation of strong aPAKE \cite{OPAQUE_Paper, KHAPE_Paper} has appeared. These new constructions are better and provide more security guarantees than ever.
 
 % - "most wiidely-deployed PAKE protocol in the world"
@@ -125,10 +131,12 @@ In the last few years, a new generation of strong aPAKE \cite{OPAQUE_Paper, KHAP
 % - used extensively in iCloud Key Vault ("make SRP one of the most widely used cryptographic protocols in the world, so vast is the number of devices that Apple ships. So this is nothing to sneer at")
 % - "SRP isn't the best PAKE we can deploy"
 
+
 \section{Our contributions}
 To our knowledge, there is currently no public implementation of KHAPE, so we present the first ever implementation of the KHAPE protocol (Chapters \ref{cha:khape} and \ref{cha:implementation}).
 We also present an implementation of a practical use case using the developed KHAPE library (Chapter \ref{cha:use_case}) and a performance test of the library (Chapter \ref{cha:result}).
-In addition, we summarize the current state of PAKE protocol landscape with a description and comparison between four main PAKEs; EKE, SRP, OPAQUE and KHAPE (Chapter \ref{cha:state_of_the_art}).
+In addition, we summarize the current state of PAKE protocol landscape with a description and comparison between four main PAKEs; EKE, SRP, OPAQUE and KHAPE (Chapter~\ref{cha:state_of_the_art}).
+
 
 \section{Generalities}
 This bachelor thesis concludes a three-year bachelor’s degree in information security at HEIG-VD.
