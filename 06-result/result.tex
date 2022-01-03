@@ -17,7 +17,7 @@ Benchmarks are computed on a HP Elitebook 850 G5 laptop with an Intel i7-8550U p
 \section{KHAPE components benchmark}
 Before diving into the overall performances of KHAPE and its endpoints, it is important to understand what some of the components that take the most time to compute are.
 \subsection{3DH}
-The 3DH AKE is unsurprisingly the most time-consuming operation to compute. Considering that a curve multiplication takes around 58 us to compute and that 3DH --- as its name suggest --- compute three of them. Adding the cost of deriving two keys using HKDF, the median time of 3DH computation is around 184 us.
+The 3DH AKE is unsurprisingly the most time-consuming operation to compute. Considering that a curve multiplication takes around \unit{58}{\micro\second} to compute and that 3DH --- as its name suggest --- compute three of them. Adding the cost of deriving two keys using HKDF, the median time of 3DH computation is around \unit{184}{\micro\second}.
 % TODO HMQV
 Both client and server functions have around the same performances. This is not surprising because they compute the same operations with different party's key.
 
@@ -58,7 +58,7 @@ Both client and server functions have around the same performances. This is not 
 
 
 \subsection{Key generation}
-Key generation also takes a lot of time with a median of 122 us. Key generation consists of: 1) generating a 32 bytes random value, 2) generating a private key from the random bytes, 3) computing its associated public key --- a curve multiplication operation --- and then 4) converting the public key to a field element using the Elligator2 mapping.
+Key generation also takes a lot of time with a median of \unit{122}{\micro\second}. Key generation consists of: 1) generating a 32 bytes random value, 2) generating a private key from the random bytes, 3) computing its associated public key --- a curve multiplication operation --- and then 4) converting the public key to a field element using the Elligator2 mapping.
 For step 2, not all 32 bytes random value can be used to generate a private key and for step 4, not all public key can be mapped to a field element.
 In this case, the rejection method is used which means that the key generation process is restarted from step 1. This is more secure than trying to modify the value to make it fit but on the other hand, it is more costly in terms of performance as the key generation process can be made multiple time.
 This is also why the time distribution of this function is more spread out than for other functions.
@@ -151,8 +151,8 @@ So for these benchmarks, the standard baseline configuration is KHAPE with OPRF 
 
 
 \subsection*{Registration}
-For the registration, we can see that both \verb|server start| and \verb|client finish| endpoints take the most time at around 200 us.
-It is not surprising as it is where each party generate his own key pair, which take around 122 us.
+For the registration, we can see that both \verb|server start| and \verb|client finish| endpoints take the most time at around \unit{200}{\micro\second}.
+It is not surprising as it is where each party generate his own key pair, which take around \unit{122}{\micro\second}.
 The \verb|server finish| endpoint take almost no time since it only builds a storable structure with the value received.
 
 
@@ -183,7 +183,7 @@ The \verb|server finish| endpoint take almost no time since it only builds a sto
 
 
 \subsection*{Authentication}
-We can see that \verb|client ke| endpoint takes the most time. This is because a lot of things are computed in this endpoint including the generation of an ephemeral key pair (122 us) and the computation of the 3DH (184 us).
+We can see that \verb|client ke| endpoint takes the most time. This is because a lot of things are computed in this endpoint including the generation of an ephemeral key pair (\unit{122}{\micro\second}) and the computation of the 3DH (\unit{184}{\micro\second}).
 We also notice that both \verb|client start| and \verb|server start| take about the same time as their homonym endpoints in registration. This is because these two functions are relatively similar between registration and authentication.\footnote{It is important to note that the endpoints for the registration and authentication are obviously different. For readability reason, it is not specified on the label of the charts but in the chart's title, which could make it look like authentication and registration share the same function.}
 
 
@@ -228,7 +228,7 @@ In this section, we compare the performance of KHAPE with and without OPRF to se
 
 
 \subsection*{Registration}
-Each OPRF concerned endpoints take between 66 and 72 us more to compute when using OPRF. In total, the registration will take around 207 us more than without an OPRF.
+Each OPRF concerned endpoints take between 66 and \unit{72}{\micro\second} more to compute when using OPRF. In total, the registration will take around \unit{207}{\micro\second} more than without an OPRF.
 
 
 \begin{tikzpicture}
@@ -265,7 +265,7 @@ Each OPRF concerned endpoints take between 66 and 72 us more to compute when usi
 
 
 \subsection*{Authentication}
-For the authentication, it is similar. The first three endpoints take between 67 and 69 us more to compute and the total time addition for the authentication is around 205 us more than without OPRF.
+For the authentication, it is similar. The first three endpoints take between 67 and \unit{69}{\micro\second} more to compute and the total time addition for the authentication is around \unit{205}{\micro\second} more than without OPRF.
 
 
 \begin{tikzpicture}
@@ -309,7 +309,7 @@ For the authentication, it is similar. The first three endpoints take between 67
 
 Using a memory-hard hashing function also increases the level of security of the protocol (see section \ref{sec:design_choice_slowhash}).
 This benchmark is not very meaningful since these functions are designed to be slow and the performance only depends on the parameters used. But it is still interesting to see the performance degradation attached to the use of these functions and the scale of it compared to the rest of the protocol.
-It also makes it easier to understand how these functions slow down attackers that build hashing table. Since we replace a simple and efficient hashing function that would not even take 0.5 us to compute by a slow and expensive hashing function that takes around 8,000 us to compute. That makes it 16,000 times slower to compute and so the attackers can compute 16,000 times less hash in the same time frame.
+It also makes it easier to understand how these functions slow down attackers that build hashing table. Since we replace a simple and efficient hashing function that would not even take \unit{0.5}{\micro\second} to compute by a slow and expensive hashing function that takes around \unit{8,000}{\micro\second} to compute. That makes it 16,000 times slower to compute and so the attackers can compute 16,000 times less hash in the same time frame.
 This benchmark is using the rust library Argon2's default parameters. The default parameters of the KHAPE library are more resource intensive and time consuming since we believe that final user can wait a little bit more than 8 ms to register/authenticate to a secure system.
 
 
@@ -428,7 +428,7 @@ For the registration, OPAQUE has an additional endpoint \verb|server setup| that
 
 
 \subsection*{Authentication}
-For the authentication, OPAQUE has only four endpoints since the server initialize the key verification. The \verb|server start| endpoint is the most time consuming with a median time of around 369 us. It is responsible for generating an ephemeral key pair, compute the OPRF evaluation, computing the key exchange and deriving the output key and key verification tag. In KHAPE, all these operations are spread between \verb|server start| and \verb|server finish| endpoints.
+For the authentication, OPAQUE has only four endpoints since the server initialize the key verification. The \verb|server start| endpoint is the most time consuming with a median time of around \unit{369}{\micro\second}. It is responsible for generating an ephemeral key pair, compute the OPRF evaluation, computing the key exchange and deriving the output key and key verification tag. In KHAPE, all these operations are spread between \verb|server start| and \verb|server finish| endpoints.
 
 
 \begin{tikzpicture}
@@ -469,16 +469,16 @@ In this section, we compare the performances of the KHAPE protocol --- with and 
 
 \subsection*{Registration}
 Firstly, we will compare OPAQUE and KHAPE with OPRF.
-For the registration, KHAPE with OPRF lose around 81 us to OPAQUE in the median.
+For the registration, KHAPE with OPRF lose around \unit{81}{\micro\second} to OPAQUE in the median.
 The \verb|client start| endpoints take about the same time. KHAPE's \verb|server start| operations are split between \verb|server setup| and \verb|server start| for OPAQUE, which make it more flexible since it can be called before a request comes. In detail, it is the random key pair generation that is computed in the \verb|server setup| endpoint. The two endpoints combined take about the same time as KHAPE's \verb|server start| endpoint.
 
 Majority of KHAPE time loss is on the \verb|client finish| endpoint.
 This is probable due to the fact that KHAPE generate a key pair using the rejection method and then encrypt the private key and server's public key in an encrypted envelope.
-We saw earlier that encryption is not very time consuming (7.7 us) but key generation is (122 us).
+We saw earlier that encryption is not very time consuming (\unit{7.7}{\micro\second}) but key generation is (\unit{122}{\micro\second}).
 OPAQUE neither generate a key pair, nor use the rejection method nor encrypt the envelope.
 Instead of using the OPRF output to derive an encryption key to decrypt the encrypted private key, OPAQUE directly derive the private key (and the resulting public key) from the OPRF output. This solution allows OPAQUE to get rid of encryption altogether and to avoid computing a random key generation which makes it much faster.
 Also note that this method is only for the client side. The server still needs to generate a random key pair which is done in the \verb|server setup| endpoint. This is why we cannot see a similar performance gain in the server-side registration and that the first three endpoints are relatively similar in terms of time consumption.
-Finally, KHAPE without OPRF is around 207 us faster than KHAPE with OPRF --- the equivalent of about three exponentiations --- and 126 us faster than OPAQUE, which makes it the fastest protocol.
+Finally, KHAPE without OPRF is around \unit{207}{\micro\second} faster than KHAPE with OPRF --- the equivalent of about three exponentiations --- and \unit{126}{\micro\second} faster than OPAQUE, which makes it the fastest protocol.
 
 
 % OPAQUE         : 378.42 us
@@ -529,7 +529,7 @@ Finally, KHAPE without OPRF is around 207 us faster than KHAPE with OPRF --- the
 \subsection*{Authentication}
 For the authentication, OPAQUE and KHAPE with OPRF have rather different endpoint performances but the overall performance of each protocol is almost equal with a difference of around seven us.
 This is because a lot of similar operations are computed on both protocol but they are executed in different endpoints.
-Similar to the registration, KHAPE without OPRF is the fastest protocol. It is faster by 197 us on OPAQUE and by 205 us on KHAPE with OPRF.
+Similar to the registration, KHAPE without OPRF is the fastest protocol. It is faster by \unit{197}{\micro\second} on OPAQUE and by \unit{205}{\micro\second} on KHAPE with OPRF.
 Even if it is the fastest in both registration and authentication, we believe that the security sacrifice is not worth the performance gain and therefore we recommend using OPAQUE or KHAPE with OPRF which is secure against pre-computation attacks (see Section \ref{sec:design_choice_oprf}).
 
 
