@@ -318,7 +318,7 @@ The client can compute the masking key with the OPRF output to compute the one-t
 OPAQUE security relies entirely on the strength of the OPRF. If OPRF gets broken --- for example by cryptanalysis, quantum attacks or security compromise --- an adversary can compute an offline dictionary attack on the user's password. This is especially critical considering that there are currently no known quantum-safe OPRFs.
 KHAPE (for Key-Hiding Asymmetric PakE) \cite{KHAPE_Paper} is a variant to the OPAQUE protocol. Instead of using OPRF as a main tool to archive security, it becomes an optional part of the protocol and KHAPE use two other concepts to archive security: non-committing encryption and key-hiding AKE.
 KHAPE is not a Strong aPAKE like OPAQUE. But it can be made a SaPAKE following the aPAKE to SaPAKE compiler from \cite{OPAQUE_Paper} using OPRF.
-So OPRF is optional with KHAPE and just allow making it a SaPAKE. In addition, it also allows using OPRF features such as a server-side threshold implementation that does not require any change from the client (see all feature in section \ref{sec:opaque_oprf}). If OPRF fails, KHAPE just loss these functionalities but the rest of the security remain in contrary to OPAQUE.
+So OPRF is optional with KHAPE and just allow making it a SaPAKE. In addition, it also allows using OPRF features such as a server-side threshold implementation that does not require any change from the client (see all features in Section \ref{sec:opaque_oprf}). If OPRF fails, KHAPE just loss these functionalities but the rest of the security remain in contrary to OPAQUE.
 
 
 % ``Two key ideas are: (i) dispense with authentication of the
@@ -339,7 +339,7 @@ To avoid these kinds of attacks, KHAPE use two main mechanisms: Non-committing e
 
 
 \paragraph{Non-committing encryption.} \phantomsection \label{sec:non_committing_encryption}
-Non-committing encryption makes it impossible for an adversary to identify the key that was used to encrypt a ciphertext even with a list of key candidates. This implies that the decryption of the ciphertext under any possible key provide a valid plaintext (i.e., a valid asymmetric key pair that can be used in the key exchange).
+Non-committing encryption makes it impossible for an adversary to identify the key that was used to encrypt a ciphertext even with a list of key candidates containing the correct key. This implies that the decryption of the ciphertext under any possible key provide a valid plaintext (i.e., a valid asymmetric key pair that can be used in the key exchange).
 
 
 \paragraph{Key-hiding AKE.} \phantomsection \label{sec:key_hiding_ake}

@@ -76,18 +76,24 @@ As its name may suggest, the ideal cipher model is an idealized model used to pr
 In practice, an ideal cipher is not implementable % Pourquoi ?
 but it is possible to construct an encryption scheme that is indifferentiable from an ideal cipher. Multiple constructions have been investigated in the literature.
 The simplest construction is the one detailed in \cite{Ideal_Cipher_2} which is an update from \cite{Ideal_Cipher_1} that got broken.
-The encryption scheme consists of 14 rounds of Feistel where function $F_i = H(key | i | input)$.
+It is a 14-round Feistel construction that is indifferentiable from a random permutation. This construction is not focused on optimization and performance. Instead, every one of the 14 rounds are used in the security proof.
+Feistel construction allow building random permutation --- the ideal cipher --- from random functions in the random oracle model. 
+% The encryption scheme consists of 14 rounds of Feistel where function $F_i = H(key | i | input)$.
+The Feistel scheme function is $F_i = H(key | i | input)$.
 The hashing function must be large enough to receive half of the encryption envelope. Since this envelope store two group element, the hashing function must output a 256-bit value which is the size of a single group element.
-In terms of performance, this construction is not very efficient but it is one of the only found that is easily instantiable.
+
+
+
 
 
 \paragraph{Curve encoding.}
 % What is it
-The cleartext group elements that will be encrypted need to be encoded as a bit string that is indistinguishable from random. This has the consequence that if plaintext is encrypted with password $pw$ and then decrypted with a different password $pw'$, the result is a valid random element.
+Before encrypting the group element with the ideal cipher, it is encoded as a bit string that is indistinguishable from random. This encoding ``hides'' the group element making it impossible for an adversary to identify the encryption key used for the ideal cipher --- even if provided with a list of key candidates.
+This is because if a plaintext envelope is encrypted with key $k$ and then decrypted with a different key $k'$, the result is still a valid random group element that can be used in the key exchange. Since almost every ciphertext decryption provide a valid group element, an adversary cannot identify which encryption key is the correct one and is forced to compute the online key exchange with the server to validate its guess.
 % implementation (elligator)
 This is done by implementing a quasi bijection from field elements to bit string.
 Elligator-squared \cite{Elligator_Squared_Paper} and Elligator2 \cite{Elligator2_Paper} are implementations for such curve point encoding.
-Both these constructions are suitable for the implementation of KHAPE but since the elliptic curve used is Curve25519, it is suitable for Elligator2.
+Both these constructions are suitable for the implementation of KHAPE but since the elliptic curve used is Curve25519, it is more suitable for Elligator2.
 
 
 \paragraph{Authentication.}
